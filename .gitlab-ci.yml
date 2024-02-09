@@ -1,0 +1,11 @@
+image: artifactory.six-group.net/maven:3.8.3-openjdk-17
+
+include:
+    - project: 'six/rftemir/rft/rft-cicd/rft-pipeline-templates'
+      ref: refit
+      file: '/CI_Templates/Backend_CI.yml'
+
+variables:
+    SERVICE_LOCATION: ''
+    HELM_CHART_VALUES_LOCATION: rft-data-bec
+    IMAGE_LOCATION: backend

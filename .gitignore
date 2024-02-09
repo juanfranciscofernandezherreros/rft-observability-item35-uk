@@ -1,0 +1,9 @@
+source/.flattened-pom.xml
+source/.project
+source/.factorypath
+source/.classpath
+source/.settings/
+source/*.iml
+source/target/
+/.idea/
+/source/.idea/
