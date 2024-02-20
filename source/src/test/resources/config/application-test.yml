@@ -1,97 +1,59 @@
-spring:
-  # (dynamic logging properties)
-  application:
-    name: "@project.artifactId@"
-    environment: dev
+server:
+  port: 8040
 
-  #=========================
-  # Kafka configuration
-  #=========================
+management:
+  server:
+    port: 9040
+
+spring:
   kafka:
-    bootstrap-servers: "localhost:29092"
+    bootstrap-servers: "localhost:9092"
     producer:
       client-id: ${spring.application.name}
       key-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
       value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
-      acks: all
       properties:
-        "schema.registry.url": "mock://localhost:8081"
-        "max.block.ms": 10000
+        "schema.registry.url": mock://not-used
+        "avro.remove.java.properties": true
     consumer:
       group-id: ${spring.application.name}
       auto-offset-reset: earliest
       key-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       properties:
-        "schema.registry.url": "mock://localhost:8081"
-        "specific.avro.reader": "true"
-        "max.poll.interval.ms": 900000
-
-server:
-  port: 8080
-
-#=========================
-# (dynamic logging properties)
-#=========================
-info:
-  product:
-    name: "EMIR REFIT"
-    application: ITEM-35
-    component: "@project.artifactId@"
-    vendor: SIX
-    final-name: "@project.build.finalName@"
-    version: "@project.version@"
-
-#=========================
-# actuator configuration
-#=========================
-management:
-  endpoints:
-    web:
-      base-path: "/actuator"
-      exposure:
-        include: "*"
-    enabled-by-default: true
-  server:
-    port: 9080
-  endpoint:
-    health:
-      probes:
-        enabled: true
-      show-details: always
-      group:
-        readiness:
-          include:
-            - readinessState
-            - kafka
-        liveness:
-          include:
-            - livenessState
-#=========================
-# OpenAPI/Swagger configuration
-#=========================
-springdoc:
-  packagesToScan: com.sixgroup
-  pathsToMatch: /**
-#=========================
-# Custom configuration
-#=========================
-fate:
-  backend:
-    jwt-secret: JWTSuperSecretKey
-    jwt-expiration: 604800000
-
+        "schema.registry.url": mock://not-used
+        "specific.avro.reader": true
+  datasource:
+    kududb:
+      url: jdbc:impala://dh-rftemir-dev-int-master10.rftemir.iq8p-shl0.a0.cloudera.site:443/;ssl=1;transportMode=http;httpPath=dh-rftemir-dev-int/cdp-proxy-api/impala;AuthMech=3
+      username: oriol.coll
+      password: bFBn8@Wd!rEQY4k#k9C*@44L
+      driverClassName: com.cloudera.impala.jdbc.Driver
+      hibernate:
+        ddl-auto: validate
+        default_schema: emir_refit_int_control_refit
+        dialect: org.hibernate.dialect.HSQLDialect
+    sqlserverdb:
+      url: jdbc:sqlserver://mdmtwdctl01;database=dev-observabilitydb;trustServerCertificate=true;authenticationScheme=NTLM;integratedSecurity=true;
+      username: tx99o
+      password: Argent76?BME
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      hibernate:
+        ddl-auto: validate
+        default_schema: dbo
+        dialect: org.hibernate.dialect.SQLServerDialect
+    jpa:
+      hibernate:
+        ddl-auto: validate
+        default_schema: emir_refit_int_control_refit
 component-config:
-#=========================
-# Component configuration
-#=========================
-  retry:
-    attempts: 3
+  csv:
+    output_path: "work-repository/write/"
+  topics:
+    file-ready-topic: rft-observability-item-topic.public.v1
 
-rft:
-  kafka:
-    retry:
-      enabled: true
-    template:
-      enabled: true
-
+logging:
+  level:
+    root: INFO
+    "org.apache.kafka": INFO
+    "com.sixgroup.refit": DEBUG

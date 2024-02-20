@@ -1,0 +1,24 @@
+server:
+  port: 8042
+
+management:
+  server:
+    port: 9040
+
+spring:
+  application:
+    name: "@project.artifactId@"
+    environment: dev
+  kafka:
+    bootstrap-servers: "localhost:9092"
+    producer:
+      properties:
+        "schema.registry.url": "http://localhost:8081"
+
+component-config:
+
+logging:
+  level:
+    root: INFO
+    "org.apache.kafka": INFO
+    "com.sixgroup.refit": DEBUG
