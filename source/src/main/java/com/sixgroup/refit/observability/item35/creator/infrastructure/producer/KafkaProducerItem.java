@@ -34,8 +34,8 @@ public class KafkaProducerItem implements ProducerItemService {
     public void send(ItemId itemId, ItemCommand itemCommand) {
         var future = producerTracing.createMessage(topic, itemId, itemCommand, tracer);
 
-        RftLog.info("Save file", () ->
-                List.of(NameObject.builder().name("Timestamp").object(LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE)).build(),
+        RftLog.info("Producer Item", () ->
+                List.of(NameObject.builder().name("timestamp").object(LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE)).build(),
                         NameObject.builder().name("itemId").object(ITEM35).build(),
                         NameObject.builder().name("itemType").object(ItemType.SUBMISSION_VOLUMES.getDescription()).build(),
                         NameObject.builder().name("command").object(Command.RESPONSE).build(),

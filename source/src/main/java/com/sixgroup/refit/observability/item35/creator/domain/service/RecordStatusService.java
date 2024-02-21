@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface RecordStatusService {
 
-    public List<RecordStatus> findRecordStatus();
+     List<RecordStatus> findRecordStatus();
 }

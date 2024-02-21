@@ -21,11 +21,12 @@ import java.util.List;
 public class KafkaConsumerItem {
 
     private final UseCaseGenerateFileSubmissionVolumes useCaseGenerateFileSubmissionVolumes;
-    private final RftKafkaConsumerTracing kafkaConsumerTracing = new RftKafkaConsumerTracing();
+    private final RftKafkaConsumerTracing kafkaConsumerTracing;
 
     @KafkaListener(topics = "${component-config.topics.file-ready-topic}")
     public void consume(ConsumerRecord<ItemId, ItemCommand> item) {
-        if (Constants.ITEM35.equals(item.key().getItemId()) && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
+        if (Constants.ITEM35.equals(item.key().getItemId())
+                && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
             // Init traceId
             kafkaConsumerTracing.initTrace(item.headers());
             RftLog.info("Consumed message item", () ->
