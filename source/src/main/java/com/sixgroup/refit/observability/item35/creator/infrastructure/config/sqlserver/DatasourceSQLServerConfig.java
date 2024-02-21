@@ -3,6 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.config.sq
 
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.sqlserver.ItemReportingEntity;
 import jakarta.persistence.EntityManagerFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,6 +21,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.HashMap;
 
+import static com.sixgroup.refit.observability.item35.creator.infrastructure.config.sqlserver.DatasourceMssqlProperties.HIBERNATE_DDL_AUTO;
+import static com.sixgroup.refit.observability.item35.creator.infrastructure.config.sqlserver.DatasourceMssqlProperties.HIBERNATE_DIALECT;
+
 @Configuration
 @EnableJpaRepositories(
         entityManagerFactoryRef = "sqlserver-em",
@@ -27,41 +31,30 @@ import java.util.HashMap;
         basePackages = "com.sixgroup.refit.observability.item35.creator.infrastructure.repository.sqlserver"
 )
 @EnableTransactionManagement
+@RequiredArgsConstructor
 public class DatasourceSQLServerConfig {
 
-    @Value("${spring.datasource.sqlserverdb.url}")
-    private String sqlServerDbUrl;
-
-    @Value("${spring.datasource.sqlserverdb.hibernate.ddl-auto}")
-    private String ddlAuto;
-
-    @Value("${spring.datasource.sqlserverdb.hibernate.default_schema}")
-    private String schema;
-
-    @Value("${spring.datasource.sqlserverdb.hibernate.dialect}")
-    private String dialect;
-
+    private final DatasourceMssqlProperties properties;
 
     @Bean("sqlserver-ds")
-    @ConfigurationProperties(prefix = "spring.datasource.sqlserverdb")
     public DataSource sqlserverDataSource() {
-        return DataSourceBuilder
-                .create()
-                .url(sqlServerDbUrl)
+        return DataSourceBuilder.create()
+                .url(properties.getJdbcUrl())
+                .username(properties.getUsername())
+                .password(properties.getPassword())
+                .driverClassName(properties.getDriverClassName())
                 .build();
     }
 
     @Bean("sqlserver-em")
     LocalContainerEntityManagerFactoryBean sqlserverDbEntityManagerFactory(EntityManagerFactoryBuilder builder, @Qualifier("sqlserver-ds") DataSource dataSource) {
         final HashMap<String, String> objectObjectHashMap = new HashMap<>();
-        objectObjectHashMap.put("hibernate.dialect", dialect);
-        objectObjectHashMap.put("hibernate.hbm2ddl.auto", ddlAuto);
-        objectObjectHashMap.put("hibernate.default_schema", schema);
-
+        objectObjectHashMap.put(HIBERNATE_DIALECT, properties.getDialect());
+        objectObjectHashMap.put(HIBERNATE_DDL_AUTO, properties.getDdlAuto());
         return builder
                 .dataSource(dataSource)
                 .packages(ItemReportingEntity.class)
-                .persistenceUnit("sqlserverdb")
+                .persistenceUnit(properties.getPersistenceUnit())
                 .properties(objectObjectHashMap)
                 .build();
     }
@@ -70,6 +63,5 @@ public class DatasourceSQLServerConfig {
     PlatformTransactionManager sqlserverTransactionManager(@Qualifier("sqlserver-em") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
-
 }
 

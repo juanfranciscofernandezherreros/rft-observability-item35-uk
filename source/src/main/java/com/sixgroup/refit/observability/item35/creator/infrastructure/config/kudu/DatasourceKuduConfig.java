@@ -3,6 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.config.ku
 
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.RecordStatusEntity;
 import jakarta.persistence.EntityManagerFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -21,6 +22,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.HashMap;
+
+import static com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.DatasourceKuduProperties.HIBERNATE_DDL_AUTO;
+import static com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.DatasourceKuduProperties.HIBERNATE_DIALECT;
+
 @Configuration
 @EnableJpaRepositories(
         entityManagerFactoryRef = "kudu-em",
@@ -28,31 +33,31 @@ import java.util.HashMap;
         basePackages = "com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu"
 )
 @EnableTransactionManagement
+@RequiredArgsConstructor
 public class DatasourceKuduConfig {
 
-    @Value("${spring.datasource.kududb.url}")
-    private String kuduDbUrl;
+    private final DatasourceKuduProperties properties;
 
     @Bean("kudu-ds")
-    @ConfigurationProperties(prefix = "spring.datasource.kududb")
     public DataSource kuduDataSource(){
         return DataSourceBuilder.create()
-                .driverClassName("com.cloudera.impala.jdbc.Driver")
-                .url(kuduDbUrl)
+                .url(properties.getJdbcUrl())
+                .username(properties.getUsername())
+                .password(properties.getPassword())
+                .driverClassName(properties.getDriverClassName())
                 .build();
     }
 
     @Bean("kudu-em")
     LocalContainerEntityManagerFactoryBean kuduDbEntityManagerFactory (EntityManagerFactoryBuilder builder, @Qualifier("kudu-ds") DataSource dataSource){
+        final HashMap<String, String> objectObjectHashMap = new HashMap<>();
+        objectObjectHashMap.put(HIBERNATE_DIALECT, properties.getDialect());
+        objectObjectHashMap.put(HIBERNATE_DDL_AUTO, properties.getDdlAuto());
         return builder
                 .dataSource(dataSource)
                 .packages(RecordStatusEntity.class)
-                .persistenceUnit("kududb")
-                .properties(Collections.singletonMap(
-                        "hibernate.dialect",
-                        "org.hibernate.dialect.HSQLDialect"
-                ))
-
+                .persistenceUnit(properties.getPersistenceUnit())
+                .properties(objectObjectHashMap)
                 .build();
     }
 

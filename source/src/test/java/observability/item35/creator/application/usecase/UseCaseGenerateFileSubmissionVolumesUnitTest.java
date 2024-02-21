@@ -7,11 +7,11 @@ import com.sixgroup.refit.observability.item35.creator.domain.service.ItemReport
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class UseCaseGenerateFileSubmissionVolumesUnitTest {
 
     @Mock
@@ -42,10 +43,6 @@ public class UseCaseGenerateFileSubmissionVolumesUnitTest {
     @InjectMocks
     private UseCaseGenerateFileSubmissionVolumes useCaseGenerateFileSubmissionVolumes;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void testManageFileSubmissionVolumes_Success() throws Exception {
@@ -72,9 +69,9 @@ public class UseCaseGenerateFileSubmissionVolumesUnitTest {
 
     @Test
     public void testManageFileSubmissionVolumes_throw_IOException() throws IOException {
-        when(recordStatusService.findRecordStatus()).thenReturn(new ArrayList<>());
         List<RecordStatus> recordStatusList = new ArrayList<>();
         recordStatusList.add(new RecordStatus("test","test","test",10));
+        when(recordStatusService.findRecordStatus()).thenReturn(recordStatusList);
         when(writeFileSubmissionVolumesService.writeFile(any(),any())).thenThrow(IOException.class);
         File resultFile = useCaseGenerateFileSubmissionVolumes.manageFileSubmissionVolumes();
         assertNull(resultFile);

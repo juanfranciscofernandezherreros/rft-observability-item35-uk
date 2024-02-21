@@ -44,9 +44,7 @@ public class UseCaseGenerateFileSubmissionVolumes {
     private final CsvProperties csvProperties;
 
     public File manageFileSubmissionVolumes() {
-
         RftLog.info("Generating submission volumes file ...");
-
         File fileSubmissionVolumes = null;
         List<RecordStatus> recordStatusList = recordStatusService.findRecordStatus();
         if (CollectionUtils.isEmpty(recordStatusList)) {
@@ -65,10 +63,7 @@ public class UseCaseGenerateFileSubmissionVolumes {
             fileSubmissionVolumes = writeFileSubmissionVolumesService.writeFile(recordStatusList, getFileName());
             itemReportingService.insertItemReporting(ItemReporting.builderItemReporting(fileSubmissionVolumes));
             RftLog.info("Generated submission volumes file");
-
-            producerItemService.send(ItemId.newBuilder().setItemId(ITEM35).build(),
-                    getItemCommandResponse(ItemType.SUBMISSION_VOLUMES, fileSubmissionVolumes));
-
+            producerItemService.send(ItemId.newBuilder().setItemId(ITEM35).build(), getItemCommandResponse(ItemType.SUBMISSION_VOLUMES, fileSubmissionVolumes));
         } catch (IOException io) {
             RftLog.error("Error to generate file submission volumes", "");
             itemReportingService.insertItemReporting(ItemReporting.builderItemReportingError());
@@ -77,16 +72,14 @@ public class UseCaseGenerateFileSubmissionVolumes {
     }
 
     private ItemCommand getItemCommandResponse(ItemType itemType, File file) {
-        return ItemCommand
-                .newBuilder()
+        return ItemCommand.newBuilder()
                 .setItemId(ITEM35)
                 .setItemType(ItemType.SUBMISSION_VOLUMES.getDescription())
                 .setCommand(Command.RESPONSE.getDescription())
                 .setCreationTimestamp(Instant.now())
                 .setItemDate(LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd)))
                 .setFileInfo(FileInfo.newBuilder()
-                        .setFileName(file.getName())
-                        .setFileUrl(file.getAbsolutePath()).build()).build();
+                        .setFileName(file.getName()).setFileUrl(file.getAbsolutePath()).build()).build();
     }
 
     private String getFileName() {

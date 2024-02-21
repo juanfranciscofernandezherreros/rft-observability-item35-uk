@@ -12,10 +12,8 @@ import com.sixgroup.refit.observability.topic.item.ItemId;
 import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,10 +23,8 @@ import static com.sixgroup.refit.observability.item35.creator.shared.Constants.I
 
 @Component
 @RequiredArgsConstructor
-public class ProducerItemServiceImpl implements ProducerItemService {
-
+public class KafkaProducerItem implements ProducerItemService {
     public static final String ERROR_SENDING_MESSAGE_EFRH_031 = "EFRH031";
-    private final KafkaTemplate<ItemId, ItemCommand> template;
     private final RftKafkaProducerTracing<ItemId, ItemCommand> producerTracing;
     private final Tracer tracer;
     @Value("${component-config.topics.file-ready-topic}")

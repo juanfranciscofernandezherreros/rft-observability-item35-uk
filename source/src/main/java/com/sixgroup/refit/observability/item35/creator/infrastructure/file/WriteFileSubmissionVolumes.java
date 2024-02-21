@@ -8,6 +8,7 @@ import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,9 +33,9 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service {
             }
         }
         RftLog.info("File created and written: " + filePath);
-        File file=new File(filePath);
-        RftLog.info("Save file",
-                List.of(NameObject.builder().name("Timestamp").object(LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE)).build(),
+        File file = new File(filePath);
+        RftLog.info("Save file", () ->
+                List.of(NameObject.builder().name("timestamp").object(LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE)).build(),
                         NameObject.builder().name("itemId").object(ITEM35).build(),
                         NameObject.builder().name("itemType").object(ItemType.SUBMISSION_VOLUMES.getDescription()).build(),
                         NameObject.builder().name("command").object(Command.REQUEST).build(),

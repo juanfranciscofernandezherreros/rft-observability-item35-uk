@@ -3,6 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.consumer;
 import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseGenerateFileSubmissionVolumes;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
+import com.sixgroup.refit.observability.item35.creator.shared.Constants;
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.consumer.RftKafkaConsumerTracing;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
@@ -17,14 +18,14 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ConsumerItem {
+public class KafkaConsumerItem {
 
     private final UseCaseGenerateFileSubmissionVolumes useCaseGenerateFileSubmissionVolumes;
     private final RftKafkaConsumerTracing kafkaConsumerTracing = new RftKafkaConsumerTracing();
 
     @KafkaListener(topics = "${component-config.topics.file-ready-topic}")
     public void consume(ConsumerRecord<ItemId, ItemCommand> item) {
-        if ("item35".equals(item.key().getItemId()) && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
+        if (Constants.ITEM35.equals(item.key().getItemId()) && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
             // Init traceId
             kafkaConsumerTracing.initTrace(item.headers());
             RftLog.info("Consumed message item", () ->

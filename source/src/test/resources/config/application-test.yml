@@ -25,18 +25,23 @@ spring:
         "specific.avro.reader": true
   datasource:
     kududb:
-      driver-class-name: ""
-      jdbc-url: ""
-      username: ""
-      password: ""
+      jdbc-url: jdbc:h2:mem:kudu;INIT=RUNSCRIPT FROM 'classpath:db/sqlServer/init_kudu.sql'
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver
+      dialect: org.hibernate.dialect.HSQLDialect
+      ddl-auto: validate
+      persistence-unit: kududb
+      schema: EMIR_REFIT_DEV_RECO
     sqlserverdb:
-      driver-class-name: ""
-      jdbc-url: ""
-      username: ""
-      password: ""
-    jpa:
-      hibernate:
-        ddl-auto: validate
+      jdbc-url: jdbc:h2:mem:DBO;MODE=MSSQLServer;INIT=RUNSCRIPT FROM 'classpath:db/sqlServer/init_mssql.sql' # init=CREATE SCHEMA DBO,CREATE TABLE RECOSTATS;
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver
+      dialect: org.hibernate.dialect.SQLServer2012Dialect
+      ddl-auto: validate
+      persistence-unit: sqlserverdb
+      schema: dbo
 component-config:
   csv:
     output_path: "work-repository/write/"

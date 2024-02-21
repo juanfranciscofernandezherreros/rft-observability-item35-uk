@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "emir_refit_int_control_refit", name = "record_status")
+@Table(name = "record_status")
 public class RecordStatusEntity {
 
     @Id
