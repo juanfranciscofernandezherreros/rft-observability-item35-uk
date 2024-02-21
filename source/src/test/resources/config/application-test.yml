@@ -25,27 +25,18 @@ spring:
         "specific.avro.reader": true
   datasource:
     kududb:
-      url: jdbc:impala://dh-rftemir-dev-int-master10.rftemir.iq8p-shl0.a0.cloudera.site:443/;ssl=1;transportMode=http;httpPath=dh-rftemir-dev-int/cdp-proxy-api/impala;AuthMech=3
-      username: oriol.coll
-      password: bFBn8@Wd!rEQY4k#k9C*@44L
-      driverClassName: com.cloudera.impala.jdbc.Driver
-      hibernate:
-        ddl-auto: validate
-        default_schema: emir_refit_int_control_refit
-        dialect: org.hibernate.dialect.HSQLDialect
+      driver-class-name: ""
+      jdbc-url: ""
+      username: ""
+      password: ""
     sqlserverdb:
-      url: jdbc:sqlserver://mdmtwdctl01;database=dev-observabilitydb;trustServerCertificate=true;authenticationScheme=NTLM;integratedSecurity=true;
-      username: tx99o
-      password: Argent76?BME
-      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-      hibernate:
-        ddl-auto: validate
-        default_schema: dbo
-        dialect: org.hibernate.dialect.SQLServerDialect
+      driver-class-name: ""
+      jdbc-url: ""
+      username: ""
+      password: ""
     jpa:
       hibernate:
         ddl-auto: validate
-        default_schema: emir_refit_int_control_refit
 component-config:
   csv:
     output_path: "work-repository/write/"

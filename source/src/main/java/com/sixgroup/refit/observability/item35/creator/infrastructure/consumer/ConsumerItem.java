@@ -1,6 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.consumer;
 
 import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseGenerateFileSubmissionVolumes;
+import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
@@ -8,10 +9,8 @@ import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -39,6 +38,6 @@ public class ConsumerItem {
 
     private boolean isRequestSubmissionVolumes(ItemCommand itemCommand){
         return ItemType.SUBMISSION_VOLUMES.getDescription().equals(itemCommand.getItemType())
-                && "request".equals(itemCommand.getCommand());
+                && Command.REQUEST.getDescription().equals(itemCommand.getCommand());
     }
 }

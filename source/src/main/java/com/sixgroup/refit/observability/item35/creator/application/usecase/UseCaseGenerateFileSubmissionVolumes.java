@@ -2,7 +2,6 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase;
 
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
-import com.sixgroup.refit.observability.item35.creator.domain.enums.StatusFile;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemReporting;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ItemReportingService;

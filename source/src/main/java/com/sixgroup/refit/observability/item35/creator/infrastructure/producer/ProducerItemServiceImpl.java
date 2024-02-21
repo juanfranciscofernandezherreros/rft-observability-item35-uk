@@ -9,11 +9,10 @@ import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.Na
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,9 +28,12 @@ public class ProducerItemServiceImpl  implements ProducerItemService {
 
     public static final String ERROR_SENDING_MESSAGE_EFRH_031 = "EFRH031";
 
+    @Value("${component-config.topics.file-ready-topic}")
+    private String topic;
+
     @Override
     public void send(ItemId itemId,ItemCommand itemCommand) {
-        var future = template.send("rft-observability-item-topic.public.v1", itemId, itemCommand);
+        var future = template.send(topic, itemId, itemCommand);
 
         RftLog.info("Save file",
                 List.of(NameObject.builder().name("Timestamp").object(LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE)).build(),

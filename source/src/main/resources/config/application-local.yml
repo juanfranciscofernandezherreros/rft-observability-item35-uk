@@ -10,29 +10,20 @@ spring:
     bootstrap-servers: "localhost:9092"
     properties:
       "schema.registry.url": "http://localhost:8081"
-#  datasource:
-#    kududb:
-#      url: jdbc:impala://dh-rftemir-dev-int-master10.rftemir.iq8p-shl0.a0.cloudera.site:443/;ssl=1;transportMode=http;httpPath=dh-rftemir-dev-int/cdp-proxy-api/impala;AuthMech=3
-#      username: oriol.coll
-#      password: bFBn8@Wd!rEQY4k#k9C*@44L
-#      driverClassName: com.cloudera.impala.jdbc.Driver
-#    sqlserverdb:
-#      url: jdbc:sqlserver://mdmtwdctl01;database=dev-observabilitydb;trustServerCertificate=true;authenticationScheme=NTLM;integratedSecurity=true;
-#      username: tx99o
-#      password: Argent76?BME
-#      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#  jpa:
-#    show-sql: true
-#    properties:
-#      javax:
-#        persistence:
-#          schema: emir_refit_dev_control_refit
-#      hibernate:
-#        dialect: org.hibernate.dialect.SQLServerDialect
-#        default_schema: emir_refit_dev_control_refit
-#        legacy_limit_handler: true
-#        format_sql: true
-
+  datasource:
+    kududb:
+      driver-class-name: ""
+      jdbc-url: ""
+      username: ""
+      password: ""
+    sqlserverdb:
+      driver-class-name: ""
+      jdbc-url: ""
+      username: ""
+      password: ""
+    jpa:
+      hibernate:
+        ddl-auto: validate
 component-config:
   csv:
     output_path: "work-repository/write/"

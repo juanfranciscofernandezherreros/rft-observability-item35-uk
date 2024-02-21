@@ -34,32 +34,32 @@ public class UseCaseGenerateFileSubmissionVolumesITTest {
     private static final String TOPIC = "rft-observability-item-topic.public.v1";
 
 
-    @BeforeEach
-    public void setUp() {
-        // Configurar el productor
-        Properties producerProps = new Properties();
-        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-        producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class.getName());
-        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class.getName());
-        producerProps.put("schema.registry.url", "mock://not-used");
-        producer = new KafkaProducer<>(producerProps);
-
-    }
-    @Test
-     void test() throws InterruptedException {
-        producer.send(new ProducerRecord<>(TOPIC,ItemId.newBuilder().setItemId("item35").build(),
-                ItemCommand
-                        .newBuilder()
-                        .setItemId("item35")
-                        .setItemType("submissionVolumes")
-                        .setCommand("request")
-                        .setCreationTimestamp(Instant.now())
-                        .setItemDate(Instant.now().toString())
-                        .setFileInfo(FileInfo.newBuilder()
-                                .setFileName("")
-                                .setFileUrl("").build())
-                        .build()));
-        Thread.sleep(10000);
-    }
+//    @BeforeEach
+//    public void setUp() {
+//        // Configurar el productor
+//        Properties producerProps = new Properties();
+//        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+//        producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class.getName());
+//        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class.getName());
+//        producerProps.put("schema.registry.url", "mock://not-used");
+//        producer = new KafkaProducer<>(producerProps);
+//
+//    }
+//    @Test
+//     void test() throws InterruptedException {
+//        producer.send(new ProducerRecord<>(TOPIC,ItemId.newBuilder().setItemId("item35").build(),
+//                ItemCommand
+//                        .newBuilder()
+//                        .setItemId("item35")
+//                        .setItemType("submissionVolumes")
+//                        .setCommand("request")
+//                        .setCreationTimestamp(Instant.now())
+//                        .setItemDate(Instant.now().toString())
+//                        .setFileInfo(FileInfo.newBuilder()
+//                                .setFileName("")
+//                                .setFileUrl("").build())
+//                        .build()));
+//        Thread.sleep(20000);
+//    }
 
 }

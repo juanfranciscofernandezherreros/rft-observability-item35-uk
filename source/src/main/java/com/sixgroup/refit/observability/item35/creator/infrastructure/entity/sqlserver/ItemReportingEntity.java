@@ -25,7 +25,8 @@ import java.util.Date;
 public class ItemReportingEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_reporting_seq")
+    @SequenceGenerator(name = "item_reporting_seq", sequenceName = "item_reporting_seq", allocationSize = 1)
     private int id;
 
     @Column(name = "item_type")
