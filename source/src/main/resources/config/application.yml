@@ -22,3 +22,11 @@ logging:
     root: INFO
     "org.apache.kafka": INFO
     "com.sixgroup.refit": DEBUG
+
+rft:
+  kafka:
+    tracing:
+      consumer:
+        enabled: true
+      producer:
+        enabled: true

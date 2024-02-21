@@ -16,6 +16,6 @@ public class ItemReportingServiceImpl implements ItemReportingService {
     @Override
     public void insertItemReporting(ItemReporting itemReporting) {
         RftLog.info("Insert item Report");
-           itemReportingRepository.insertItemReporting(itemReporting);
+        itemReportingRepository.insertItemReporting(itemReporting);
     }
 }
