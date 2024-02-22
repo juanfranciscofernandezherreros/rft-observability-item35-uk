@@ -6,16 +6,27 @@ management:
     port: 9040
 
 spring:
-  application:
-    name: "@project.artifactId@"
-    environment: dev
   kafka:
     bootstrap-servers: "localhost:9092"
-    producer:
-      properties:
-        "schema.registry.url": "http://localhost:8081"
-
+    properties:
+      "schema.registry.url": "http://localhost:8081"
+  datasource:
+    kududb:
+      driver-class-name: ""
+      jdbc-url: ""
+      username: ""
+      password: ""
+    sqlserverdb:
+      driver-class-name: ""
+      jdbc-url: ""
+      username: ""
+      password: ""
+    jpa:
+      hibernate:
+        ddl-auto: validate
 component-config:
+  csv:
+    output_path: "work-repository/write/"
 
 logging:
   level:

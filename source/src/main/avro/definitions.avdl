@@ -1,0 +1,5 @@
+@namespace ( "com.sixgroup.refit.observability" )
+protocol Internals {
+  import idl  "classpath:/topics/rft-observability-item-topic.avdl";
+}
+
