@@ -16,14 +16,14 @@ import lombok.NoArgsConstructor;
 public class RecordStatusEntity {
 
     @Id
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
-    @Column(name="receiveddt")
+    @Column(name = "receiveddt")
     private String reportingDate;
     @Column(name = "status")
     private String messageType;
     @Column(name = "channel")
     private String submissionChannel;
-    @Column(name="nomessagesOnGiveDate")
+    @Column(name = "nomessagesOnGiveDate")
     private Integer nomessagesOnGiveDate;
 }

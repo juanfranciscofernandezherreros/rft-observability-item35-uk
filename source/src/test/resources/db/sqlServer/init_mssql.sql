@@ -15,3 +15,6 @@ CREATE TABLE IF NOT EXISTS item_reporting(
     state_update_date  date
     );
 
+INSERT INTO dbo.item_reporting (id, item_type, file_name, file_url, file_creation_date, file_update_date, state_name, state_update_date) VALUES (1, 'item35','TRRGS_EMIR_PR_IN_ND_ITEM35A_20240229.csv', null, '2024-02-22', '2024-02-23', 'sent_request', '2024-02-23');
+INSERT INTO dbo.item_reporting (id, item_type, file_name, file_url, file_creation_date, file_update_date, state_name, state_update_date) VALUES (2, 'item35','TRRGS_EMIR_PR_IN_ND_ITEM35A_20240129.csv', null, '2024-02-22', '2024-02-23', 'sent_request', '2024-02-23');
+

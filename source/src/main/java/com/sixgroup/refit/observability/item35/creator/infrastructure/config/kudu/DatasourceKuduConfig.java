@@ -23,8 +23,7 @@ import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.DatasourceKuduProperties.HIBERNATE_DDL_AUTO;
-import static com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.DatasourceKuduProperties.HIBERNATE_DIALECT;
+import static com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.DatasourceKuduProperties.*;
 
 @Configuration
 @EnableJpaRepositories(
@@ -37,9 +36,12 @@ import static com.sixgroup.refit.observability.item35.creator.infrastructure.con
 public class DatasourceKuduConfig {
 
     private final DatasourceKuduProperties properties;
+    
+    @Value("${component-config.db.schema}")
+    private String schema;
 
     @Bean("kudu-ds")
-    public DataSource kuduDataSource(){
+    public DataSource kuduDataSource() {
         return DataSourceBuilder.create()
                 .url(properties.getJdbcUrl())
                 .username(properties.getUsername())
@@ -49,10 +51,11 @@ public class DatasourceKuduConfig {
     }
 
     @Bean("kudu-em")
-    LocalContainerEntityManagerFactoryBean kuduDbEntityManagerFactory (EntityManagerFactoryBuilder builder, @Qualifier("kudu-ds") DataSource dataSource){
+    LocalContainerEntityManagerFactoryBean kuduDbEntityManagerFactory(EntityManagerFactoryBuilder builder, @Qualifier("kudu-ds") DataSource dataSource) {
         final HashMap<String, String> objectObjectHashMap = new HashMap<>();
         objectObjectHashMap.put(HIBERNATE_DIALECT, properties.getDialect());
         objectObjectHashMap.put(HIBERNATE_DDL_AUTO, properties.getDdlAuto());
+        objectObjectHashMap.put(HIBERNATE_DEFAULT_SCHEMA, schema);
         return builder
                 .dataSource(dataSource)
                 .packages(RecordStatusEntity.class)
@@ -62,7 +65,7 @@ public class DatasourceKuduConfig {
     }
 
     @Bean("kudu-trm")
-    PlatformTransactionManager kuduTransactionManager(@Qualifier("kudu-em") EntityManagerFactory entityManagerFactory){
+    PlatformTransactionManager kuduTransactionManager(@Qualifier("kudu-em") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
 

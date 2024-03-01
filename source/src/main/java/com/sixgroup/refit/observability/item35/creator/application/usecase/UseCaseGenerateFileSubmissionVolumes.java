@@ -3,12 +3,17 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
+import com.sixgroup.refit.observability.item35.creator.domain.enums.SubmissionChannels;
+import com.sixgroup.refit.observability.item35.creator.domain.model.ItemFileFinderRequest;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemReporting;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ItemReportingService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
+import com.sixgroup.refit.observability.item35.creator.shared.Utils;
+import com.sixgroup.refit.observability.item35.creator.state.application.StateService;
+import com.sixgroup.refit.observability.item35.creator.state.domain.StateRequest;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
@@ -26,8 +31,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.Constants.DATE_FORMAT_yyyy_MM_dd;
-import static com.sixgroup.refit.observability.item35.creator.shared.Constants.ITEM35;
+import static com.sixgroup.refit.observability.item35.creator.shared.Constants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,53 +41,58 @@ public class UseCaseGenerateFileSubmissionVolumes {
 
     private final WriteFileItem35Service writeFileSubmissionVolumesService;
 
-    private final ItemReportingService itemReportingService;
-
     private final ProducerItemService producerItemService;
 
     private final CsvProperties csvProperties;
 
-    public File manageFileSubmissionVolumes() {
+    private final StateService stateService;
+
+    public File manageFileSubmissionVolumes(String itemDate) {
         RftLog.info("Generating submission volumes file ...");
         File fileSubmissionVolumes = null;
-        List<RecordStatus> recordStatusList = recordStatusService.findRecordStatus();
+        List<RecordStatus> recordStatusList = recordStatusService.findRecordStatus(itemDate);
         if (CollectionUtils.isEmpty(recordStatusList)) {
             RftLog.info("No record status found, skipping file generation");
-            itemReportingService.insertItemReporting(ItemReporting.builderItemReportingError());
+            stateService.setError(
+                ItemFileFinderRequest.builder().fileName(Utils.getFileName(itemDate)).itemType(ITEM35).build());
             return null;
         }
         try {
+            stateService.nextStep(
+                StateRequest.builder().fileName(Utils.getFileName(itemDate)).itemType(ITEM35).build());
             RftLog.info("Creating and saving file", () ->
-                    List.of(NameObject.builder().name("timestamp").object(LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE)).build(),
-                            NameObject.builder().name("itemId").object(ITEM35).build(),
-                            NameObject.builder().name("itemType").object(ItemType.SUBMISSION_VOLUMES.getDescription()).build(),
-                            NameObject.builder().name("command").object(Command.REQUEST).build(),
-                            NameObject.builder().name("fileName").object(getFileName()).build(),
-                            NameObject.builder().name("fileUrl").object(csvProperties.getOutputPath() + getFileName()).build()));
-            fileSubmissionVolumes = writeFileSubmissionVolumesService.writeFile(recordStatusList, getFileName());
-            itemReportingService.insertItemReporting(ItemReporting.builderItemReporting(fileSubmissionVolumes));
+                List.of(NameObject.builder().name("timestamp").object(LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE)).build(),
+                    NameObject.builder().name("itemId").object(ITEM35).build(),
+                    NameObject.builder().name("itemType").object(ItemType.SUBMISSION_VOLUMES.getName()).build(),
+                    NameObject.builder().name("command").object(Command.REQUEST).build(),
+                    NameObject.builder().name("fileName").object(getFileName(itemDate)).build(),
+                    NameObject.builder().name("fileUrl").object(getFileName(itemDate)).build()));
+            fileSubmissionVolumes = writeFileSubmissionVolumesService.writeFile(recordStatusList, getFileName(itemDate), itemDate);
             RftLog.info("Generated submission volumes file");
-            producerItemService.send(ItemId.newBuilder().setItemId(ITEM35).build(), getItemCommandResponse(ItemType.SUBMISSION_VOLUMES, fileSubmissionVolumes));
+            producerItemService.send(ItemId.newBuilder().setItemId(ITEM35).build(),
+                getItemCommandResponse(fileSubmissionVolumes, itemDate));
         } catch (IOException io) {
-            RftLog.error("Error to generate file submission volumes", "");
-            itemReportingService.insertItemReporting(ItemReporting.builderItemReportingError());
+            RftLog.error("Error to generate file submission volumes",
+                List.of(NameObject.builder().name("Error").object(io.getMessage()).build()), "");
+            stateService.setError(
+                ItemFileFinderRequest.builder().fileName(Utils.getFileName(itemDate)).itemType(ITEM35).build());
         }
         return fileSubmissionVolumes;
     }
 
-    private ItemCommand getItemCommandResponse(ItemType itemType, File file) {
+    private ItemCommand getItemCommandResponse(File file, String itemDate) {
         return ItemCommand.newBuilder()
-                .setItemId(ITEM35)
-                .setItemType(ItemType.SUBMISSION_VOLUMES.getDescription())
-                .setCommand(Command.RESPONSE.getDescription())
-                .setCreationTimestamp(Instant.now())
-                .setItemDate(LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd)))
-                .setFileInfo(FileInfo.newBuilder()
-                        .setFileName(file.getName()).setFileUrl(file.getAbsolutePath()).build()).build();
+            .setItemId(ITEM35)
+            .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
+            .setCommand(Command.RESPONSE.getDescription())
+            .setCreationTimestamp(Instant.now())
+            .setItemDate(itemDate)
+            .setFileInfo(FileInfo.newBuilder()
+                .setFileName(file.getName()).setFileUrl(file.getAbsolutePath()).build()).build();
     }
 
-    private String getFileName() {
-        return "TRRGS_EMIR_PR_FU_ND_ITEM35A_" + LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd)) + ".csv";
+    private String getFileName(String itemDate) {
+        return csvProperties.getOutputPath() + ItemType.SUBMISSION_VOLUMES.getNamePattern() + itemDate + ".csv";
     }
 
 }
