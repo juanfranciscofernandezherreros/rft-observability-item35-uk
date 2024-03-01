@@ -2,20 +2,25 @@ package observability.item35.creator.application.usecase;
 
 import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseGenerateFileSubmissionVolumes;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
+import com.sixgroup.refit.observability.item35.creator.domain.model.ItemFileFinderRequest;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ItemReportingService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
+import com.sixgroup.refit.observability.item35.creator.state.application.StateService;
+import com.sixgroup.refit.observability.item35.creator.state.domain.StateRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -40,6 +45,9 @@ public class UseCaseGenerateFileSubmissionVolumesUnitTest {
     @Mock
     private CsvProperties csvProperties;
 
+    @Mock
+    private StateService stateService;
+
     @InjectMocks
     private UseCaseGenerateFileSubmissionVolumes useCaseGenerateFileSubmissionVolumes;
 
@@ -47,22 +55,22 @@ public class UseCaseGenerateFileSubmissionVolumesUnitTest {
     @Test
     public void testManageFileSubmissionVolumes_Success() throws Exception {
         List<RecordStatus> recordStatusList = new ArrayList<>();
-        recordStatusList.add(new RecordStatus("test","test","test",10));
-        when(recordStatusService.findRecordStatus()).thenReturn(recordStatusList);
+        recordStatusList.add(new RecordStatus("test", "test", "test", 10));
+        when(recordStatusService.findRecordStatus(any())).thenReturn(recordStatusList);
         File mockedFile = new File("test_file.csv");
-        when(writeFileSubmissionVolumesService.writeFile(anyList(), anyString())).thenReturn(mockedFile);
-        File resultFile = useCaseGenerateFileSubmissionVolumes.manageFileSubmissionVolumes();
+        when(writeFileSubmissionVolumesService.writeFile(anyList(), anyString(), anyString())).thenReturn(mockedFile);
+        File resultFile = useCaseGenerateFileSubmissionVolumes.manageFileSubmissionVolumes("20241201");
         assertNotNull(resultFile);
-        verify(itemReportingService, times(1)).insertItemReporting(any());
+        verify(stateService, times(1)).nextStep((StateRequest) any());
         verify(producerItemService, times(1)).send(any(), any());
     }
 
     @Test
-    public void testManageFileSubmissionVolumes_NoRecordStatusFound(){
-        when(recordStatusService.findRecordStatus()).thenReturn(new ArrayList<>());
-        File resultFile = useCaseGenerateFileSubmissionVolumes.manageFileSubmissionVolumes();
+    public void testManageFileSubmissionVolumes_NoRecordStatusFound() {
+        when(recordStatusService.findRecordStatus(any())).thenReturn(new ArrayList<>());
+        File resultFile = useCaseGenerateFileSubmissionVolumes.manageFileSubmissionVolumes("20241201");
         assertNull(resultFile);
-        verify(itemReportingService, times(1)).insertItemReporting(any());
+        verify(stateService, times(1)).setError((ItemFileFinderRequest) any());
         verify(producerItemService, times(0)).send(any(), any());
     }
 
@@ -70,12 +78,12 @@ public class UseCaseGenerateFileSubmissionVolumesUnitTest {
     @Test
     public void testManageFileSubmissionVolumes_throw_IOException() throws IOException {
         List<RecordStatus> recordStatusList = new ArrayList<>();
-        recordStatusList.add(new RecordStatus("test","test","test",10));
-        when(recordStatusService.findRecordStatus()).thenReturn(recordStatusList);
-        when(writeFileSubmissionVolumesService.writeFile(any(),any())).thenThrow(IOException.class);
-        File resultFile = useCaseGenerateFileSubmissionVolumes.manageFileSubmissionVolumes();
+        recordStatusList.add(new RecordStatus("test", "test", "test", 10));
+        when(recordStatusService.findRecordStatus(any())).thenReturn(recordStatusList);
+        when(writeFileSubmissionVolumesService.writeFile(any(), any(), any())).thenThrow(IOException.class);
+        File resultFile = useCaseGenerateFileSubmissionVolumes.manageFileSubmissionVolumes("20241201");
         assertNull(resultFile);
-        verify(itemReportingService, times(1)).insertItemReporting(any());
+        verify(stateService, times(1)).setError((ItemFileFinderRequest) any());
         verify(producerItemService, times(0)).send(any(), any());
     }
 

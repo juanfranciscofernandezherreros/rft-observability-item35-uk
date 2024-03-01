@@ -6,19 +6,20 @@ import com.sixgroup.refit.observability.item35.creator.domain.service.RecordStat
 import com.sixgroup.refit.observability.item35.creator.shared.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class RecordStatusServiceImpl implements RecordStatusService {
 
     private final RecordStatusRepository recordStatusRepository;
+
     @Override
-    public List<RecordStatus> findRecordStatus() {
+    public List<RecordStatus> findRecordStatus(String itemDate) {
         return recordStatusRepository.
-                findByRecordStatus(Utils.getFirstDayOfPreviousMonth(LocalDate.now()),Utils.getLastDayOfPreviousMonth(LocalDate.now()));
+                findByRecordStatus(Utils.getFirstDayOfMonthAndYear(itemDate), Utils.getLastDayOfMonthAndYear(itemDate));
     }
 
 }

@@ -1,18 +1,15 @@
 package com.sixgroup.refit.observability.item35.creator.domain.model;
 
-import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
-import com.sixgroup.refit.observability.item35.creator.domain.enums.StatusFile;
-import lombok.Builder;
-import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
 import java.time.LocalDate;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
-public class ItemReporting {
-
+public class ItemReportingDto {
+    private int id;
     private String itemType;
     private String fileName;
     private String fileUrl;

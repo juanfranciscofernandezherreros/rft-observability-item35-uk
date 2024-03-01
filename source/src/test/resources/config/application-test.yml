@@ -32,7 +32,7 @@ spring:
       dialect: org.hibernate.dialect.HSQLDialect
       ddl-auto: validate
       persistence-unit: kududb
-      schema: EMIR_REFIT_DEV_RECO
+      schema: EMIR_REFIT_DEV_CONTROL_REFIT
     sqlserverdb:
       jdbc-url: jdbc:h2:mem:DBO;MODE=MSSQLServer;INIT=RUNSCRIPT FROM 'classpath:db/sqlServer/init_mssql.sql' # init=CREATE SCHEMA DBO,CREATE TABLE RECOSTATS;
       username: sa
@@ -44,9 +44,12 @@ spring:
       schema: dbo
 component-config:
   csv:
-    output_path: "work-repository/write/"
+    output_path: "work-repository-observability/upload/"
   topics:
-    file-ready-topic: rft-observability-item-topic.public.v1
+    observability-item-topic: rft.dev.observability.item.private.v1
+    observability-item-consumer-group-id: rft.dev.rft-observability-item35-creator
+  db:
+    schema: EMIR_REFIT_DEV_CONTROL_REFIT
 
 logging:
   level:

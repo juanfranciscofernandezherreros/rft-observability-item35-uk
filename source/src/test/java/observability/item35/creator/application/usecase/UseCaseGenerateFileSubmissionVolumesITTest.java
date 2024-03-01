@@ -5,10 +5,13 @@ import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCa
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.StatusFile;
+import com.sixgroup.refit.observability.item35.creator.domain.model.ItemFileFinderRequest;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.ItemFileFinderRepository;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.ItemReportingRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.sqlserver.ItemReportingEntity;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.sqlserver.ItemReportingRepositorySqlServer;
 import com.sixgroup.refit.observability.item35.creator.shared.Constants;
+import com.sixgroup.refit.observability.item35.creator.shared.Utils;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
@@ -21,21 +24,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
 import static org.awaitility.Awaitility.waitAtMost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
-@SpringBootTest(classes={ApplicationMain.class})
+@SpringBootTest(classes = {ApplicationMain.class})
 @ActiveProfiles("test")
-@EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 public class UseCaseGenerateFileSubmissionVolumesITTest {
 
     @Autowired
@@ -44,13 +50,14 @@ public class UseCaseGenerateFileSubmissionVolumesITTest {
     private Producer<ItemId, ItemCommand> producer;
 
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
-    private static final String TOPIC = "rft-observability-item-topic.public.v1";
 
+    @Value("${component-config.topics.observability-item-topic}")
+    private String topic;
 
     @Autowired
-    private ItemReportingRepositorySqlServer itemReportingRepositorySqlServer;
+    private ItemFileFinderRepository sqlServerItemFileFinderRepository;
 
-    private KafkaConsumerClient kafkaConsumerClient=new KafkaConsumerClient();
+    private KafkaConsumerClient kafkaConsumerClient = new KafkaConsumerClient();
 
     @BeforeEach
     public void setUp() {
@@ -63,31 +70,53 @@ public class UseCaseGenerateFileSubmissionVolumesITTest {
         producer = new KafkaProducer<>(producerProps);
 
     }
+
     @Test
     @DisplayName("Given a message item from topic, validate create and save file")
-     void when_send_item_request_item_35_create_and_save_file_submission_volumes() throws InterruptedException {
-        producer.send(new ProducerRecord<>(TOPIC,ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
-                ItemCommand
-                        .newBuilder()
-                        .setItemId(Constants.ITEM35)
-                        .setItemType(ItemType.SUBMISSION_VOLUMES.getDescription())
-                        .setCommand(Command.REQUEST.getDescription())
-                        .setCreationTimestamp(Instant.now())
-                        .setItemDate(Instant.now().toString())
-                        .setFileInfo(FileInfo.newBuilder()
-                                .setFileName("")
-                                .setFileUrl("").build())
-                        .build()));
+    void when_send_item_request_item_35_create_and_save_file_submission_volumes() throws InterruptedException {
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+            ItemCommand
+                .newBuilder()
+                .setItemId(Constants.ITEM35)
+                .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
+                .setCommand(Command.REQUEST.getDescription())
+                .setCreationTimestamp(Instant.now())
+                .setItemDate("20240229")
+                .setFileInfo(FileInfo.newBuilder()
+                    .setFileName("")
+                    .setFileUrl("").build())
+                .build()));
 
-      waitAtMost(5, TimeUnit.SECONDS)
-                .until(()->itemReportingRepositorySqlServer.findAll().size()==1);
-       List<ItemReportingEntity> reportingEntity= itemReportingRepositorySqlServer.findAll();
-       ItemReportingEntity itemReportingDb=reportingEntity.get(0);
-       assertNotNull(itemReportingDb);
-       assertEquals(ItemType.SUBMISSION_VOLUMES.getDescription(),itemReportingDb.getItemType());
-       assertEquals(StatusFile.ITEM_REPORTING_OK.getDescription(),itemReportingDb.getStateName());
-        waitAtMost(5,TimeUnit.SECONDS)
-                .until(()->kafkaConsumerClient.getNumberOfMessagesOnTopic(TOPIC)==2);
+        waitAtMost(20, TimeUnit.SECONDS)
+            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
+                Utils.getFileName("20240229")).getStateName().equals("sent_response")
+                &&
+                sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
+                    Utils.getFileName("20240229")).getFileUrl().equals("work-repository-observability/upload/TRRGS_EMIR_PR_IN_ND_ITEM35A_20240229.csv")
+            );
+
+    }
+
+    @Test
+    @DisplayName("Given a message item from topic, validate state is error")
+    void when_send_item_request_item_35_then_state_error_not_exist_records() throws InterruptedException {
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+            ItemCommand
+                .newBuilder()
+                .setItemId(Constants.ITEM35)
+                .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
+                .setCommand(Command.REQUEST.getDescription())
+                .setCreationTimestamp(Instant.now())
+                .setItemDate("20240129")
+                .setFileInfo(FileInfo.newBuilder()
+                    .setFileName("")
+                    .setFileUrl("").build())
+                .build()));
+
+        waitAtMost(15, TimeUnit.SECONDS)
+            .until(() -> sqlServerItemFileFinderRepository.
+                findByItemTypeAndFileName(Constants.ITEM35, Utils.getFileName("20240129")).getStateName().equals("error")
+            );
 
     }
 
