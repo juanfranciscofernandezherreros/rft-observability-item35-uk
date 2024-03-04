@@ -1,12 +1,11 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.producer;
 
+import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
-import com.sixgroup.refit.observability.item35.creator.domain.model.ItemFileFinderRequest;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
 import com.sixgroup.refit.observability.item35.creator.shared.Utils;
-import com.sixgroup.refit.observability.item35.creator.state.application.StateService;
-import com.sixgroup.refit.observability.item35.creator.state.domain.StateRequest;
+
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.producer.RftKafkaProducerTracing;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.AvroLog;
@@ -23,6 +22,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import com.sixgroup.refit.observability.item.state.application.StateService;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.Constants.ITEM35;
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_SENDING_MESSAGE_EFRH_031;

@@ -1,14 +1,14 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
+import com.sixgroup.refit.observability.item.state.application.StateService;
+import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
+import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
-import com.sixgroup.refit.observability.item35.creator.domain.model.ItemFileFinderRequest;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.shared.Utils;
-import com.sixgroup.refit.observability.item35.creator.state.application.StateService;
-import com.sixgroup.refit.observability.item35.creator.state.domain.StateRequest;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +30,12 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service {
 
     private final StateService stateService;
 
+    private final CsvProperties csvProperties;
+
     @Override
-    public File writeFile(List<RecordStatus> recordStatus, String filePath, String itemDate) throws IOException {
+    public File writeFile(List<RecordStatus> recordStatus, String itemDate) throws IOException {
         RftLog.info("Creating and writing file");
+        String filePath = csvProperties.getOutputPath() + Utils.getFileName(itemDate);
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = new CSVWriter(writer)) {
             writeHeader(csvWriter);
