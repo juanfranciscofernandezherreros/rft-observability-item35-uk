@@ -1,13 +1,12 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.consumer;
 
-import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseGenerateFileSubmissionVolumes;
+import com.sixgroup.refit.observability.item.state.application.StateService;
+import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
+import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseSubmissionVolumes;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
-import com.sixgroup.refit.observability.item35.creator.domain.model.ItemFileFinderRequest;
 import com.sixgroup.refit.observability.item35.creator.shared.Constants;
 import com.sixgroup.refit.observability.item35.creator.shared.Utils;
-import com.sixgroup.refit.observability.item35.creator.state.application.StateService;
-import com.sixgroup.refit.observability.item35.creator.state.domain.StateRequest;
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.consumer.RftKafkaConsumerTracing;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
@@ -26,7 +25,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.Constants.I
 @RequiredArgsConstructor
 public class KafkaConsumerItem {
 
-    private final UseCaseGenerateFileSubmissionVolumes useCaseGenerateFileSubmissionVolumes;
+    private final UseCaseSubmissionVolumes useCaseSubmissionVolumes;
     private final RftKafkaConsumerTracing kafkaConsumerTracing;
     private final StateService stateService;
 
@@ -47,7 +46,7 @@ public class KafkaConsumerItem {
                     StateRequest.builder().fileName(Utils.getFileName(item.value().getItemDate()))
                         .itemType(ITEM35).build());
                 RftLog.debug("Consumed message to generate file Submission Volumes");
-                useCaseGenerateFileSubmissionVolumes.manageFileSubmissionVolumes(item.value().getItemDate());
+                useCaseSubmissionVolumes.manageFileSubmissionVolumes(item.value().getItemDate());
                 RftLog.debug("Generate file item35: Submission Volumes");
             }
         }

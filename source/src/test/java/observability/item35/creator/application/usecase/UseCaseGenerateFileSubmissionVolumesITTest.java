@@ -1,21 +1,15 @@
 package observability.item35.creator.application.usecase;
 
 import com.sixgroup.refit.observability.ApplicationMain;
-import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseGenerateFileSubmissionVolumes;
+import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
+import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseSubmissionVolumes;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
-import com.sixgroup.refit.observability.item35.creator.domain.enums.StatusFile;
-import com.sixgroup.refit.observability.item35.creator.domain.model.ItemFileFinderRequest;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.ItemFileFinderRepository;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.ItemReportingRepository;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.sqlserver.ItemReportingEntity;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.sqlserver.ItemReportingRepositorySqlServer;
 import com.sixgroup.refit.observability.item35.creator.shared.Constants;
 import com.sixgroup.refit.observability.item35.creator.shared.Utils;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
-import observability.item35.creator.config.KafkaConsumerClient;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -30,13 +24,10 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.waitAtMost;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 @SpringBootTest(classes = {ApplicationMain.class})
@@ -45,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class UseCaseGenerateFileSubmissionVolumesITTest {
 
     @Autowired
-    private UseCaseGenerateFileSubmissionVolumes useCaseGenerateFileSubmissionVolumes;
+    private UseCaseSubmissionVolumes useCaseSubmissionVolumes;
 
     private Producer<ItemId, ItemCommand> producer;
 
@@ -56,8 +47,6 @@ public class UseCaseGenerateFileSubmissionVolumesITTest {
 
     @Autowired
     private ItemFileFinderRepository sqlServerItemFileFinderRepository;
-
-    private KafkaConsumerClient kafkaConsumerClient = new KafkaConsumerClient();
 
     @BeforeEach
     public void setUp() {

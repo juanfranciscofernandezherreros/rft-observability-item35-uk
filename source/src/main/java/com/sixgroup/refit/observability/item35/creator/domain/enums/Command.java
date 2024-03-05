@@ -5,10 +5,10 @@ public enum Command {
     REQUEST("request"),
     RESPONSE("response");
 
-    private String description;
+    private final String description;
 
-    Command(String description){
-        this.description=description;
+    Command(String description) {
+        this.description = description;
     }
 
     public String getDescription() {
