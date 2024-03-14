@@ -1,13 +1,14 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
+import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
+import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
+import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
-import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
-import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import lombok.RequiredArgsConstructor;
@@ -20,24 +21,28 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.*;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_yyyy_MM_dd;
+
 
 @Service
 @RequiredArgsConstructor
-public class WriteFileSubmissionVolumes implements WriteFileItem35Service<RecordStatus> {
-
-    private final StateService stateService;
+public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity> {
 
     private final CsvProperties csvProperties;
 
+    private final StateService stateService;
+
+
     @Override
-    public File writeFile(List<RecordStatus> recordStatus, ItemCommandDTO itemCommandDTO) throws IOException {
+    public File writeFile(List<Capacity> records, ItemCommandDTO itemCommandDTO) throws IOException {
         RftLog.info("Creating and writing file");
         String filePath = csvProperties.getOutputPath() + Utils.getFileName(itemCommandDTO);
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = new CSVWriter(writer)) {
             writeHeader(csvWriter);
-            for (RecordStatus record : recordStatus) {
+            for (Capacity record : records) {
                 writeRecord(csvWriter, record);
             }
         }
@@ -49,24 +54,27 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
         return file;
     }
 
-
     private void writeHeader(CSVWriter csvWriter) {
-        csvWriter.writeNext(new String[]{HEADER_TR_CODE, HEADER_REPORTING_DATE,
-            HEADER_REGULATION_REFERENCE, HEADER_MESSAGE_TYPE, HEADER_SUBMISSION_CHANNEL, HEADER_NO_MESSAGES_ON_GIVE, HEADER_DATE});
+        csvWriter.writeNext(ItemType.COMPUTE_CAPACITY.getHeaders());
     }
 
-    private void writeRecord(CSVWriter csvWriter, RecordStatus record) {
+
+    private void writeRecord(CSVWriter csvWriter, Capacity record) {
         String[] data = {
             TR_CODE,
-            record.reportingDate(),
+            record.getDate(),
             EMIR,
-            record.messageType(),
-            record.submissionChannel(),
-            String.valueOf(record.noMessagesOnGiveDate()),
-            LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd))
-        };
+            FIELD_NAME_FILE,
+            FIELD_DESCRIPTION_FILE,
+            record.getTypeCapacity(),
+            LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd)),
+            record.getMin(),
+            record.getMean(),
+            record.getMax(),
+            FIELD_INCIDENT_RELATED_FILE,
+            FIELD_TR_INCIDENT_ID_RELATED_FILE};
         csvWriter.writeNext(data);
     }
 
-}
 
+}

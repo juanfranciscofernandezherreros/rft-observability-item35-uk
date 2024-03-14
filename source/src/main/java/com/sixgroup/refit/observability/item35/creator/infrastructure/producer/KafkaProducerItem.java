@@ -1,15 +1,15 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.producer;
 
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
+import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
-import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
+import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
-import com.sixgroup.refit.observability.item35.creator.shared.Utils;
-
+import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.producer.RftKafkaProducerTracing;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.AvroLog;
-import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
+import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
 import io.micrometer.tracing.Tracer;
@@ -18,14 +18,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.sixgroup.refit.observability.item.state.application.StateService;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.Constants.ITEM35;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_SENDING_MESSAGE_EFRH_031;
 
 @Component
@@ -41,37 +40,17 @@ public class KafkaProducerItem implements ProducerItemService {
     private final StateService stateService;
 
     @Override
-    public void send(ItemId itemId, ItemCommand itemCommand) {
-        var future = producerTracing.createMessage(topic, itemId, itemCommand, tracer);
+    public void send(ItemCommandDTO itemCommandDTO) {
 
+        ItemId itemId = ItemId.newBuilder().setItemId(itemCommandDTO.getItemId()).build();
+        ItemCommand itemCommand = getItemCommandResponse(itemCommandDTO);
+        var future = producerTracing.createMessage(topic, itemId, itemCommand, tracer);
         stateService.nextStep(
             StateRequest.builder()
-                .fileName(Utils.getFileName(itemCommand.getItemDate()))
+                .fileName(Utils.getFileName(itemCommandDTO))
                 .itemType(ITEM35)
                 .build());
-        RftLog.info(
-            "Producer Item",
-            () ->
-                List.of(
-                    NameObject.builder()
-                        .name("timestamp")
-                        .object(LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE))
-                        .build(),
-                    NameObject.builder().name("itemId").object(ITEM35).build(),
-                    NameObject.builder()
-                        .name("itemType")
-                        .object(ItemType.SUBMISSION_VOLUMES.getName())
-                        .build(),
-                    NameObject.builder().name("command").object(Command.RESPONSE).build(),
-                    NameObject.builder()
-                        .name("fileName")
-                        .object(itemCommand.getFileInfo().getFileName())
-                        .build(),
-                    NameObject.builder()
-                        .name("fileUrl")
-                        .object(itemCommand.getFileInfo().getFileUrl())
-                        .build()));
-
+        LogService.logInfo("Producer Item", itemCommandDTO);
         addCallBack(future, itemId, itemCommand);
     }
 
@@ -96,4 +75,16 @@ public class KafkaProducerItem implements ProducerItemService {
                 }
             });
     }
+
+    private ItemCommand getItemCommandResponse(ItemCommandDTO itemCommandDTO) {
+        return ItemCommand.newBuilder()
+            .setItemId(itemCommandDTO.getItemId())
+            .setItemType(itemCommandDTO.getItemType())
+            .setCommand(Command.RESPONSE.getDescription())
+            .setCreationTimestamp(Instant.now())
+            .setItemDate(itemCommandDTO.getItemDate())
+            .setFileInfo(FileInfo.newBuilder()
+                .setFileName(itemCommandDTO.getFileName()).setFileUrl(itemCommandDTO.getFileUrl()).build()).build();
+    }
+
 }

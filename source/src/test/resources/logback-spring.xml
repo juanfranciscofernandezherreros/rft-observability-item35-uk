@@ -1,0 +1,186 @@
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <springProperty scope="context" name="productName" source="info.product.name"/>
+  <springProperty scope="context" name="productVersion" source="info.product.version"/>
+  <springProperty scope="context" name="productVendor" source="info.product.vendor"/>
+  <springProperty scope="context" name="springAppEnv" source="spring.application.environment"/>
+  <springProperty scope="context" name="applicationId" source="info.product.application"/>
+  <springProperty scope="context" name="componentId" source="info.product.component"/>
+  <!--  Default logging  -->
+  <appender name="console-default" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+        <marker>MARKED_ENABLED</marker>
+      </evaluator>
+      <OnMatch>DENY</OnMatch>
+      <OnMismatch>ACCEPT</OnMismatch>
+    </filter>
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <pattern>
+          <pattern> { "sixUnifiedEventObject": "1.2" } </pattern>
+        </pattern>
+        <timestamp>
+          <fieldName>eventTimestamp</fieldName>
+          <pattern>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</pattern>
+          <timeZone>UTC</timeZone>
+        </timestamp>
+        <nestedField>
+          <fieldName>header</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "eventCategory": "APP", "eventType": "0", "eventMessage": "Application Logging", "severityLevel": "%level" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <nestedField>
+          <fieldName>product</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "productName": "${productName:-}", "applicationId": "${applicationId:-}", "componentId": "${componentId:-}", "productVersion": "${productVersion:-}", "productVendor": "${productVendor:-}" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <nestedField>
+          <fieldName>origin</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "environment": "${springAppEnv:-}", "hostname": "${HOSTNAME:-}", "processId": "${PID:-}", "threadId": "%thread" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <nestedField>
+          <fieldName>trace</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "traceId": "%X{traceId:-}", "spanId": "%X{spanId:-}" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <nestedField>
+          <fieldName>trace</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "traceId": "%X{traceId:-}", "spanId": "%X{spanId:-}" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <pattern>
+          <pattern> { "eventPayload": "%message%exception" } </pattern>
+        </pattern>
+      </providers>
+    </encoder>
+  </appender>
+  <!--  Default logging with header marker -->
+  <appender name="console-api" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+        <marker>MARKED_API_ENABLED</marker>
+      </evaluator>
+      <OnMatch>ACCEPT</OnMatch>
+      <OnMismatch>DENY</OnMismatch>
+    </filter>
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <pattern>
+          <pattern> { "sixUnifiedEventObject": "1.2" } </pattern>
+        </pattern>
+        <timestamp>
+          <fieldName>eventTimestamp</fieldName>
+          <pattern>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</pattern>
+          <timeZone>UTC</timeZone>
+        </timestamp>
+        <logstashMarkers/>
+        <!--  header  -->
+        <nestedField>
+          <fieldName>product</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "productName": "${productName:-}", "applicationId": "${applicationId:-}", "componentId": "${componentId:-}", "productVersion": "${productVersion:-}", "productVendor": "${productVendor:-}" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <nestedField>
+          <fieldName>origin</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "environment": "${springAppEnv:-}", "hostname": "${HOSTNAME:-}", "processId": "${PID:-}", "threadId": "%thread" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <nestedField>
+          <fieldName>trace</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "traceId": "%X{traceId:-}", "spanId": "%X{spanId:-}" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <pattern>
+          <pattern> { "eventPayload": "%message%exception" } </pattern>
+        </pattern>
+      </providers>
+    </encoder>
+  </appender>
+  <appender name="console-library" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+        <marker>MARKED_LIBRARY_ENABLED</marker>
+      </evaluator>
+      <OnMatch>ACCEPT</OnMatch>
+      <OnMismatch>DENY</OnMismatch>
+    </filter>
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <pattern>
+          <pattern> { "sixUnifiedEventObject": "1.2" } </pattern>
+        </pattern>
+        <timestamp>
+          <fieldName>eventTimestamp</fieldName>
+          <pattern>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</pattern>
+          <timeZone>UTC</timeZone>
+        </timestamp>
+        <logstashMarkers/>
+        <!--  header  -->
+        <nestedField>
+          <fieldName>product</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "productName": "${productName:-}", "applicationId": "${applicationId:-}", "componentId": "${componentId:-}", "productVersion": "${productVersion:-}", "productVendor": "${productVendor:-}" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <nestedField>
+          <fieldName>origin</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "environment": "${springAppEnv:-}", "hostname": "${HOSTNAME:-}", "processId": "${PID:-}", "threadId": "%thread" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <nestedField>
+          <fieldName>trace</fieldName>
+          <providers>
+            <pattern>
+              <pattern> { "traceId": "%X{traceId:-}", "spanId": "%X{spanId:-}" } </pattern>
+            </pattern>
+          </providers>
+        </nestedField>
+        <pattern>
+          <pattern> { "eventPayload": "%message%exception" } </pattern>
+        </pattern>
+      </providers>
+    </encoder>
+  </appender>
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+    <encoder>
+      <pattern>%X{LogController}</pattern>
+    </encoder>
+  </appender>
+  <root level="INFO">
+    <appender-ref ref="console-default"/>
+    <appender-ref ref="console-api"/>
+    <appender-ref ref="console-library"/>
+    <appender-ref ref="STDOUT"/>
+  </root>
+</configuration>

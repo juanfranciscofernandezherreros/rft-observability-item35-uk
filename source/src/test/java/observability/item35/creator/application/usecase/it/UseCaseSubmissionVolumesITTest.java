@@ -1,12 +1,12 @@
-package observability.item35.creator.application.usecase;
+package observability.item35.creator.application.usecase.it;
 
 import com.sixgroup.refit.observability.ApplicationMain;
 import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
-import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseSubmissionVolumes;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
-import com.sixgroup.refit.observability.item35.creator.shared.Constants;
-import com.sixgroup.refit.observability.item35.creator.shared.Utils;
+import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
+import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
@@ -33,10 +33,7 @@ import static org.awaitility.Awaitility.waitAtMost;
 @SpringBootTest(classes = {ApplicationMain.class})
 @ActiveProfiles("test")
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
-public class UseCaseGenerateFileSubmissionVolumesITTest {
-
-    @Autowired
-    private UseCaseSubmissionVolumes useCaseSubmissionVolumes;
+public class UseCaseSubmissionVolumesITTest {
 
     private Producer<ItemId, ItemCommand> producer;
 
@@ -78,10 +75,16 @@ public class UseCaseGenerateFileSubmissionVolumesITTest {
 
         waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
-                Utils.getFileName("20240229")).getStateName().equals("sent_response")
+                Utils.getFileName(ItemCommandDTO.builder()
+                    .itemDate("20240229")
+                    .itemType(ItemType.SUBMISSION_VOLUMES.getName()).build())).getStateName().equals("sent_response")
                 &&
                 sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
-                    Utils.getFileName("20240229")).getFileUrl().equals("work-repository-observability/upload/TRRGS_EMIR_PR_IN_ND_ITEM35A_20240229.csv")
+                        Utils.getFileName(ItemCommandDTO.builder()
+                            .itemDate("20240229")
+                            .itemType(ItemType.SUBMISSION_VOLUMES.getName())
+                            .build()))
+                    .getFileUrl().equals("work-repository-observability/upload/TRRGS_EMIR_PR_IN_ND_ITEM35A_20240229.csv")
             );
 
     }
@@ -104,7 +107,10 @@ public class UseCaseGenerateFileSubmissionVolumesITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(Constants.ITEM35, Utils.getFileName("20240129")).getStateName().equals("error")
+                findByItemTypeAndFileName(Constants.ITEM35, Utils.getFileName(ItemCommandDTO.builder()
+                    .itemDate("20240129")
+                    .itemType(ItemType.SUBMISSION_VOLUMES.getName())
+                    .build())).getStateName().equals("error")
             );
 
     }
