@@ -13,7 +13,7 @@
     <artifactId>rft-observability-item35-creator</artifactId>
     <version>${revision}${sha1}${changelist}</version>
     <properties>
-        <revision>1.0.2</revision>
+        <revision>1.0.3</revision>
         <sha1></sha1>
         <changelist>-SNAPSHOT</changelist>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,6 +33,7 @@
         <sql-server-version>11.2.3.jre17</sql-server-version>
         <rft-observability-item-topic-version>1.0.2</rft-observability-item-topic-version>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -76,6 +77,11 @@
                 <version>5.14.1</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>2.7.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -288,11 +294,25 @@
             <version>${rft-observability-item-topic-version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>com.sixgroup.refit.observability</groupId>
             <artifactId>rft-observability-item-state-library</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+
 
     </dependencies>
     <build>

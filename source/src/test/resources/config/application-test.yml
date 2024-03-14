@@ -50,9 +50,25 @@ component-config:
     observability-item-consumer-group-id: rft.dev.rft-observability-item35-creator
   db:
     schema: EMIR_REFIT_DEV_CONTROL_REFIT
-
+  api:
+    cloudera:
+      username: tx99o
+      password: Argent76?BME
+      host: https://mqmblclutil01.internal.six-group.net
+      port: 7183
+      url: /api/v54/timeseries
+      cpu:
+        enabled: false
+        selectCpu: select cpu_percent_across_hosts where category=CLUSTER
+        desiredRollup: DAILY
+      ram:
+        enabled: false
+        selectRam: select physical_memory_used
+        desiredRollup: DAILY
 logging:
   level:
     root: INFO
     "org.apache.kafka": INFO
     "com.sixgroup.refit": DEBUG
+
+

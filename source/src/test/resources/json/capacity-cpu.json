@@ -1,0 +1,686 @@
+{
+    "items": [
+        {
+            "timeSeries": [
+                {
+                    "metadata": {
+                        "metricName": "cpu_percent_across_hosts",
+                        "entityName": "rftemir-cldr-qa-mbt",
+                        "startTime": "2024-01-01T00:00:00.000Z",
+                        "endTime": "2024-02-01T00:00:00.000Z",
+                        "attributes": {
+                            "active": "true",
+                            "clusterDisplayName": "rftemir-cldr-qa-mbt",
+                            "category": "CLUSTER",
+                            "version": "CDH 7.1.9",
+                            "entityName": "1546334437",
+                            "clusterName": "rftemir-cldr-qa-mbt"
+                        },
+                        "unitNumerators": [
+                            "percent"
+                        ],
+                        "unitDenominators": [],
+                        "expression": "SELECT cpu_percent_across_hosts WHERE entityName = \"1546334437\" AND category = CLUSTER",
+                        "metricCollectionFrequencyMs": 60000,
+                        "rollupUsed": "DAILY"
+                    },
+                    "data": [
+                        {
+                            "timestamp": "2024-01-01T00:00:00.000Z",
+                            "value": 2.1002638888888887,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2023-12-31T08:06:28.000Z",
+                                "sampleValue": 25.7,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2023-12-31T07:53:35.000Z",
+                                "max": 25.7,
+                                "maxTime": "2023-12-31T08:06:28.000Z",
+                                "mean": 2.1002638888888887,
+                                "stdDev": 1.280108945967136,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk02.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-02T00:00:00.000Z",
+                            "value": 3.023527777777778,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-01T14:13:11.000Z",
+                                "sampleValue": 69.4,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-01T02:47:36.000Z",
+                                "max": 69.4,
+                                "maxTime": "2024-01-01T14:13:11.000Z",
+                                "mean": 3.023527777777778,
+                                "stdDev": 5.1148644523259925,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-03T00:00:00.000Z",
+                            "value": 3.032944444444444,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-02T07:47:02.000Z",
+                                "sampleValue": 76,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-02T01:13:37.000Z",
+                                "max": 76,
+                                "maxTime": "2024-01-02T07:47:02.000Z",
+                                "mean": 3.032944444444444,
+                                "stdDev": 5.376342088674131,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk03.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-04T00:00:00.000Z",
+                            "value": 3.395104166666666,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-03T14:21:03.000Z",
+                                "sampleValue": 66.7,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-03T04:04:37.000Z",
+                                "max": 66.7,
+                                "maxTime": "2024-01-03T14:21:03.000Z",
+                                "mean": 3.395104166666666,
+                                "stdDev": 6.199636306673897,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk03.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-05T00:00:00.000Z",
+                            "value": 3.137078074552392,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-04T11:48:12.000Z",
+                                "sampleValue": 64.8,
+                                "count": 6814,
+                                "min": 0.2,
+                                "minTime": "2024-01-04T16:41:38.000Z",
+                                "max": 64.8,
+                                "maxTime": "2024-01-04T11:48:12.000Z",
+                                "mean": 3.137078074552392,
+                                "stdDev": 5.5872614746330544,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 4.993055555555555
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-06T00:00:00.000Z",
+                            "value": 2.7688194444444445,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-05T15:51:15.000Z",
+                                "sampleValue": 60.8,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-05T00:22:14.000Z",
+                                "max": 60.8,
+                                "maxTime": "2024-01-05T15:51:15.000Z",
+                                "mean": 2.7688194444444445,
+                                "stdDev": 4.94872065119081,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-07T00:00:00.000Z",
+                            "value": 1.9746527777777776,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-06T19:11:09.000Z",
+                                "sampleValue": 9,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-06T00:29:15.000Z",
+                                "max": 9,
+                                "maxTime": "2024-01-06T19:11:09.000Z",
+                                "mean": 1.9746527777777776,
+                                "stdDev": 1.024674344572248,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk03.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-08T00:00:00.000Z",
+                            "value": 1.9882499999999996,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-07T08:06:16.000Z",
+                                "sampleValue": 31.4,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-07T01:34:16.000Z",
+                                "max": 31.4,
+                                "maxTime": "2024-01-07T08:06:16.000Z",
+                                "mean": 1.9882499999999996,
+                                "stdDev": 1.1616783504069188,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-09T00:00:00.000Z",
+                            "value": 2.060847222222222,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-08T17:36:18.000Z",
+                                "sampleValue": 42,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-08T09:14:17.000Z",
+                                "max": 42,
+                                "maxTime": "2024-01-08T17:36:18.000Z",
+                                "mean": 2.060847222222222,
+                                "stdDev": 2.597272037210381,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-10T00:00:00.000Z",
+                            "value": 3.4424027777777777,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-09T10:21:19.000Z",
+                                "sampleValue": 51,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-09T13:44:18.000Z",
+                                "max": 51,
+                                "maxTime": "2024-01-09T10:21:19.000Z",
+                                "mean": 3.4424027777777777,
+                                "stdDev": 6.40824198024637,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-11T00:00:00.000Z",
+                            "value": 2.747311827956989,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-10T14:19:19.000Z",
+                                "sampleValue": 56.9,
+                                "count": 7161,
+                                "min": 0.2,
+                                "minTime": "2024-01-10T15:51:19.000Z",
+                                "max": 56.9,
+                                "maxTime": "2024-01-10T14:19:19.000Z",
+                                "mean": 2.747311827956989,
+                                "stdDev": 4.959013726965291,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 4.993576388888889
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-12T00:00:00.000Z",
+                            "value": 2.763430555555556,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-11T15:02:12.000Z",
+                                "sampleValue": 61.8,
+                                "count": 7200,
+                                "min": 0.6,
+                                "minTime": "2024-01-11T01:01:39.000Z",
+                                "max": 61.8,
+                                "maxTime": "2024-01-11T15:02:12.000Z",
+                                "mean": 2.763430555555556,
+                                "stdDev": 4.0850695128418995,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-13T00:00:00.000Z",
+                            "value": 3.8609999999999998,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-12T14:09:27.000Z",
+                                "sampleValue": 64.8,
+                                "count": 7200,
+                                "min": 0.7,
+                                "minTime": "2024-01-11T23:59:41.000Z",
+                                "max": 64.8,
+                                "maxTime": "2024-01-12T14:09:27.000Z",
+                                "mean": 3.8609999999999998,
+                                "stdDev": 7.3007481515744965,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk03.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-14T00:00:00.000Z",
+                            "value": 1.8498194444444442,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-13T08:47:43.000Z",
+                                "sampleValue": 30.4,
+                                "count": 7200,
+                                "min": 0.6,
+                                "minTime": "2024-01-13T05:06:42.000Z",
+                                "max": 30.4,
+                                "maxTime": "2024-01-13T08:47:43.000Z",
+                                "mean": 1.8498194444444442,
+                                "stdDev": 1.5805817320377045,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk02.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-15T00:00:00.000Z",
+                            "value": 1.877013888888889,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-14T08:06:43.000Z",
+                                "sampleValue": 30.5,
+                                "count": 7200,
+                                "min": 0.6,
+                                "minTime": "2024-01-14T02:42:42.000Z",
+                                "max": 30.5,
+                                "maxTime": "2024-01-14T08:06:43.000Z",
+                                "mean": 1.877013888888889,
+                                "stdDev": 1.0937894230300307,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk02.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-16T00:00:00.000Z",
+                            "value": 2.759770833333333,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-15T16:46:05.000Z",
+                                "sampleValue": 64,
+                                "count": 7200,
+                                "min": 0.2,
+                                "minTime": "2024-01-15T16:27:43.000Z",
+                                "max": 64,
+                                "maxTime": "2024-01-15T16:46:05.000Z",
+                                "mean": 2.759770833333333,
+                                "stdDev": 4.760796068777135,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclutil01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-17T00:00:00.000Z",
+                            "value": 1.7308055555555555,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-16T07:38:57.000Z",
+                                "sampleValue": 44.3,
+                                "count": 7200,
+                                "min": 0.6,
+                                "minTime": "2024-01-16T15:47:49.000Z",
+                                "max": 44.3,
+                                "maxTime": "2024-01-16T07:38:57.000Z",
+                                "mean": 1.7308055555555555,
+                                "stdDev": 2.879248006493591,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-18T00:00:00.000Z",
+                            "value": 3.2407361111111115,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-17T20:08:00.000Z",
+                                "sampleValue": 79.2,
+                                "count": 7200,
+                                "min": 0.6,
+                                "minTime": "2024-01-17T03:02:50.000Z",
+                                "max": 79.2,
+                                "maxTime": "2024-01-17T20:08:00.000Z",
+                                "mean": 3.2407361111111115,
+                                "stdDev": 8.76071480644108,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-19T00:00:00.000Z",
+                            "value": 3.640222222222223,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-18T12:00:52.000Z",
+                                "sampleValue": 47.4,
+                                "count": 7200,
+                                "min": 0.6,
+                                "minTime": "2024-01-18T04:03:51.000Z",
+                                "max": 47.4,
+                                "maxTime": "2024-01-18T12:00:52.000Z",
+                                "mean": 3.640222222222223,
+                                "stdDev": 4.299634004078678,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk02.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-20T00:00:00.000Z",
+                            "value": 4.510722222222221,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-19T18:04:53.000Z",
+                                "sampleValue": 73.9,
+                                "count": 7200,
+                                "min": 0.7,
+                                "minTime": "2024-01-19T00:03:51.000Z",
+                                "max": 73.9,
+                                "maxTime": "2024-01-19T18:04:53.000Z",
+                                "mean": 4.510722222222221,
+                                "stdDev": 6.51426797213088,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk02.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-21T00:00:00.000Z",
+                            "value": 2.572166666666667,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-20T23:08:52.000Z",
+                                "sampleValue": 13.6,
+                                "count": 7200,
+                                "min": 0.7,
+                                "minTime": "2024-01-20T00:03:52.000Z",
+                                "max": 13.6,
+                                "maxTime": "2024-01-20T23:08:52.000Z",
+                                "mean": 2.572166666666667,
+                                "stdDev": 1.483640576296457,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-22T00:00:00.000Z",
+                            "value": 2.348180555555556,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-21T00:04:02.000Z",
+                                "sampleValue": 23,
+                                "count": 7200,
+                                "min": 0.7,
+                                "minTime": "2024-01-21T00:30:52.000Z",
+                                "max": 23,
+                                "maxTime": "2024-01-21T00:04:02.000Z",
+                                "mean": 2.348180555555556,
+                                "stdDev": 1.1266867347988472,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclutil01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-23T00:00:00.000Z",
+                            "value": 2.6097638888888888,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-22T10:49:54.000Z",
+                                "sampleValue": 38.8,
+                                "count": 7200,
+                                "min": 0.7,
+                                "minTime": "2024-01-22T00:16:53.000Z",
+                                "max": 38.8,
+                                "maxTime": "2024-01-22T10:49:54.000Z",
+                                "mean": 2.6097638888888888,
+                                "stdDev": 2.2396719665912213,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk02.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-24T00:00:00.000Z",
+                            "value": 3.6196944444444448,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-23T08:57:54.000Z",
+                                "sampleValue": 31.3,
+                                "count": 7200,
+                                "min": 0.6,
+                                "minTime": "2024-01-23T17:16:54.000Z",
+                                "max": 31.3,
+                                "maxTime": "2024-01-23T08:57:54.000Z",
+                                "mean": 3.6196944444444448,
+                                "stdDev": 2.9971905937809593,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk02.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-25T00:00:00.000Z",
+                            "value": 3.058791666666667,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-24T10:14:03.000Z",
+                                "sampleValue": 39.8,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-24T17:17:54.000Z",
+                                "max": 39.8,
+                                "maxTime": "2024-01-24T10:14:03.000Z",
+                                "mean": 3.058791666666667,
+                                "stdDev": 2.355920256849299,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk03.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-26T00:00:00.000Z",
+                            "value": 2.5500208333333334,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-25T09:27:03.000Z",
+                                "sampleValue": 19.5,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-25T00:03:54.000Z",
+                                "max": 19.5,
+                                "maxTime": "2024-01-25T09:27:03.000Z",
+                                "mean": 2.5500208333333334,
+                                "stdDev": 1.6267835904752717,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk03.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-27T00:00:00.000Z",
+                            "value": 2.4453472222222223,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-26T09:08:04.000Z",
+                                "sampleValue": 25.1,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-25T23:59:55.000Z",
+                                "max": 25.1,
+                                "maxTime": "2024-01-26T09:08:04.000Z",
+                                "mean": 2.4453472222222223,
+                                "stdDev": 1.6172977627304828,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk03.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-28T00:00:00.000Z",
+                            "value": 2.6075069444444443,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-27T15:21:57.000Z",
+                                "sampleValue": 44,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-27T00:03:56.000Z",
+                                "max": 44,
+                                "maxTime": "2024-01-27T15:21:57.000Z",
+                                "mean": 2.6075069444444443,
+                                "stdDev": 2.2623558887136253,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk02.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-29T00:00:00.000Z",
+                            "value": 2.435111111111111,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-28T11:21:57.000Z",
+                                "sampleValue": 31.8,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-27T23:59:56.000Z",
+                                "max": 31.8,
+                                "maxTime": "2024-01-28T11:21:57.000Z",
+                                "mean": 2.435111111111111,
+                                "stdDev": 1.7345481547562678,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk02.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-30T00:00:00.000Z",
+                            "value": 3.2564374999999997,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-29T13:49:06.000Z",
+                                "sampleValue": 79.7,
+                                "count": 7200,
+                                "min": 0.5,
+                                "minTime": "2024-01-29T00:02:57.000Z",
+                                "max": 79.7,
+                                "maxTime": "2024-01-29T13:49:06.000Z",
+                                "mean": 3.2564374999999997,
+                                "stdDev": 4.130315323356502,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk01.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        },
+                        {
+                            "timestamp": "2024-01-31T00:00:00.000Z",
+                            "value": 3.5394861111111116,
+                            "type": "SAMPLE",
+                            "aggregateStatistics": {
+                                "sampleTime": "2024-01-30T14:07:10.000Z",
+                                "sampleValue": 44.4,
+                                "count": 7200,
+                                "min": 0.3,
+                                "minTime": "2024-01-30T07:25:59.000Z",
+                                "max": 44.4,
+                                "maxTime": "2024-01-30T14:07:10.000Z",
+                                "mean": 3.5394861111111116,
+                                "stdDev": 3.6220693802255552,
+                                "crossEntityMetadata": {
+                                    "maxEntityDisplayName": "mqmblclwrk03.internal.six-group.net",
+                                    "minEntityDisplayName": "mqmblclmtr01.internal.six-group.net",
+                                    "numEntities": 5
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "warnings": [],
+            "timeSeriesQuery": "select cpu_percent_across_hosts where category = CLUSTER"
+        }
+    ]
+}
