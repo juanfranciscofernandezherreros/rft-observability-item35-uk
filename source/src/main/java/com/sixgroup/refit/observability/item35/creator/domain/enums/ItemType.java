@@ -31,6 +31,21 @@ public enum ItemType {
             HEADER_MAX_USAGE,
             HEADER_INCIDENT_RELATED,
             HEADER_TR_INCIDENT_ID
+        }),
+    STORAGE_CAPACITY("storageCapacity", "TRRGS_EMIR_PR_IN_ND_ITEM35C_",
+        new String[]{
+            HEADER_TR_CODE,
+            HEADER_REPORTING_DATE,
+            HEADER_REGULATION_REFERENCE,
+            HEADER_DATA_CENTER_LOCATION,
+            HEADER_DATABASE_SERVER_OR_PLATFORM,
+            HEADER_DATE,
+            HEADER_CAPACITY,
+            HEADER_USED_CAPACITY,
+            HEADER_AVAILABLE_CAPACITY,
+            HEADER_UTILIZATION,
+            HEADER_INCIDENT_RELATED,
+            HEADER_TR_INCIDENT_ID
         });
 
     private final String name;

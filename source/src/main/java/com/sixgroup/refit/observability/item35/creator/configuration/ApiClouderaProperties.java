@@ -14,6 +14,7 @@ public class ApiClouderaProperties {
     private String port;
     private Cpu cpu = new Cpu();
     private Ram ram = new Ram();
+    private Storage storage = new Storage();
 
     @Data
     public static class Cpu {
@@ -27,6 +28,14 @@ public class ApiClouderaProperties {
         private boolean enabled;
         private String selectRam;
         private String desiredRollup;
+    }
+
+    @Data
+    public static class Storage {
+        private String selectTotalApi;
+        private String selectFreeApi;
+        private String desiredRollup;
+        private boolean enabled;
     }
 
 }

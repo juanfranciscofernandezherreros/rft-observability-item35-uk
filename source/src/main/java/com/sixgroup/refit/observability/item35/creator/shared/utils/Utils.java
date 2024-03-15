@@ -58,8 +58,15 @@ public class Utils {
         }
     }
 
+
     public static String convertBytesToTeraBytes(BigDecimal bytes) {
         return bytes.divide(new BigDecimal("1024").pow(4), 3, RoundingMode.HALF_UP).toString();
+    }
+
+    public static String createFileDateFromTimeStamp(String timestamp) {
+        String[] dateArray = timestamp.split("T");
+        String dayString = dateArray[0];
+        return dayString.replace("-", "/");
     }
 
 }

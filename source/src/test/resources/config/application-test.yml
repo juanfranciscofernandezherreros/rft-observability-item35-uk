@@ -52,8 +52,8 @@ component-config:
     schema: EMIR_REFIT_DEV_CONTROL_REFIT
   api:
     cloudera:
-      username: tx99o
-      password: Argent76?BME
+      username:
+      password:
       host: https://mqmblclutil01.internal.six-group.net
       port: 7183
       url: /api/v54/timeseries
@@ -65,10 +65,14 @@ component-config:
         enabled: false
         selectRam: select physical_memory_used
         desiredRollup: DAILY
+      storage:
+        selectTotalApi: select total_capacity_across_filesystems
+        selectFreeApi: select total_capacity_free_across_filesystems
+        desiredRollup: DAILY
+        enabled: false
+
 logging:
   level:
     root: INFO
     "org.apache.kafka": INFO
     "com.sixgroup.refit": DEBUG
-
-

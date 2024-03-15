@@ -4,6 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 
 public class CapacityConstants {
 
+    public static final String ITEMS = "items";
+    public static final String TIME_SERIES = "timeSeries";
+    public static final String DATA = "data";
+    public static final String TIMESTAMP = "timestamp";
+    public static final String AGGREGATE_STATISTICS = "aggregateStatistics";
+    public static final String MIN = "min";
+    public static final String MAX = "max";
+    public static final String MEAN = "mean";
     public static final String RAM = "RAM";
     public static final String CPU = "CPU";
     public static final String FIELD_NAME_FILE = "Cloudera";
