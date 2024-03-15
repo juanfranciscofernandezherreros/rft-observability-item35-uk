@@ -24,6 +24,17 @@ public class Constants {
     public static String CREATING_AND_SAVING_FILE = "Creating and saving file";
     public static String CONSUMED_MESSAGE_ITEM35 = "Consumed message";
 
+    public static String HEADER_DATA_CENTER_LOCATION = "DATA_CENTER_LOCATION";
+    public static String HEADER_DATABASE_SERVER_OR_PLATFORM = "DATABASE_SERVER_OR_PLATFORM";
+    public static String HEADER_CAPACITY = "CAPACITY";
+    public static String HEADER_USED_CAPACITY = "USED_CAPACITY";
+    public static String HEADER_AVAILABLE_CAPACITY = "AVAILABLE_CAPACITY";
+    public static String HEADER_UTILIZATION = "UTILIZATION";
+    public static String DATA_CENTER_LOCATION = "Cloudera";
+    public static String DATABASE_SERVER_OR_PLATFORM = "Cloudera data warehouse";
+    public static String NODE_STORAGE_TOTAL = "rftemir-cldr-qa-mbt";
+    public static String INCIDENT_RELATED = "NO";
+    public static String TR_INCIDENT_ID = "";
     public static final String DESIRED_ROLLUP = "desiredRollup";
     public static final String DATE_FROM = "from";
     public static final String DATE_TO = "to";

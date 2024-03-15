@@ -45,7 +45,7 @@ public class KafkaConsumerItem {
             kafkaConsumerTracing.initTrace(item.headers());
             ItemCommandDTO itemCommand = ItemCommandDTO.generateItemCommandDTO(item.value());
             LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommand);
-            if (isRequestSubmissionVolumes(item.value())) {
+            if (isRequestTypeAccepted(item.value())) {
                 stateService.nextStep(
                     StateRequest.builder().fileName(Utils.getFileName(itemCommand))
                         .itemType(ITEM35).build());
@@ -57,8 +57,9 @@ public class KafkaConsumerItem {
         }
     }
 
-    private boolean isRequestSubmissionVolumes(ItemCommand itemCommand) {
+    private boolean isRequestTypeAccepted(ItemCommand itemCommand) {
         return ItemType.SUBMISSION_VOLUMES.getName().equals(itemCommand.getItemType())
-            || ItemType.COMPUTE_CAPACITY.getName().equals(itemCommand.getItemType());
+            || ItemType.COMPUTE_CAPACITY.getName().equals(itemCommand.getItemType())
+            || ItemType.STORAGE_CAPACITY.getName().equals(itemCommand.getItemType());
     }
 }
