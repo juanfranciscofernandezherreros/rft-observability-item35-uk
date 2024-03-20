@@ -1,5 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.producer;
 
+import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
@@ -12,8 +13,8 @@ import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.Av
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
-import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.header.Headers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -22,29 +23,24 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import com.sixgroup.refit.observability.item.state.application.StateService;
-
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_SENDING_MESSAGE_EFRH_031;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 
 @Component
 @RequiredArgsConstructor
 public class KafkaProducerItem implements ProducerItemService {
 
     private final RftKafkaProducerTracing<ItemId, ItemCommand> producerTracing;
-    private final Tracer tracer;
-
+    private final StateService stateService;
     @Value("${component-config.topics.observability-item-topic}")
     private String topic;
 
-    private final StateService stateService;
-
     @Override
-    public void send(ItemCommandDTO itemCommandDTO) {
+    public void send(ItemCommandDTO itemCommandDTO, Headers headers) {
 
         ItemId itemId = ItemId.newBuilder().setItemId(itemCommandDTO.getItemId()).build();
         ItemCommand itemCommand = getItemCommandResponse(itemCommandDTO);
-        var future = producerTracing.createMessage(topic, itemId, itemCommand, tracer);
+        var future = producerTracing.createMessage(topic, itemId, itemCommand, headers);
         stateService.nextStep(
             StateRequest.builder()
                 .fileName(Utils.getFileName(itemCommandDTO))

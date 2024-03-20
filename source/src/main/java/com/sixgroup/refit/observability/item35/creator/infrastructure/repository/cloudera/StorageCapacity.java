@@ -3,6 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Response;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
@@ -17,7 +18,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_CALL_CLOUDERA;
@@ -31,15 +31,15 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 public class StorageCapacity implements StorageCapacityRepository {
 
     private final OkHttpClient okHttpClient;
-
     private final ApiClouderaProperties apiClouderaProperties;
+    private final ComponentProperties componentProperties;
 
     public Response findTotalStorage(String dateFrom, String dateTo) {
-        return doClouderaCaller(dateFrom, dateTo, apiClouderaProperties.getStorage().getSelectTotalApi());
+        return doClouderaCaller(dateFrom, dateTo, componentProperties.getStorage().getSelectTotalApi());
     }
 
     public Response findFreeStorage(String dateFrom, String dateTo) {
-        return doClouderaCaller(dateFrom, dateTo, apiClouderaProperties.getStorage().getSelectFreeApi());
+        return doClouderaCaller(dateFrom, dateTo, componentProperties.getStorage().getSelectFreeApi());
     }
 
     private Response doClouderaCaller(String dateFrom, String dateTo, String query) {

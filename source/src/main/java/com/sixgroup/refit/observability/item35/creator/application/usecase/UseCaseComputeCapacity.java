@@ -16,6 +16,7 @@ import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -42,7 +43,7 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
     private final StateService stateService;
 
     @Override
-    public File execute(ItemCommandDTO itemCommandDTO) throws ExecutionException, InterruptedException {
+    public File execute(ItemCommandDTO itemCommandDTO, Headers headers) throws ExecutionException, InterruptedException {
 
         RftLog.info("Generating compute capacity file ...");
         File fileComputeCapacity = null;
@@ -68,7 +69,7 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
             RftLog.info("Generated capacity file");
             itemCommandDTO.setFileUrl(fileComputeCapacity.toString());
             itemCommandDTO.setFileName(fileComputeCapacity.getName());
-            producerItemService.send(itemCommandDTO);
+            producerItemService.send(itemCommandDTO, headers);
         } catch (Exception e) {
             RftLog.error("Error to generate file compute capacity",
                 List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), "");

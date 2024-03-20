@@ -1,6 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.cloudera;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
 import okhttp3.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,9 @@ class StorageCapacityTest {
 
     @Mock
     private ApiClouderaProperties mockApiClouderaProperties;
+
+    @Mock
+    private ComponentProperties mockComponentProperties;
 
     @Mock
     private Call mockCall;
@@ -48,8 +52,8 @@ class StorageCapacityTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ApiClouderaProperties.Storage mockStorage = mock(ApiClouderaProperties.Storage.class);
-        when(mockApiClouderaProperties.getStorage()).thenReturn(mockStorage);
+        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
+        when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectTotalApi()).thenReturn("select total_capacity_across_filesystems");
 
         // Execute the method under test
@@ -80,8 +84,8 @@ class StorageCapacityTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ApiClouderaProperties.Storage mockStorage = mock(ApiClouderaProperties.Storage.class);
-        when(mockApiClouderaProperties.getStorage()).thenReturn(mockStorage);
+        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
+        when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
 
         // Execute the method under test
@@ -103,8 +107,8 @@ class StorageCapacityTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ApiClouderaProperties.Storage mockStorage = mock(ApiClouderaProperties.Storage.class);
-        when(mockApiClouderaProperties.getStorage()).thenReturn(mockStorage);
+        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
+        when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectTotalApi()).thenReturn("select total_capacity_across_filesystems");
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
@@ -126,8 +130,8 @@ class StorageCapacityTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ApiClouderaProperties.Storage mockStorage = mock(ApiClouderaProperties.Storage.class);
-        when(mockApiClouderaProperties.getStorage()).thenReturn(mockStorage);
+        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
+        when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,

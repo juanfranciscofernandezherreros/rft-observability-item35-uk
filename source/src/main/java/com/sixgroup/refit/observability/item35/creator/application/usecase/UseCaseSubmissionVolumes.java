@@ -14,6 +14,7 @@ import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -37,7 +38,7 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
     private final StateService stateService;
 
     @Override
-    public File execute(ItemCommandDTO itemCommandDTO) {
+    public File execute(ItemCommandDTO itemCommandDTO, Headers headers) {
 
         RftLog.info("Generating submission volumes file ...");
         File file = null;
@@ -56,7 +57,7 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
             RftLog.info("Generated submission volumes file");
             itemCommandDTO.setFileUrl(file.getAbsolutePath());
             itemCommandDTO.setFileName(file.getName());
-            producerItemService.send(itemCommandDTO);
+            producerItemService.send(itemCommandDTO, headers);
         } catch (Exception e) {
             RftLog.error("Error to generate file submission volumes",
                 List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), "");

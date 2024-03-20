@@ -6,15 +6,12 @@ import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCa
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
-import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.StorageCapacityDto;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
-import com.sixgroup.refit.observability.item35.creator.domain.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
-import org.apache.kafka.common.errors.ResourceNotFoundException;
+import org.apache.kafka.common.header.Headers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -25,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,130 +32,19 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UseCaseStorageCapacityTest {
 
-    @Mock
-    private WriteFileItem35Service<StorageCapacityDto> writeFileSubmissionVolumesService;
-
-    @Mock
-    private ProducerItemService producerItemService;
-
-    @Mock
-    private StateService stateService;
-
-    @InjectMocks
-    private UseCaseStorageCapacity useCaseStorageCapacity;
-
-    @Mock
-    private StorageService storageService;
-
     @Captor
     ArgumentCaptor<List<StorageCapacityDto>> storageCapacityDtoListCaptor;
-
-    @Test
-    void execute() throws IOException {
-        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.703632f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
-        when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
-
-        List<Storage> totalFreeCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.464956f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.486961f));
-        when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
-
-        StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("20240915", "2023/09/01",
-            "2023-09-01T00:00:00.000Z", 16.703632f,0.23867607f, 16.464956f,
-            0.0142888725f);
-
-        StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("20240915", "2023/09/02",
-            "2023-09-02T00:00:00.000Z", 16.700466f,0.21350479f, 16.486961f,
-            0.012784361f);
-
-        List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
-
-        File mockedFile = new File("test_file.csv");
-        when(writeFileSubmissionVolumesService.writeFile(anyList(), any())).thenReturn(mockedFile);
-
-        ItemCommandDTO itemCommandDTO = getItemCommandDTO();
-
-        File resultFile = useCaseStorageCapacity.execute(itemCommandDTO);
-        assertNotNull(resultFile);
-        verify(storageService, times(1)).getTotalCapacity(any(), any());
-        verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
-        verify(stateService, times(1)).nextStep(any(StateRequest.class));
-        verify(producerItemService, times(1)).send(any());
-
-        verify(writeFileSubmissionVolumesService).writeFile(storageCapacityDtoListCaptor.capture(),
-            any());
-        List<StorageCapacityDto> value = storageCapacityDtoListCaptor.getValue();
-        assertEquals(value, storageCapacityDtoList);
-    }
-
-    @Test
-    void execute_resource_not_found_total_capacity_error() {
-        when(storageService.getTotalCapacity(any(), any())).thenReturn(null);
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> useCaseStorageCapacity.execute(getItemCommandDTO()));
-        assertEquals(runtimeException.getMessage(), "Not exist 'total capacity data' between 2024-09-01 and 2024-10-01");
-        verify(stateService, times(1)).setError(any());
-        verify(producerItemService, times(0)).send(any());
-        verify(storageService, times(1)).getTotalCapacity(any(), any());
-        verify(storageService, times(0)).getTotalFreeCapacity(any(), any());
-    }
-
-    @Test
-    void execute_resource_not_found_total_free_capacity_error() {
-        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.703632f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
-        when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
-        when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(null);
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> useCaseStorageCapacity.execute(getItemCommandDTO()));
-        assertEquals(runtimeException.getMessage(), "Not exist 'total free capacity data' between 2024-09-01 and 2024-10-01");
-        verify(stateService, times(1)).setError(any());
-        verify(producerItemService, times(0)).send(any());
-        verify(storageService, times(1)).getTotalCapacity(any(), any());
-        verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
-    }
-
-    @Test
-    void execute_throws_io_exception() throws IOException {
-        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.703632f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
-        when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
-
-        List<Storage> totalFreeCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.464956f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.486961f));
-        when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
-
-        StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("20240915", "2023/09/01",
-            "2023-09-01T00:00:00.000Z", 16.703632f,0.23867607f, 16.464956f,
-            0.0142888725f);
-
-        StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("20240915", "2023/09/02",
-            "2023-09-02T00:00:00.000Z", 16.700466f,0.21350479f, 16.486961f,
-            0.012784361f);
-
-        List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
-
-        when(writeFileSubmissionVolumesService.writeFile(anyList(), any())).thenThrow(new IOException("Error"));
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> useCaseStorageCapacity.execute(getItemCommandDTO()));
-
-        assertEquals(runtimeException.getMessage(), "java.io.IOException: Error");
-
-        verify(storageService, times(1)).getTotalCapacity(any(), any());
-        verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
-        verify(stateService, times(1)).nextStep(any(StateRequest.class));
-        verify(producerItemService, times(0)).send(any());
-
-        verify(writeFileSubmissionVolumesService).writeFile(storageCapacityDtoListCaptor.capture(),
-            any());
-        List<StorageCapacityDto> value = storageCapacityDtoListCaptor.getValue();
-        assertEquals(value, storageCapacityDtoList);
-    }
-
-    @Test
-    void getItemType() {
-        assertEquals(useCaseStorageCapacity.getItemType(), ItemType.STORAGE_CAPACITY);
-    }
+    @Mock
+    private WriteFileItem35Service<StorageCapacityDto> writeFileSubmissionVolumesService;
+    @Mock
+    private ProducerItemService producerItemService;
+    @Mock
+    private StateService stateService;
+    @InjectMocks
+    private UseCaseStorageCapacity useCaseStorageCapacity;
+    @Mock
+    private StorageService storageService;
+    private final Headers mockHeaders = mock(Headers.class);
 
     private static StorageCapacityDto createStorageCapacity(String reportDay, String date, String timeStamp, float capacity,
                                                             float usedCapacity, float availableCapacity, float utilization) {
@@ -180,6 +65,113 @@ class UseCaseStorageCapacityTest {
             .itemType(ItemType.STORAGE_CAPACITY.getName())
             .command(Command.REQUEST.getDescription())
             .build();
+    }
+
+    @Test
+    void execute() throws IOException {
+        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.703632f),
+            new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
+        when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
+
+        List<Storage> totalFreeCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.464956f),
+            new Storage("2023-09-02T00:00:00.000Z", 16.486961f));
+        when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
+
+        StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("20240915", "2023/09/01",
+            "2023-09-01T00:00:00.000Z", 16.703632f, 0.23867607f, 16.464956f,
+            0.0142888725f);
+
+        StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("20240915", "2023/09/02",
+            "2023-09-02T00:00:00.000Z", 16.700466f, 0.21350479f, 16.486961f,
+            0.012784361f);
+
+        List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
+
+        File mockedFile = new File("test_file.csv");
+        when(writeFileSubmissionVolumesService.writeFile(anyList(), any())).thenReturn(mockedFile);
+
+        ItemCommandDTO itemCommandDTO = getItemCommandDTO();
+
+        File resultFile = useCaseStorageCapacity.execute(itemCommandDTO, mockHeaders);
+        assertNotNull(resultFile);
+        verify(storageService, times(1)).getTotalCapacity(any(), any());
+        verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
+        verify(stateService, times(1)).nextStep(any(StateRequest.class));
+        verify(producerItemService, times(1)).send(any(), any());
+
+        verify(writeFileSubmissionVolumesService).writeFile(storageCapacityDtoListCaptor.capture(),
+            any());
+        List<StorageCapacityDto> value = storageCapacityDtoListCaptor.getValue();
+        assertEquals(value, storageCapacityDtoList);
+    }
+
+    @Test
+    void execute_resource_not_found_total_capacity_error() {
+        when(storageService.getTotalCapacity(any(), any())).thenReturn(null);
+        RuntimeException runtimeException = assertThrows(RuntimeException.class,
+            () -> useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders));
+        assertEquals(runtimeException.getMessage(), "Not exist 'total capacity data' between 2024-09-01 and 2024-10-01");
+        verify(stateService, times(1)).setError(any());
+        verify(producerItemService, times(0)).send(any(), any());
+        verify(storageService, times(1)).getTotalCapacity(any(), any());
+        verify(storageService, times(0)).getTotalFreeCapacity(any(), any());
+    }
+
+    @Test
+    void execute_resource_not_found_total_free_capacity_error() {
+        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.703632f),
+            new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
+        when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
+        when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(null);
+        RuntimeException runtimeException = assertThrows(RuntimeException.class,
+            () -> useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders));
+        assertEquals(runtimeException.getMessage(), "Not exist 'total free capacity data' between 2024-09-01 and 2024-10-01");
+        verify(stateService, times(1)).setError(any());
+        verify(producerItemService, times(0)).send(any(), any());
+        verify(storageService, times(1)).getTotalCapacity(any(), any());
+        verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
+    }
+
+    @Test
+    void execute_throws_io_exception() throws IOException {
+        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.703632f),
+            new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
+        when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
+
+        List<Storage> totalFreeCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.464956f),
+            new Storage("2023-09-02T00:00:00.000Z", 16.486961f));
+        when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
+
+        StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("20240915", "2023/09/01",
+            "2023-09-01T00:00:00.000Z", 16.703632f, 0.23867607f, 16.464956f,
+            0.0142888725f);
+
+        StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("20240915", "2023/09/02",
+            "2023-09-02T00:00:00.000Z", 16.700466f, 0.21350479f, 16.486961f,
+            0.012784361f);
+
+        List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
+
+        when(writeFileSubmissionVolumesService.writeFile(anyList(), any())).thenThrow(new IOException("Error"));
+        RuntimeException runtimeException = assertThrows(RuntimeException.class,
+            () -> useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders));
+
+        assertEquals(runtimeException.getMessage(), "java.io.IOException: Error");
+
+        verify(storageService, times(1)).getTotalCapacity(any(), any());
+        verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
+        verify(stateService, times(1)).nextStep(any(StateRequest.class));
+        verify(producerItemService, times(0)).send(any(), any());
+
+        verify(writeFileSubmissionVolumesService).writeFile(storageCapacityDtoListCaptor.capture(),
+            any());
+        List<StorageCapacityDto> value = storageCapacityDtoListCaptor.getValue();
+        assertEquals(value, storageCapacityDtoList);
+    }
+
+    @Test
+    void getItemType() {
+        assertEquals(useCaseStorageCapacity.getItemType(), ItemType.STORAGE_CAPACITY);
     }
 
 }

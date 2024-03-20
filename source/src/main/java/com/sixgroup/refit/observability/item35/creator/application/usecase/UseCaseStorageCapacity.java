@@ -7,7 +7,6 @@ import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.StorageCapacityDto;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
@@ -18,11 +17,10 @@ import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.Na
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
+import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +40,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
     private final StorageService storageService;
 
     @Override
-    public File execute(ItemCommandDTO itemCommandDTO) {
+    public File execute(ItemCommandDTO itemCommandDTO, Headers headers) {
         RftLog.info("Generating storage capacity volumes file ...");
         File fileStorageCapacity;
         try {
@@ -82,7 +80,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             RftLog.info("Generated storage capacity file");
             itemCommandDTO.setFileUrl(fileStorageCapacity.toString());
             itemCommandDTO.setFileName(fileStorageCapacity.getName());
-            producerItemService.send(itemCommandDTO);
+            producerItemService.send(itemCommandDTO, headers);
             return fileStorageCapacity;
         } catch (Exception e) {
             RftLog.error("Error to generate file storage capacity",
