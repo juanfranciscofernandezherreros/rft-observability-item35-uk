@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
-@ConfigurationProperties("component-config.api.cloudera")
+@ConfigurationProperties("api.cloudera")
 public class ApiClouderaProperties {
 
     private String host;
@@ -12,30 +12,4 @@ public class ApiClouderaProperties {
     private String username;
     private String password;
     private String port;
-    private Cpu cpu = new Cpu();
-    private Ram ram = new Ram();
-    private Storage storage = new Storage();
-
-    @Data
-    public static class Cpu {
-        private boolean enabled;
-        private String selectCpu;
-        private String desiredRollup;
-    }
-
-    @Data
-    public static class Ram {
-        private boolean enabled;
-        private String selectRam;
-        private String desiredRollup;
-    }
-
-    @Data
-    public static class Storage {
-        private String selectTotalApi;
-        private String selectFreeApi;
-        private String desiredRollup;
-        private boolean enabled;
-    }
-
 }

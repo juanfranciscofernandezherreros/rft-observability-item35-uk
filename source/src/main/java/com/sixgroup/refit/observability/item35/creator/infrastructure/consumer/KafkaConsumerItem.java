@@ -51,7 +51,7 @@ public class KafkaConsumerItem {
                         .itemType(ITEM35).build());
                 RftLog.debug("Consumed message to generate file Submission Volumes");
                 ItemTypeStrategy itemTypeStrategy = itemType.get(ItemType.getItemTypeFromName(item.value().getItemType()));
-                itemTypeStrategy.execute(itemCommand);
+                itemTypeStrategy.execute(itemCommand, item.headers());
                 RftLog.debug("Generate file item35: Submission Volumes");
             }
         }

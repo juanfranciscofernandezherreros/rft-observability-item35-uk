@@ -3,6 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Response;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityCpuRepository;
@@ -14,7 +15,8 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -32,8 +34,8 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 public class CapacityCpuCloudera implements CapacityCpuRepository {
 
     private final OkHttpClient okHttpClient;
-
     private final ApiClouderaProperties apiClouderaProperties;
+    private final ComponentProperties componentProperties;
 
     @Override
     public List<Capacity> findByCapacityCpu(String dateFrom, String dateTo) {
@@ -42,11 +44,11 @@ public class CapacityCpuCloudera implements CapacityCpuRepository {
 
         List<Capacity> listCapacityCpu = null;
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl())).newBuilder();
-        urlBuilder.addQueryParameter(QUERY, apiClouderaProperties.getCpu().getSelectCpu());
+        urlBuilder.addQueryParameter(QUERY, componentProperties.getCpu().getSelectCpu());
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         urlBuilder.addQueryParameter(DATE_FROM, dateFrom);
         urlBuilder.addQueryParameter(DATE_TO, dateTo);
-        urlBuilder.addQueryParameter(DESIRED_ROLLUP, apiClouderaProperties.getCpu().getDesiredRollup());
+        urlBuilder.addQueryParameter(DESIRED_ROLLUP, componentProperties.getCpu().getDesiredRollup());
         Request request = new Request.Builder()
             .url(urlBuilder.build().toString())
             .method(HttpMethod.GET.name(), null)

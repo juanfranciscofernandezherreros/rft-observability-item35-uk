@@ -42,6 +42,15 @@ spring:
       ddl-auto: validate
       persistence-unit: sqlserverdb
       schema: dbo
+
+api:
+  cloudera:
+    username:
+    password:
+    host: https://mqmblclutil01.internal.six-group.net
+    port: 7183
+    url: /api/v54/timeseries
+
 component-config:
   csv:
     output_path: "work-repository-observability/upload/"
@@ -52,11 +61,6 @@ component-config:
     schema: EMIR_REFIT_DEV_CONTROL_REFIT
   api:
     cloudera:
-      username:
-      password:
-      host: https://mqmblclutil01.internal.six-group.net
-      port: 7183
-      url: /api/v54/timeseries
       cpu:
         enabled: false
         selectCpu: select cpu_percent_across_hosts where category=CLUSTER

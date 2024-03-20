@@ -1,8 +1,8 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.cloudera;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.cloudera.CapacityCpuCloudera;
 import okhttp3.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,18 +13,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CapacityCpuClouderaTest {
+class CapacityCpuClouderaTest {
 
     @Mock
     private OkHttpClient mockOkHttpClient;
 
     @Mock
     private ApiClouderaProperties mockApiClouderaProperties;
+
+    @Mock
+    private ComponentProperties mockComponentProperties;
 
     @Mock
     private Call mockCall;
@@ -51,8 +55,8 @@ public class CapacityCpuClouderaTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("https://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ApiClouderaProperties.Cpu mockCpu = mock(ApiClouderaProperties.Cpu.class);
-        when(mockApiClouderaProperties.getCpu()).thenReturn(mockCpu);
+        ComponentProperties.Cpu mockCpu = mock(ComponentProperties.Cpu.class);
+        when(mockComponentProperties.getCpu()).thenReturn(mockCpu);
         when(mockCpu.getSelectCpu()).thenReturn("select * from test");
         when(mockCpu.getDesiredRollup()).thenReturn("DAILY");
         List<Capacity> result = capacityCpuCloudera.findByCapacityCpu(testDateFrom, testDateTo);
@@ -87,8 +91,8 @@ public class CapacityCpuClouderaTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("https://example.com");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/test");
-        ApiClouderaProperties.Cpu mockCpu = mock(ApiClouderaProperties.Cpu.class);
-        when(mockApiClouderaProperties.getCpu()).thenReturn(mockCpu);
+        ComponentProperties.Cpu mockCpu = mock(ComponentProperties.Cpu.class);
+        when(mockComponentProperties.getCpu()).thenReturn(mockCpu);
         when(mockCpu.getSelectCpu()).thenReturn("select * from test");
         when(mockCpu.getDesiredRollup()).thenReturn("DAILY");
         when(mockOkHttpClient.newCall(any(Request.class))).thenAnswer(invocation -> {

@@ -2,10 +2,9 @@ package com.sixgroup.refit.observability.item35.creator.domain.service;
 
 
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
-import com.sixgroup.refit.observability.topic.item.ItemCommand;
-import com.sixgroup.refit.observability.topic.item.ItemId;
+import org.apache.kafka.common.header.Headers;
 
 public interface ProducerItemService {
 
-    void send(ItemCommandDTO itemCommandDTO);
+    void send(ItemCommandDTO itemCommandDTO, Headers headers);
 }
