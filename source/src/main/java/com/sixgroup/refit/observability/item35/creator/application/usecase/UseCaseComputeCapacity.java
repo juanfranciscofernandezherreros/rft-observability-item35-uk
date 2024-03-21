@@ -54,7 +54,11 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
         if (CollectionUtils.isEmpty(capacityCpu) || CollectionUtils.isEmpty(capacityRam)) {
             RftLog.info("No record ram or cpu found from Cloudera api, skipping file generation");
             stateService.setError(
-                StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
+                StateRequest.builder()
+                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .itemType(ITEM35)
+                    .errorDescription("No record ram or cpu found from Cloudera api, skipping file generation")
+                    .build());
             return null;
         }
         try {
@@ -74,7 +78,11 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
             RftLog.error("Error to generate file compute capacity",
                 List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), "");
             stateService.setError(
-                StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
+                StateRequest.builder()
+                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .itemType(ITEM35)
+                    .errorDescription("Error to generate file compute capacity: " + e.getMessage())
+                    .build());
         }
 
         return fileComputeCapacity;

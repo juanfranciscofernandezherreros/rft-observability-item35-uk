@@ -13,7 +13,7 @@
     <artifactId>rft-observability-item35-creator</artifactId>
     <version>${revision}${sha1}${changelist}</version>
     <properties>
-        <revision>1.1.0</revision>
+        <revision>1.1.1</revision>
         <sha1></sha1>
         <changelist>-SNAPSHOT</changelist>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -298,7 +298,7 @@
         <dependency>
             <groupId>com.sixgroup.refit.observability</groupId>
             <artifactId>rft-observability-item-state-library</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
