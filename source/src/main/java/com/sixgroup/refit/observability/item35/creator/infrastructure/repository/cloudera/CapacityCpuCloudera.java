@@ -40,7 +40,7 @@ public class CapacityCpuCloudera implements CapacityCpuRepository {
     @Override
     public List<Capacity> findByCapacityCpu(String dateFrom, String dateTo) {
 
-        RftLog.info("Find Compute capacity Cpu  by dateFrom and dateTo");
+        RftLog.info("Find Compute capacity Cpu by dateFrom and dateTo");
 
         List<Capacity> listCapacityCpu = null;
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl())).newBuilder();

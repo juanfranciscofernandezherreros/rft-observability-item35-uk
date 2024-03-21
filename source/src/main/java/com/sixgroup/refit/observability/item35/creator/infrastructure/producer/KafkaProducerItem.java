@@ -9,23 +9,23 @@ import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerIt
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.producer.RftKafkaProducerTracing;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
-import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.AvroLog;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.header.Headers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_SENDING_MESSAGE_EFRH_031;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class KafkaProducerItem implements ProducerItemService {
@@ -62,12 +62,7 @@ public class KafkaProducerItem implements ProducerItemService {
                         ex.getMessage(),
                         ERROR_SENDING_MESSAGE_EFRH_031);
                 } else {
-                    RftLog.debug(
-                        "Successfully produced to output topic an event with key and result ",
-                        () ->
-                            List.of(
-                                AvroLog.builder().name("key").object(key).build(),
-                                AvroLog.builder().name("value").object(value).build()));
+                    log.debug("Successfully produced to output topic an event with key and result key {} value {} ", key, value);
                 }
             });
     }

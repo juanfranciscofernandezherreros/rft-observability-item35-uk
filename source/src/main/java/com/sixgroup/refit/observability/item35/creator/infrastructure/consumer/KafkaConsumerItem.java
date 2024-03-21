@@ -16,6 +16,7 @@ import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.Na
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.CREATING_AND_SAVING_FILE;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class KafkaConsumerItem {
@@ -42,6 +44,7 @@ public class KafkaConsumerItem {
         RftLog.info("Consume message", () -> List.of(NameObject.builder().name("item").object(item).build()));
         if (Constants.ITEM35.equals(item.key().getItemId())
             && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
+
             kafkaConsumerTracing.initTrace(item.headers());
             ItemCommandDTO itemCommand = ItemCommandDTO.generateItemCommandDTO(item.value());
             LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommand);
@@ -49,10 +52,10 @@ public class KafkaConsumerItem {
                 stateService.nextStep(
                     StateRequest.builder().fileName(Utils.getFileName(itemCommand))
                         .itemType(ITEM35).build());
-                RftLog.debug("Consumed message to generate file Submission Volumes");
+                log.debug("Consumed message to generate file Submission Volumes");
                 ItemTypeStrategy itemTypeStrategy = itemType.get(ItemType.getItemTypeFromName(item.value().getItemType()));
                 itemTypeStrategy.execute(itemCommand, item.headers());
-                RftLog.debug("Generate file item35: Submission Volumes");
+                log.debug("Generate file item35: Submission Volumes");
             }
         }
     }
