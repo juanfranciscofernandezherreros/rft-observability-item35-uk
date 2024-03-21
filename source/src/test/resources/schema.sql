@@ -5,6 +5,10 @@ CREATE SEQUENCE IF NOT EXISTS item_reporting_seq
     START WITH 1
     INCREMENT BY 1;
 
+CREATE SEQUENCE  if not exists dbo.item_reporting_state_seq
+    start with 1
+    increment by 1;
+
 CREATE TABLE IF NOT EXISTS item_reporting( id int not null constraint item_reporting_pk primary key, item_type varchar(50),
     file_name          varchar(255),
     file_url           varchar(255),
@@ -13,6 +17,17 @@ CREATE TABLE IF NOT EXISTS item_reporting( id int not null constraint item_repor
     state_name         varchar(50),
     state_update_date  date
 );
+
+CREATE TABLE IF NOT EXISTS item_reporting_state
+(
+    id int not null primary key,
+    state_name        VARCHAR(50),
+    state_date        datetime,
+    comment           VARCHAR(255),
+    item_reporting_id int
+    constraint item_reporting_state_item_reporting_id_fk
+    references item_reporting
+    );
 
 CREATE SCHEMA  IF NOT EXISTS `emir_refit_int_control_refit`;
 SET SCHEMA `emir_refit_int_control_refit`;

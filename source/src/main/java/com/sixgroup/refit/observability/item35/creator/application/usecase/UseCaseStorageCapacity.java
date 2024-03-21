@@ -86,7 +86,11 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             RftLog.error("Error to generate file storage capacity",
                 List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), "");
             stateService.setError(
-                StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
+                StateRequest.builder()
+                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .itemType(ITEM35)
+                    .errorDescription("Error to generate file storage capacity: " + e.getMessage())
+                    .build());
             if (e instanceof ResourceNotFoundException) {
                 throw new RuntimeException(e.getMessage());
             }

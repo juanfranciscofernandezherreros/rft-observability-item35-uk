@@ -46,7 +46,11 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
         if (CollectionUtils.isEmpty(recordStatusList)) {
             RftLog.info("No record status found, skipping file generation");
             stateService.setError(
-                StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
+                StateRequest.builder()
+                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .itemType(ITEM35)
+                    .errorDescription("No record status found, skipping file generation")
+                    .build());
             return null;
         }
         try {
@@ -62,7 +66,11 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
             RftLog.error("Error to generate file submission volumes",
                 List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), "");
             stateService.setError(
-                StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
+                StateRequest.builder()
+                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .itemType(ITEM35)
+                    .errorDescription("Error to generate file submission volumes: " + e.getMessage())
+                    .build());
         }
         return file;
     }
