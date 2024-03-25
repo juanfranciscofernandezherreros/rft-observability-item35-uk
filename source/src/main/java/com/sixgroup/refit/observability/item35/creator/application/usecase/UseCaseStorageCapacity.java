@@ -11,6 +11,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerIt
 import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
+import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
@@ -21,11 +22,15 @@ import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
 import static com.sixgroup.refit.observability.item35.creator.shared.utils.Utils.createFileDateFromTimeStamp;
+import static com.sixgroup.refit.observability.item35.creator.shared.utils.Utils.getItemDateFormatted;
 
 @Service
 @RequiredArgsConstructor
@@ -121,7 +126,9 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
                     storageCapacityDto.setUtilization(utilization);
                     String date = createFileDateFromTimeStamp(storageCapacityDto.getTimeStamp());
                     storageCapacityDto.setDate(date);
-                    storageCapacityDto.setReportingDate(itemDate);
+
+                    String itemDateFormatted = getItemDateFormatted(itemDate);
+                    storageCapacityDto.setReportingDate(itemDateFormatted);
 
                     storageCapacityFinalList.add(storageCapacityDto);
                 }

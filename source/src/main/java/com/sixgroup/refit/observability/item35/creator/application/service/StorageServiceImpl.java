@@ -10,6 +10,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.service.StorageSer
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -51,9 +52,9 @@ public class StorageServiceImpl implements StorageService {
             response.getItems().forEach(items -> {
                 if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
                     List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
-                        .filter(timeSeries -> null != timeSeries.getMetadata() && null != timeSeries.getMetadata().getAttributes()
-                            && null != timeSeries.getMetadata().getAttributes().getClusterName()
-                            && timeSeries.getMetadata().getAttributes().getClusterName().equals(NODE_STORAGE_TOTAL))
+                        .filter(timeSeries -> null != timeSeries.getMetadata()
+                            && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
+                            && timeSeries.getMetadata().getEntityName().equals(NODE_STORAGE_TOTAL))
                         .toList();
 
                     if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
@@ -90,9 +91,9 @@ public class StorageServiceImpl implements StorageService {
             response.getItems().forEach(items -> {
                 if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
                     List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
-                        .filter(timeSeries -> null != timeSeries.getMetadata() && null != timeSeries.getMetadata().getAttributes()
-                            && null != timeSeries.getMetadata().getAttributes().getClusterName()
-                            && timeSeries.getMetadata().getAttributes().getClusterName().equals(NODE_STORAGE_TOTAL)).toList();
+                        .filter(timeSeries -> null != timeSeries.getMetadata()
+                            && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
+                            && timeSeries.getMetadata().getEntityName().equals(NODE_STORAGE_TOTAL)).toList();
                     if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
                         filteredTimeseries.forEach(timeSeries -> {
                             List<Data> dataList = timeSeries.getData();
