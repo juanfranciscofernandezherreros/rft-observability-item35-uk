@@ -1,22 +1,19 @@
 package com.sixgroup.refit.observability.item35.creator.configuration;
 
 
+import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import lombok.AllArgsConstructor;
 import okhttp3.Credentials;
+import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.*;
-import java.security.SecureRandom;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
 
 @Configuration
 @AllArgsConstructor
@@ -26,12 +23,16 @@ public class ApiConfig {
 
     @Bean
     public OkHttpClient okHttpClient() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
+        CookieManager cookieManager = new CookieManager();
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+        OkHttpClient.Builder builder = new OkHttpClient.Builder().cookieJar(new JavaNetCookieJar(cookieManager));
         builder.addInterceptor(chain -> {
             Request originalRequest = chain.request();
             Request.Builder requestBuilder = originalRequest.newBuilder()
                 .header("Authorization", Credentials.basic(apiClouderaProperties.getUsername(), apiClouderaProperties.getPassword()));
             Request newRequest = requestBuilder.build();
+            RftLog.info("Request URL: " + newRequest.url());
             return chain.proceed(newRequest);
         });
         //configureToIgnoreCertificate(builder);

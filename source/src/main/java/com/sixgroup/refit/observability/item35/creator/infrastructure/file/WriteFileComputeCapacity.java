@@ -67,7 +67,7 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
             FIELD_NAME_FILE,
             FIELD_DESCRIPTION_FILE,
             record.getTypeCapacity(),
-            LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd)),
+            LocalDate.now().withDayOfMonth(15).format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd)),
             record.getMin(),
             record.getMean(),
             record.getMax(),

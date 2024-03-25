@@ -4,6 +4,7 @@ import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
+import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
@@ -51,8 +52,7 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
 
 
     private void writeHeader(CSVWriter csvWriter) {
-        csvWriter.writeNext(new String[]{HEADER_TR_CODE, HEADER_REPORTING_DATE,
-            HEADER_REGULATION_REFERENCE, HEADER_MESSAGE_TYPE, HEADER_SUBMISSION_CHANNEL, HEADER_NO_MESSAGES_ON_GIVE, HEADER_DATE});
+        csvWriter.writeNext(ItemType.SUBMISSION_VOLUMES.getHeaders());
     }
 
     private void writeRecord(CSVWriter csvWriter, RecordStatus record) {
@@ -63,7 +63,7 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
             record.messageType(),
             record.submissionChannel(),
             String.valueOf(record.noMessagesOnGiveDate()),
-            LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd))
+            LocalDate.now().withDayOfMonth(15).format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd))
         };
         csvWriter.writeNext(data);
     }
