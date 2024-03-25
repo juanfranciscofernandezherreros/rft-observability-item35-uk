@@ -7,5 +7,6 @@ import lombok.RequiredArgsConstructor;
 @Data
 public class Metadata {
 
+    private String entityName;
     private Attributes attributes;
 }

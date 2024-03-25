@@ -30,6 +30,16 @@ public class Utils {
         }
     }
 
+    public static String getItemDateFormatted(String itemDate) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_yyyyMMdd);
+            Date date_1 = sdf.parse(itemDate);
+            return new SimpleDateFormat(Constants.DATE_FORMAT_yyyy_MM_dd).format(date_1);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
     public static String getLastDayOfMonthAndYear(String itemDate) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_yyyyMMdd);
