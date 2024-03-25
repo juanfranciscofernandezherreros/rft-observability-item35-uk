@@ -8,24 +8,24 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 public enum ItemType {
     SUBMISSION_VOLUMES("submissionVolumes", "TRRGS_EMIR_PR_IN_ND_ITEM35A_",
         new String[]{
-            "HEADER_TR_CODE",
-            "HEADER_REPORTING_DATE",
-            "HEADER_REGULATION_REFERENCE",
-            "HEADER_MESSAGE_TYPE",
-            "HEADER_SUBMISSION_CHANNEL",
-            "HEADER_NO_MESSAGES_ON_GIVE",
-            "HEADER_DATE"
+            HEADER_TR_CODE,
+            HEADER_DATE,
+            HEADER_REGULATION_REFERENCE,
+            HEADER_MESSAGE_TYPE,
+            HEADER_SUBMISSION_CHANNEL,
+            HEADER_NO_MESSAGES_ON_GIVE,
+            HEADER_REPORTING_DATE
         }),
 
-    COMPUTE_CAPACITY("computeCapacity", "TRRGS_EMIR_PR_IN_ND_ITEM35_",
+    COMPUTE_CAPACITY("computeCapacity", "TRRGS_EMIR_PR_IN_ND_ITEM35D_",
         new String[]{
             HEADER_TR_CODE,
-            HEADER_REPORTING_DATE,
+            HEADER_DATE,
             HEADER_REGULATION_REFERENCE,
             HEADER_NAME,
             HEADER_DESCRIPTION,
             HEADER_CPU_RAM,
-            HEADER_DATE,
+            HEADER_REPORTING_DATE,
             HEADER_MIN_USAGE,
             HEADER_AVG_USAGE,
             HEADER_MAX_USAGE,
