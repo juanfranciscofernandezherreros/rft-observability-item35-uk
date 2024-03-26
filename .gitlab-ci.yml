@@ -9,3 +9,4 @@ variables:
     SERVICE_LOCATION: ''
     HELM_CHART_VALUES_LOCATION: rft-data-bec
     IMAGE_LOCATION: backend
+    JAVA_VERSION: 17
