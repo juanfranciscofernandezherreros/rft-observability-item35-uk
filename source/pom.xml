@@ -13,7 +13,7 @@
     <artifactId>rft-observability-item35-creator</artifactId>
     <version>${revision}${sha1}${changelist}</version>
     <properties>
-        <revision>1.1.4</revision>
+        <revision>1.1.9</revision>
         <sha1></sha1>
         <changelist>-SNAPSHOT</changelist>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,7 +27,7 @@
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
         <spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
         <!-- Health Checks lib -->
-        <rft-commons-observability.version>2.5.0</rft-commons-observability.version>
+        <rft-commons-observability.version>4.0.0</rft-commons-observability.version>
         <rft-commons-spring-support.version>1.0.5</rft-commons-spring-support.version>
         <imapala-jdbc.version>2.6.29.1035</imapala-jdbc.version>
         <sql-server-version>11.2.3.jre17</sql-server-version>

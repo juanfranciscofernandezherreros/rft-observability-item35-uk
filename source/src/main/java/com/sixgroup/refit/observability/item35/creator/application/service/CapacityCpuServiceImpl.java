@@ -7,6 +7,7 @@ import com.sixgroup.refit.observability.item35.creator.shared.constants.Capacity
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CapacityCpuServiceImpl implements CapacityCpuService {
 
     private final CapacityCpuRepository capacityCpuRepository;
@@ -24,7 +26,7 @@ public class CapacityCpuServiceImpl implements CapacityCpuService {
     @Override
     public List<Capacity> findByCapacityCpu(String itemDate) {
 
-        RftLog.info("Find Capacity Cpu by date");
+        log.debug("Find Capacity Cpu by date");
 
         List<Capacity> capacityMonthList = capacityCpuRepository.
             findByCapacityCpu(Utils.getFirstDayOfMonthAndYear(itemDate), Utils.getFirstDayOfNextMonthAndYear(itemDate));

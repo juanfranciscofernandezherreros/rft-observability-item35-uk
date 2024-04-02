@@ -9,6 +9,7 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.Ca
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +20,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalo
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 @ConditionalOnProperty(
     value = "component-config.api.cloudera.ram.enabled",
     havingValue = "false")
@@ -31,8 +33,8 @@ public class CapacityRamClouderaMock implements CapacityRamRepository {
                 .readValue(getClass().getClassLoader().getResourceAsStream("json/capacity-ram.json"), Response.class);
             listCapacityRam = CapacityMapper.mapperResponseToListCapacity(response);
         } catch (IOException e) {
-            RftLog.error("Error to call Cloudera Ram Mock",
-                List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), ERROR_CALL_CLOUDERA);
+            log.error("Error to call Cloudera Ram Mock with message: {}, and code: {}",
+                e.getMessage(), ERROR_CALL_CLOUDERA);
         }
         return listCapacityRam;
     }

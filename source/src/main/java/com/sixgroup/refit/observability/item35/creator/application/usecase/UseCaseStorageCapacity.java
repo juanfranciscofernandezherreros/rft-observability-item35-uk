@@ -11,29 +11,28 @@ import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerIt
 import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
-import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.CREATING_AND_SAVING_FILE;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 import static com.sixgroup.refit.observability.item35.creator.shared.utils.Utils.createFileDateFromTimeStamp;
 import static com.sixgroup.refit.observability.item35.creator.shared.utils.Utils.getItemDateFormatted;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
     private final WriteFileItem35Service<StorageCapacityDto> writeFileStorageCapacityService;
@@ -46,7 +45,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
     @Override
     public File execute(ItemCommandDTO itemCommandDTO, Headers headers) {
-        RftLog.info("Generating storage capacity volumes file ...");
+        log.debug("Generating storage capacity volumes file ...");
         File fileStorageCapacity;
         try {
             stateService.nextStep(
@@ -59,7 +58,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             List<Storage> totalCapacityList = storageService.getTotalCapacity(firstDayOfMonth, firstDayOfNextMonth);
 
             if (CollectionUtils.isEmpty(totalCapacityList)) {
-                RftLog.info("Not exist 'total capacity data' between " + firstDayOfMonth + " and " + firstDayOfNextMonth);
+                log.debug("Not exist 'total capacity data' between {} and {}", firstDayOfMonth, firstDayOfNextMonth);
                 throw new
                     ResourceNotFoundException("Not exist 'total capacity data' between " + firstDayOfMonth + " and " + firstDayOfNextMonth);
             }
@@ -67,7 +66,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             List<Storage> totalFreeCapacityList = storageService.getTotalFreeCapacity(firstDayOfMonth, firstDayOfNextMonth);
 
             if (CollectionUtils.isEmpty(totalFreeCapacityList)) {
-                RftLog.info("Not exist 'total free capacity data' between " + firstDayOfMonth + " and " + firstDayOfNextMonth);
+                log.debug("Not exist 'total free capacity data' between {} and {}", firstDayOfMonth, firstDayOfNextMonth);
                 throw new
                     ResourceNotFoundException("Not exist 'total free capacity data' between " + firstDayOfMonth + " and " + firstDayOfNextMonth);
             }
@@ -76,20 +75,19 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
                 totalCapacityList, totalFreeCapacityList);
 
             if (CollectionUtils.isEmpty(storageCapacityFinalList)) {
-                RftLog.info("Not exist any match between 'total free capacity data' and 'total capacity data'");
+                log.debug("Not exist any match between 'total free capacity data' and 'total capacity data'");
                 throw new
                     ResourceNotFoundException("Not exist any match between 'total free capacity data' and 'total capacity data'");
             }
 
             fileStorageCapacity = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommandDTO);
-            RftLog.info("Generated storage capacity file");
+            log.debug("Generated storage capacity file");
             itemCommandDTO.setFileUrl(fileStorageCapacity.toString());
             itemCommandDTO.setFileName(fileStorageCapacity.getName());
             producerItemService.send(itemCommandDTO, headers);
             return fileStorageCapacity;
         } catch (Exception e) {
-            RftLog.error("Error to generate file storage capacity",
-                List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), "");
+            log.error("Error to generate file storage capacity: {}", e.getMessage(), e);
             stateService.setError(
                 StateRequest.builder()
                     .fileName(Utils.getFileName(itemCommandDTO))

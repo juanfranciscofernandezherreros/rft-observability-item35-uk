@@ -12,6 +12,7 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.Ca
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,6 +30,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 @ConditionalOnProperty(
     value = "component-config.api.cloudera.ram.enabled",
     havingValue = "true")
@@ -41,7 +43,7 @@ public class CapacityRamCloudera implements CapacityRamRepository {
     @Override
     public List<Capacity> findByCapacityRam(String dateFrom, String dateTo) {
 
-        RftLog.info("Find Compute capacity Ram by dateFrom and dateTo");
+        log.debug("Find Compute capacity Ram by dateFrom and dateTo");
 
         List<Capacity> listCapacityRam = null;
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl())).newBuilder();
@@ -59,8 +61,7 @@ public class CapacityRamCloudera implements CapacityRamRepository {
         try {
             okhttp3.Response response = okHttpClient.newCall(request).execute();
             if (!response.isSuccessful()) {
-                RftLog.error("Error to call Cloudera",
-                    List.of(NameObject.builder().name("Error").object(response.message()).build()), ERROR_CALL_CLOUDERA);
+                log.error("Error to call Cloudera with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
                 return null;
             }
             if (Objects.nonNull(response.body())) {
@@ -68,8 +69,7 @@ public class CapacityRamCloudera implements CapacityRamRepository {
                 listCapacityRam = CapacityMapper.mapperResponseToListCapacity(responseBody);
             }
         } catch (IOException e) {
-            RftLog.error("Error to call Cloudera",
-                List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), ERROR_CALL_CLOUDERA);
+            log.error("Error to call Cloudera with message: {}, and code: {}", e.getMessage(), ERROR_CALL_CLOUDERA);
             return null;
         }
         return listCapacityRam;

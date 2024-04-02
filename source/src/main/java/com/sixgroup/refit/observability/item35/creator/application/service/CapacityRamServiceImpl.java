@@ -5,8 +5,8 @@ import com.sixgroup.refit.observability.item35.creator.domain.repository.Capacit
 import com.sixgroup.refit.observability.item35.creator.domain.service.CapacityRamService;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CapacityRamServiceImpl implements CapacityRamService {
 
     private final CapacityRamRepository capacityRamRepository;
@@ -25,7 +26,7 @@ public class CapacityRamServiceImpl implements CapacityRamService {
     @Override
     public List<Capacity> findByCapacityRam(String itemDate) {
 
-        RftLog.info("Find Capacity Ram by date");
+        log.debug("Find Capacity Ram by date");
 
         List<Capacity> listCapacityRam = capacityRamRepository.
             findByCapacityRam(Utils.getFirstDayOfMonthAndYear(itemDate), Utils.getFirstDayOfNextMonthAndYear(itemDate));

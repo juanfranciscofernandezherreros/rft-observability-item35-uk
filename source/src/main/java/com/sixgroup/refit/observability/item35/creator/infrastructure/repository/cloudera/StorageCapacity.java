@@ -9,6 +9,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.repository.Storage
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -25,6 +26,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 @ConditionalOnProperty(
     value = "component-config.api.cloudera.storage.enabled",
     havingValue = "true")
@@ -62,9 +64,8 @@ public class StorageCapacity implements StorageCapacityRepository {
             return objectMapper.readValue(responseBody.string(), Response.class);
         } catch (Exception e) {
             String api = query.split("\\s+")[1];
-            RftLog.error("Error to call Cloudera Storage",
-                List.of(NameObject.builder().name("Error").object(e.getMessage()).build(),
-                    NameObject.builder().name("Api").object(api).build()), ERROR_CALL_CLOUDERA);
+            log.error("Error to call Cloudera Storage with message: {}, and code: {}",
+                e.getMessage(), ERROR_CALL_CLOUDERA);
             throw new RuntimeException("Error to call Cloudera Storage with select " + api, e);
         }
     }

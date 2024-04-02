@@ -1,14 +1,13 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Data;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Response;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.TimeSeries;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
 import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
@@ -24,6 +23,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StorageServiceImpl implements StorageService {
 
     private final StorageCapacityRepository storageCapacityRepository;
@@ -77,7 +77,7 @@ public class StorageServiceImpl implements StorageService {
             });
         }
         if (CollectionUtils.isEmpty(storageList)) {
-            RftLog.info("Empty list from Cloudera Api TotalCapacity");
+            log.debug("Empty list from Cloudera Api TotalCapacity");
             throw new ResourceNotFoundException("Empty list from Cloudera Api 'TotalCapacity' filter");
         }
         return storageList;
@@ -115,7 +115,7 @@ public class StorageServiceImpl implements StorageService {
         }
 
         if (CollectionUtils.isEmpty(storageList)) {
-            RftLog.info("Empty list from Cloudera Api 'TotalFreeCapacity' filter");
+            log.debug("Empty list from Cloudera Api 'TotalFreeCapacity' filter");
             throw new ResourceNotFoundException("Empty list from Cloudera Api 'TotalFreeCapacity' filter");
         }
         return storageList;
