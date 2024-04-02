@@ -1,17 +1,17 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
+import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
-import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
-import com.opencsv.CSVWriter;
+import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -25,6 +25,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WriteFileSubmissionVolumes implements WriteFileItem35Service<RecordStatus> {
 
     private final StateService stateService;
@@ -33,7 +34,7 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
 
     @Override
     public File writeFile(List<RecordStatus> recordStatus, ItemCommandDTO itemCommandDTO) throws IOException {
-        RftLog.info("Creating and writing file");
+        log.debug("Creating and writing file");
         String filePath = csvProperties.getOutputPath() + Utils.getFileName(itemCommandDTO);
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = new CSVWriter(writer)) {
@@ -42,7 +43,7 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
                 writeRecord(csvWriter, record);
             }
         }
-        RftLog.info("File created and written: " + filePath);
+        log.debug("File created and written: " + filePath);
         stateService.nextStep(
             StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).fileUrl(filePath).build());
         File file = new File(filePath);
@@ -58,12 +59,12 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
     private void writeRecord(CSVWriter csvWriter, RecordStatus record) {
         String[] data = {
             TR_CODE,
-            record.reportingDate(),
+            LocalDate.now().withDayOfMonth(15).format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd)),
             EMIR,
             record.messageType(),
             record.submissionChannel(),
             String.valueOf(record.noMessagesOnGiveDate()),
-            LocalDate.now().withDayOfMonth(15).format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd))
+            record.reportingDate()
         };
         csvWriter.writeNext(data);
     }

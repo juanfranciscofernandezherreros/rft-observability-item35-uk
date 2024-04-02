@@ -41,7 +41,7 @@ public class KafkaConsumerItem {
 
     @KafkaListener(topics = "${component-config.topics.observability-item-topic}", groupId = "${component-config.topics.observability-item-consumer-group-id}")
     public void consume(ConsumerRecord<ItemId, ItemCommand> item) throws ExecutionException, InterruptedException {
-        RftLog.info("Consume message", () -> List.of(NameObject.builder().name("item").object(item).build()));
+        log.debug("Consume message: {}", item);
         if (Constants.ITEM35.equals(item.key().getItemId())
             && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
 

@@ -57,10 +57,8 @@ public class KafkaProducerItem implements ProducerItemService {
         completableFuture.whenComplete(
             (kvSendResult, ex) -> {
                 if (null != ex) {
-                    RftLog.error(
-                        "Couldn't produce to output topic  with exception:",
-                        ex.getMessage(),
-                        ERROR_SENDING_MESSAGE_EFRH_031);
+                    log.error("Couldn't produce to output topic with exception message: {}, and code: {}",
+                        ex.getMessage(), ERROR_SENDING_MESSAGE_EFRH_031);
                 } else {
                     log.debug("Successfully produced to output topic an event with key and result key {} value {} ", key, value);
                 }

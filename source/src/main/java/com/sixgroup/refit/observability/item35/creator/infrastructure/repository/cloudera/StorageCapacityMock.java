@@ -7,6 +7,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.repository.Storage
 import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +20,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalo
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 @ConditionalOnProperty(
     value = "component-config.api.cloudera.storage.enabled",
     havingValue = "false")
@@ -31,8 +33,8 @@ public class StorageCapacityMock implements StorageCapacityRepository {
                 .readValue(getClass().getClassLoader().getResourceAsStream("json/total_all.json"),
                     Response.class);
         } catch (IOException e) {
-            RftLog.error("Error to call 'findTotalStorage()' Cloudera Storage Mock",
-                List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), ERROR_CALL_CLOUDERA);
+            log.error("Error to call 'findTotalStorage()' Cloudera Storage Mock, with message: {}, and code: {}",
+                e.getMessage(), ERROR_CALL_CLOUDERA);
             throw new RuntimeException(e);
         }
     }
@@ -44,8 +46,8 @@ public class StorageCapacityMock implements StorageCapacityRepository {
                 .readValue(getClass().getClassLoader().getResourceAsStream("json/free_all.json"),
                     Response.class);
         } catch (IOException e) {
-            RftLog.error("Error to call 'findFreeStorage()' Cloudera Storage Mock",
-                List.of(NameObject.builder().name("Error").object(e.getMessage()).build()), ERROR_CALL_CLOUDERA);
+            log.error("Error to call 'findFreeStorage()' Cloudera Storage Mock, with message: {}, and code: {}",
+                e.getMessage(), ERROR_CALL_CLOUDERA);
             throw new RuntimeException(e);
         }
     }

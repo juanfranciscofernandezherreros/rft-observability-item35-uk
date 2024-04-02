@@ -10,8 +10,8 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandD
 import com.sixgroup.refit.observability.item35.creator.domain.model.StorageCapacityDto;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -23,6 +23,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageCapacityDto> {
 
     private final StateService stateService;
@@ -31,7 +32,7 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
 
     @Override
     public File writeFile(List<StorageCapacityDto> storageCapacityDtoList, ItemCommandDTO itemCommandDTO) throws IOException {
-        RftLog.info("Creating and writing file");
+        log.debug("Creating and writing file");
         String filePath = csvProperties.getOutputPath() + getFileName(itemCommandDTO.getItemDate());
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = new CSVWriter(writer)) {
@@ -40,7 +41,7 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
                 writeRecord(csvWriter, record);
             }
         }
-        RftLog.info("File created and written: " + filePath);
+        log.debug("File created and written: {}", filePath);
         stateService.nextStep(
             StateRequest.builder()
                 .fileName(Utils.getFileName(itemCommandDTO))
