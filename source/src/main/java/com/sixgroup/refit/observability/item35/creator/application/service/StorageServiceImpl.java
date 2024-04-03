@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.FOUR_DECIMALS;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.NODE_STORAGE_TOTAL;
 
 @Service
@@ -65,7 +66,7 @@ public class StorageServiceImpl implements StorageService {
                                     String timestamp = dataItem.getTimestamp();
                                     Float mean = dataItem.getAggregateStatistics().getMean();
                                     Float totalCapacityInTeras = new BigDecimal(mean)
-                                        .divide(new BigDecimal("1024").pow(4), 3, RoundingMode.HALF_UP)
+                                        .divide(new BigDecimal("1024").pow(4), FOUR_DECIMALS, RoundingMode.HALF_UP)
                                         .floatValue();
                                     Storage storage = new Storage(timestamp, totalCapacityInTeras);
                                     storageList.add(storage);
@@ -102,7 +103,7 @@ public class StorageServiceImpl implements StorageService {
                                     String timestamp = dataItem.getTimestamp();
                                     Float max = dataItem.getAggregateStatistics().getMax();
                                     Float maxFreeDataInTeras = new BigDecimal(max)
-                                        .divide(new BigDecimal("1024").pow(4), 3, RoundingMode.HALF_UP)
+                                        .divide(new BigDecimal("1024").pow(4), FOUR_DECIMALS, RoundingMode.HALF_UP)
                                         .floatValue();
                                     Storage storage = new Storage(timestamp, maxFreeDataInTeras);
                                     storageList.add(storage);

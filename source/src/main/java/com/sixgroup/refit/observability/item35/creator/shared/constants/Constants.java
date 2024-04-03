@@ -40,4 +40,5 @@ public class Constants {
     public static final String DATE_TO = "to";
     public static final String QUERY = "query";
     public static final String CONTENT_TYPE = "contentType";
+    public static final int FOUR_DECIMALS = 4;
 }

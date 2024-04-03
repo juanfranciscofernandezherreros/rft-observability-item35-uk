@@ -6,6 +6,7 @@ import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
+import com.sixgroup.refit.observability.item35.creator.domain.enums.Status;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
@@ -40,7 +41,7 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
              CSVWriter csvWriter = new CSVWriter(writer)) {
             writeHeader(csvWriter);
             for (RecordStatus record : recordStatus) {
-                writeRecord(csvWriter, record);
+                writeRecord(csvWriter, record, itemCommandDTO.getItemDate());
             }
         }
         log.debug("File created and written: " + filePath);
@@ -56,13 +57,13 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
         csvWriter.writeNext(ItemType.SUBMISSION_VOLUMES.getHeaders());
     }
 
-    private void writeRecord(CSVWriter csvWriter, RecordStatus record) {
+    private void writeRecord(CSVWriter csvWriter, RecordStatus record, String itemDate) {
         String[] data = {
             TR_CODE,
-            LocalDate.now().withDayOfMonth(15).format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd)),
+            Utils.getItemDateFormatted(itemDate),
             EMIR,
-            record.messageType(),
-            record.submissionChannel(),
+            Status.getStatusFromDescription(record.messageType()).toString(),
+            record.submissionChannel().toUpperCase(),
             String.valueOf(record.noMessagesOnGiveDate()),
             record.reportingDate()
         };

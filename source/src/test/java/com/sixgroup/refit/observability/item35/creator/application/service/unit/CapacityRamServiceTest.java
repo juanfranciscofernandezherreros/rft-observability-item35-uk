@@ -39,7 +39,7 @@ public class CapacityRamServiceTest {
         assertNotNull(result);
 
         Assertions.assertEquals(result,
-            List.of(new Capacity("2024-01-01", "0.232", "0.220", "0.224", CapacityConstants.RAM)));
+            List.of(new Capacity("2024-01-01", "0.2317", "0.2200", "0.2236", CapacityConstants.RAM)));
     }
 
 }

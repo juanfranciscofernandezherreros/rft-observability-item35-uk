@@ -77,13 +77,13 @@ class UseCaseStorageCapacityTest {
             new Storage("2023-09-02T00:00:00.000Z", 16.486961f));
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
 
-        StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("2024-09-15", "2023/09/01",
-            "2023-09-01T00:00:00.000Z", 16.703632f, 0.23867607f, 16.464956f,
-            0.0142888725f);
+        StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("2024-09-15", "2023-09-01",
+            "2023-09-01T00:00:00.000Z", 16.7036f, 0.2386f, 16.4650f,
+            0.0143f);
 
-        StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("2024-09-15", "2023/09/02",
-            "2023-09-02T00:00:00.000Z", 16.700466f, 0.21350479f, 16.486961f,
-            0.012784361f);
+        StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("2024-09-15", "2023-09-02",
+            "2023-09-02T00:00:00.000Z", 16.7005f, 0.2135f, 16.4870f,
+            0.0128f);
 
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
 
@@ -142,13 +142,13 @@ class UseCaseStorageCapacityTest {
             new Storage("2023-09-02T00:00:00.000Z", 16.486961f));
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
 
-        StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("2024-09-15", "2023/09/01",
-            "2023-09-01T00:00:00.000Z", 16.703632f, 0.23867607f, 16.464956f,
-            0.0142888725f);
+        StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("2024-09-15", "2023-09-01",
+            "2023-09-01T00:00:00.000Z", 16.7036f, 0.2386f, 16.4650f,
+            0.0143f);
 
-        StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("2024-09-15", "2023/09/02",
-            "2023-09-02T00:00:00.000Z", 16.700466f, 0.21350479f, 16.486961f,
-            0.012784361f);
+        StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("2024-09-15", "2023-09-02",
+            "2023-09-02T00:00:00.000Z", 16.7005f, 0.2135f, 16.4870f,
+            0.0128f);
 
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
 

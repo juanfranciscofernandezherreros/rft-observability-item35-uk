@@ -22,11 +22,12 @@ import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.CREATING_AND_SAVING_FILE;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
 import static com.sixgroup.refit.observability.item35.creator.shared.utils.Utils.createFileDateFromTimeStamp;
 import static com.sixgroup.refit.observability.item35.creator.shared.utils.Utils.getItemDateFormatted;
 
@@ -34,6 +35,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.utils.Utils
 @RequiredArgsConstructor
 @Slf4j
 public class UseCaseStorageCapacity implements ItemTypeStrategy {
+
 
     private final WriteFileItem35Service<StorageCapacityDto> writeFileStorageCapacityService;
 
@@ -115,13 +117,13 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
                 if (totalStorage.getTimeStamp().equals(totalFreeStorage.getTimeStamp())) {
                     StorageCapacityDto storageCapacityDto = new StorageCapacityDto();
                     storageCapacityDto.setTimeStamp(totalStorage.getTimeStamp());
-                    storageCapacityDto.setCapacity(totalStorage.getCapacity());
-                    storageCapacityDto.setAvailableCapacity(totalFreeStorage.getCapacity());
+                    storageCapacityDto.setCapacity(BigDecimal.valueOf(totalStorage.getCapacity()).setScale(FOUR_DECIMALS, RoundingMode.HALF_UP).floatValue());
+                    storageCapacityDto.setAvailableCapacity(BigDecimal.valueOf(totalFreeStorage.getCapacity()).setScale(FOUR_DECIMALS, RoundingMode.HALF_UP).floatValue());
                     // CALCULATED VALUES
                     float usedCapacity = storageCapacityDto.getCapacity() - storageCapacityDto.getAvailableCapacity();
-                    storageCapacityDto.setUsedCapacity(usedCapacity);
+                    storageCapacityDto.setUsedCapacity(BigDecimal.valueOf(usedCapacity).setScale(FOUR_DECIMALS, RoundingMode.HALF_UP).floatValue());
                     float utilization = storageCapacityDto.getUsedCapacity() / storageCapacityDto.getCapacity();
-                    storageCapacityDto.setUtilization(utilization);
+                    storageCapacityDto.setUtilization(BigDecimal.valueOf(utilization).setScale(FOUR_DECIMALS, RoundingMode.HALF_UP).floatValue());
                     String date = createFileDateFromTimeStamp(storageCapacityDto.getTimeStamp());
                     storageCapacityDto.setDate(date);
 
