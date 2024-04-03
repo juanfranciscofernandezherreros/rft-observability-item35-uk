@@ -43,7 +43,7 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
              CSVWriter csvWriter = new CSVWriter(writer)) {
             writeHeader(csvWriter);
             for (Capacity record : records) {
-                writeRecord(csvWriter, record);
+                writeRecord(csvWriter, record, itemCommandDTO.getItemDate());
             }
         }
         log.debug("File created and written: " + filePath);
@@ -59,13 +59,13 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
     }
 
 
-    private void writeRecord(CSVWriter csvWriter, Capacity record) {
+    private void writeRecord(CSVWriter csvWriter, Capacity record, String itemDate) {
         String[] data = {
             TR_CODE,
-            LocalDate.now().withDayOfMonth(15).format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd)),
+            Utils.getItemDateFormatted(itemDate),
             EMIR,
-            FIELD_NAME_FILE,
-            FIELD_DESCRIPTION_FILE,
+            DATA_CENTER_LOCATION,
+            DATABASE_SERVER_OR_PLATFORM,
             record.getTypeCapacity(),
             record.getDate(),
             record.getMin(),

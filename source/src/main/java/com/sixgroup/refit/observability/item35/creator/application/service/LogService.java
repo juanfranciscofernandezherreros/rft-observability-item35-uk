@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 public class LogService {
     public static void logInfo(String message, ItemCommandDTO itemCommandDTO) {
-        log.debug(message + ", with timestamp: {}, " + "itemId: {}, " + "itemType: {}, " + "command {}",
+        log.info(message + ", with timestamp: {}, " + "itemId: {}, " + "itemType: {}, " + "command {}",
             LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE),
             itemCommandDTO.getItemId(),
             itemCommandDTO.getItemType(),

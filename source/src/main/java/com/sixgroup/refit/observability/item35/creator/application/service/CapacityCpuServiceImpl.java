@@ -16,6 +16,8 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.FOUR_DECIMALS;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,9 +37,9 @@ public class CapacityCpuServiceImpl implements CapacityCpuService {
 
         if (CollectionUtils.isNotEmpty(capacityMonthList)) {
             capacityMonthList.forEach(capacityDay -> {
-                BigDecimal minValue = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMin())).divide(BigDecimal.valueOf(100), 3, RoundingMode.UNNECESSARY);
-                BigDecimal maxValue = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMax())).divide(BigDecimal.valueOf(100), 3, RoundingMode.UNNECESSARY);
-                BigDecimal mean = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMean())).divide(BigDecimal.valueOf(100), 3, RoundingMode.HALF_UP);
+                BigDecimal minValue = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMin())).divide(BigDecimal.valueOf(100), FOUR_DECIMALS, RoundingMode.UNNECESSARY);
+                BigDecimal maxValue = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMax())).divide(BigDecimal.valueOf(100), FOUR_DECIMALS, RoundingMode.UNNECESSARY);
+                BigDecimal mean = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMean())).divide(BigDecimal.valueOf(100), FOUR_DECIMALS, RoundingMode.HALF_UP);
 
                 capacityDay.setMin(minValue.toString());
                 capacityDay.setMax(maxValue.toString());

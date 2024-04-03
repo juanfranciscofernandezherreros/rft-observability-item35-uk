@@ -15,7 +15,7 @@ public class CapacityConstants {
     public static final String RAM = "RAM";
     public static final String CPU = "CPU";
     public static final String FIELD_NAME_FILE = "Cloudera";
-    public static final String FIELD_DESCRIPTION_FILE = " Cloudera data warehouse";
+    public static final String FIELD_DESCRIPTION_FILE = "Cloudera data warehouse";
     public static final String FIELD_INCIDENT_RELATED_FILE = "No";
     public static final String FIELD_TR_INCIDENT_ID_RELATED_FILE = StringUtils.EMPTY;
     public static final String HEADER_NAME = "NAME";

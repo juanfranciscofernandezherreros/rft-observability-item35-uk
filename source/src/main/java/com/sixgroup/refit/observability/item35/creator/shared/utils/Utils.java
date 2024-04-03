@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.FOUR_DECIMALS;
+
 public class Utils {
 
     public static String getFileName(ItemCommandDTO itemCommandDTO) {
@@ -70,13 +72,13 @@ public class Utils {
 
 
     public static String convertBytesToTeraBytes(BigDecimal bytes) {
-        return bytes.divide(new BigDecimal("1024").pow(4), 3, RoundingMode.HALF_UP).toString();
+        return bytes.divide(new BigDecimal("1024").pow(4), FOUR_DECIMALS, RoundingMode.HALF_UP).toString();
     }
 
     public static String createFileDateFromTimeStamp(String timestamp) {
         String[] dateArray = timestamp.split("T");
         String dayString = dateArray[0];
-        return dayString.replace("-", "/");
+        return dayString;
     }
 
 }

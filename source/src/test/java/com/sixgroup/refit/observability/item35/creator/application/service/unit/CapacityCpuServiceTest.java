@@ -40,15 +40,15 @@ public class CapacityCpuServiceTest {
         assertEquals(2, result.size());
         Capacity capacity1 = result.get(0);
         assertEquals("2024-01-01", capacity1.getDate());
-        assertEquals("0.002", capacity1.getMin());
-        assertEquals("0.008", capacity1.getMax());
-        assertEquals("0.005", capacity1.getMean());
+        assertEquals("0.0020", capacity1.getMin());
+        assertEquals("0.0080", capacity1.getMax());
+        assertEquals("0.0050", capacity1.getMean());
 
         Capacity capacity2 = result.get(1);
         assertEquals("2024-01-02", capacity2.getDate());
-        assertEquals("0.003", capacity2.getMin());
-        assertEquals("0.009", capacity2.getMax());
-        assertEquals("0.006", capacity2.getMean());
+        assertEquals("0.0030", capacity2.getMin());
+        assertEquals("0.0090", capacity2.getMax());
+        assertEquals("0.0060", capacity2.getMean());
 
     }
 
