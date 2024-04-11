@@ -2,18 +2,25 @@ package com.sixgroup.refit.observability.item35.creator.shared.utils;
 
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
+import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.FOUR_DECIMALS;
 
+@Slf4j
 public class Utils {
+
+    private static final String COMPARE_FORMAT = "yyyy-MM-dd";
 
     public static String getFileName(ItemCommandDTO itemCommandDTO) {
         return ItemType.getItemTypeFromName(itemCommandDTO.getItemType()).getNamePattern() + itemCommandDTO.getItemDate() + ".csv";
@@ -79,6 +86,22 @@ public class Utils {
         String[] dateArray = timestamp.split("T");
         String dayString = dateArray[0];
         return dayString;
+    }
+
+    public static List<ReportGenerationDto> getOrderCollectionsByDate(List<ReportGenerationDto> joinedCollection) {
+
+        SimpleDateFormat compareFormat = new SimpleDateFormat(COMPARE_FORMAT);
+
+        // SORT DATA BY DATE
+        joinedCollection.sort(Comparator.comparing(generationDto -> {
+            try {
+                return compareFormat.parse(generationDto.getDate());
+            } catch (ParseException e) {
+                log.error("Error parsing data in report generation compare sort");
+                throw new RuntimeException(e);
+            }
+        }));
+        return joinedCollection;
     }
 
 }

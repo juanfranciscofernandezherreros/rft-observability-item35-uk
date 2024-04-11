@@ -5,21 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.application.service.StorageServiceImpl;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.*;
-import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.cloudera.StorageCapacity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +23,8 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class StorageServiceTest {
