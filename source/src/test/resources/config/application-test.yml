@@ -6,6 +6,11 @@ management:
     port: 9040
 
 spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   kafka:
     bootstrap-servers: "localhost:9092"
     producer:
@@ -52,6 +57,98 @@ api:
     url: /api/v54/timeseries
 
 component-config:
+  TR_CODE: TRRGS
+  REGULATION_REFERENCE: EMIR
+  PARTICIPANT:
+    REPORT_TYPE: PARTICIPANT
+    REPORT_TYPE_QUERY:
+      - TAR030
+      - TAR108
+      - TSR107
+      - TSR109
+      - RJ092
+      - RJCT000
+    TYPES:
+      TAR030:
+        REPORT_NAME: TAR030
+        SLA: yyyy-MM-ddT06:00:00Z
+      TAR108:
+        REPORT_NAME: TAR108
+        SLA: yyyy-MM-ddT06:00:00Z
+      TSR107:
+        REPORT_NAME: TSR107
+        SLA: yyyy-MM-ddT06:00:00Z
+      TSR109:
+        REPORT_NAME: TSR109
+        SLA: yyyy-MM-ddT06:00:00Z
+      RJ092:
+        REPORT_NAME: RJ092
+        SLA: yyyy-MM-ddT06:00:00Z
+      RJCT000:
+        REPORT_NAME: RJCT000
+        SLA: yyyy-MM-ddT06:00:00Z
+  REGULATOR:
+    REPORT_TYPE_ESMA: ESMA
+    REPORT_TYPE_NCA: NCA
+    REPORT_TYPE_QUERY:
+      - TAR030
+      - TAR108
+      - TSR107
+      - TSR109
+      - RJ092
+      - RJCT000
+    TYPES:
+      TAR030:
+        REPORT_NAME: TAR030
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+      TAR108:
+        REPORT_NAME: TAR108
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+      TSR107:
+        REPORT_NAME: TSR107
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+      TSR109:
+        REPORT_NAME: TSR109
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+      RJ092:
+        REPORT_NAME: RJ092
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+      RJCT000:
+        REPORT_NAME: RJCT000
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+  TR:
+    REPORT_TYPE: TR
+    REPORT_TYPE_QUERY:
+      - RL
+      - TD
+    TYPES:
+      RL:
+        REPORT_NAME: RL
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+      TD:
+        REPORT_NAME: TD
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+      RL078:
+        REPORT_NAME: RL078
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+      RECO091:
+        REPORT_NAME: RECO091
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+      TDD107:
+        REPORT_NAME: TDD107
+        SLA: yyyy-MM-ddT12:00:00Z
+        INIT: yyyy-MM-ddT00:00:00Z
+
   csv:
     output_path: "work-repository-observability/upload/"
   topics:
@@ -77,6 +174,11 @@ component-config:
 
 logging:
   level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
     root: INFO
     "org.apache.kafka": INFO
     "com.sixgroup.refit": DEBUG

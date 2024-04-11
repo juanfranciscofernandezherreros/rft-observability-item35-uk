@@ -46,6 +46,21 @@ public enum ItemType {
             HEADER_UTILIZATION,
             HEADER_INCIDENT_RELATED,
             HEADER_TR_INCIDENT_ID
+        }),
+    REPORT_GENERATION("reportGeneration", "TRRGS_EMIR_PR_IN_ND_ITEM35B_",
+        new String[]{
+            HEADER_TR_CODE,
+            HEADER_REPORTING_DATE,
+            HEADER_REGULATION_REFERENCE,
+            HEADER_REPORT_NAME,
+            HEADER_REPORT_TYPE,
+            HEADER_REPORT_GENERATION_TIME,
+            HEADER_REPORT_COMPLETION_TIME,
+            HEADER_REPORT_PUBLICATION_TIME,
+            HEADER_DATE,
+            HEADER_SLA,
+            HEADER_DIFFERENCE,
+            HEADER_TR_INCIDENT_ID
         });
 
     private final String name;
