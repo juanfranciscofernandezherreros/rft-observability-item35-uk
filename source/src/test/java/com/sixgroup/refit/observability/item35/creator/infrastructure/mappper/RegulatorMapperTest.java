@@ -205,12 +205,12 @@ class RegulatorMapperTest {
         if (creationDateOffsetDateTime.isAfter(slaDateOffsetDateTime)) {
             // NEXT DAY FROM reportingSession
             slaDateOffsetDateTime = regulatorDTO.getReportingSession().toLocalDateTime().atOffset(ZoneOffset.UTC).plusDays(1);
+            // REPORT_PUBLICATION_TIME (NOW IS USING creationDate) - SLA
+            // The format is a float that indicates the diference of time between this two dates.
+            float seconds = Duration.between(regulatorDTO.getCreationDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
+                slaDateOffsetDateTime).getSeconds() / 3600.00f;
+            return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN).toString();
         }
-
-        // REPORT_PUBLICATION_TIME (NOW IS USING creationDate) - SLA
-        // The format is a float that indicates the diference of time between this two dates.
-        float seconds = Duration.between(regulatorDTO.getCreationDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
-            slaDateOffsetDateTime).getSeconds() / 3600.00f;
-        return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN).toString();
+        return "";
     }
 }
