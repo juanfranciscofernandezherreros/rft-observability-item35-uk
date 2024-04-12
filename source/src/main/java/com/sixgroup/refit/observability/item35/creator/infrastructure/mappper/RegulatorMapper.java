@@ -43,8 +43,10 @@ public abstract class RegulatorMapper {
         reportGenerationDto.setDate(calculateDate(regulator.getReportingSession()));
         reportGenerationDto.setSla(calculateSlaDate(regulator.getReportingSession()));
 //          DIFFERENCE -> REPORT_PUBLICATION_TIME - SLA
-        reportGenerationDto.setDifference(calculateDifference(regulator).toString());
-
+        BigDecimal bigDecimalDifference = calculateDifference(regulator);
+        reportGenerationDto.setDifference(bigDecimalDifference.intValue() == 0
+            ? "" :
+            bigDecimalDifference.toString());
     }
 
     public abstract ReportGenerationDto toReportGenerationDto(RegulatorDTO regulator,
@@ -58,13 +60,13 @@ public abstract class RegulatorMapper {
         if (creationDateOffsetDateTime.isAfter(slaDateOffsetDateTime)) {
             // NEXT DAY FROM reportingSession
             slaDateOffsetDateTime = regulatorDTO.getReportingSession().toLocalDateTime().atOffset(ZoneOffset.UTC).plusDays(1);
+            // REPORT_PUBLICATION_TIME (NOW IS USING creationDate) - SLA
+            // The format is a float that indicates the diference of time between this two dates.
+            float seconds = Duration.between(regulatorDTO.getCreationDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
+                slaDateOffsetDateTime).getSeconds() / TO_HOURS;
+            return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN);
         }
-
-        // REPORT_PUBLICATION_TIME (NOW IS USING creationDate) - SLA
-        // The format is a float that indicates the diference of time between this two dates.
-        float seconds = Duration.between(regulatorDTO.getCreationDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
-            slaDateOffsetDateTime).getSeconds() / TO_HOURS;
-        return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN);
+        return new BigDecimal(0).setScale(1, RoundingMode.DOWN);
     }
 
     private String getReportName(String fileName, String fileType, RegulatorFileTypeProperties fileTypeProperties) {

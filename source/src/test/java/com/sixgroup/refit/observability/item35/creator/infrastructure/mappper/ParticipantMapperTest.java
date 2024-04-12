@@ -112,13 +112,13 @@ class ParticipantMapperTest {
         if (endDateOffsetDateTime.isAfter(slaDateOffsetDateTime)) {
             // NEXT DAY FROM reportingSession
             slaDateOffsetDateTime = participant_1.getReportingSession().toLocalDateTime().atOffset(ZoneOffset.UTC).plusDays(1);
+            // REPORT_PUBLICATION_TIME (NOW IS USING endDate) - SLA
+            // The format is a float that indicates the difference time between this two dates.
+            float seconds = Duration.between(participant_1.getEndDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
+                slaDateOffsetDateTime).getSeconds() / 3600.00f;
+            return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN).toString();
         }
-
-        // REPORT_PUBLICATION_TIME (NOW IS USING endDate) - SLA
-        // The format is a float that indicates the difference time between this two dates.
-        float seconds = Duration.between(participant_1.getEndDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
-            slaDateOffsetDateTime).getSeconds() / 3600.00f;
-        return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN).toString();
+        return "";
     }
 
 }

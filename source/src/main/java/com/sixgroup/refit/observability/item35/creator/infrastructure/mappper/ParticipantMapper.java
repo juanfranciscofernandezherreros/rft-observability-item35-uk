@@ -40,7 +40,10 @@ public abstract class ParticipantMapper {
         reportGenerationDto.setDate(calculateDate(participant.getReportingSession()));
         reportGenerationDto.setSla(calculateSlaDate(participant.getReportingSession()));
 //          DIFFERENCE -> REPORT_PUBLICATION_TIME - SLA (if endDate > slaDate -> SLA = NEXT DAY FROM reportingSession)
-        reportGenerationDto.setDifference(calculateDifference(participant).toString());
+        BigDecimal bigDecimalDifference = calculateDifference(participant);
+        reportGenerationDto.setDifference(bigDecimalDifference.intValue() == 0
+            ? "" :
+            bigDecimalDifference.toString());
     }
 
     public abstract ReportGenerationDto toReportGenerationDto(ParticipantDTO participant,
@@ -65,13 +68,13 @@ public abstract class ParticipantMapper {
         if (endDateOffsetDateTime.isAfter(slaDateOffsetDateTime)) {
             // NEXT DAY FROM reportingSession
             slaDateOffsetDateTime = participant.getReportingSession().toLocalDateTime().atOffset(ZoneOffset.UTC).plusDays(1);
+            // REPORT_PUBLICATION_TIME (NOW IS USING endDate) - SLA
+            // The format is a float that indicates the diference of time between this two dates.
+            float seconds = Duration.between(participant.getEndDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
+                slaDateOffsetDateTime).getSeconds() / TO_HOURS;
+            return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN);
         }
-
-        // REPORT_PUBLICATION_TIME (NOW IS USING endDate) - SLA
-        // The format is a float that indicates the diference of time between this two dates.
-        float seconds = Duration.between(participant.getEndDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
-            slaDateOffsetDateTime).getSeconds() / TO_HOURS;
-        return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN);
+        return new BigDecimal(0).setScale(1, RoundingMode.DOWN);
     }
 
 

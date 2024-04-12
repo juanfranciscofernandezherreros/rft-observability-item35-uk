@@ -42,7 +42,10 @@ public abstract class TrMapper {
         reportGenerationDto.setDate(calculateDate(tr.getReportingSession()));
         reportGenerationDto.setSla(calculateSlaDate(tr.getReportingSession()));
 //          DIFFERENCE -> REPORT_PUBLICATION_TIME - SLA
-        reportGenerationDto.setDifference(calculateDifference(tr).toString());
+        BigDecimal bigDecimalDifference = calculateDifference(tr);
+        reportGenerationDto.setDifference(bigDecimalDifference.intValue() == 0
+            ? "" :
+            bigDecimalDifference.toString());
     }
 
     public abstract ReportGenerationDto toReportGenerationDto(TrDTO regulator,
@@ -56,13 +59,14 @@ public abstract class TrMapper {
         if (creationDateOffsetDateTime.isAfter(slaDateOffsetDateTime)) {
             // NEXT DAY FROM reportingSession
             slaDateOffsetDateTime = tr.getReportingSession().toLocalDateTime().atOffset(ZoneOffset.UTC).plusDays(1);
+            // REPORT_PUBLICATION_TIME (NOW IS USING creationDate) - SLA
+            // The format is a float that indicates the diference of time between this two dates.
+            float seconds = Duration.between(tr.getCreationDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
+                slaDateOffsetDateTime).getSeconds() / TO_HOURS;
+            return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN);
         }
 
-        // REPORT_PUBLICATION_TIME (NOW IS USING creationDate) - SLA
-        // The format is a float that indicates the diference of time between this two dates.
-        float seconds = Duration.between(tr.getCreationDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
-            slaDateOffsetDateTime).getSeconds() / TO_HOURS;
-        return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN);
+        return new BigDecimal(0).setScale(1, RoundingMode.DOWN);
     }
 
     private String getReportName(String accountId, String fileType, TrFileTypeProperties fileTypeProperties) {
