@@ -31,7 +31,8 @@ public class ApiConfig {
             Request.Builder requestBuilder = originalRequest.newBuilder()
                 .header("Authorization", Credentials.basic(apiClouderaProperties.getUsername(), apiClouderaProperties.getPassword()));
             Request newRequest = requestBuilder.build();
-            log.debug("Request URL: {}", newRequest.url());
+            log.info("Sending request to URL: {} with method: {}", newRequest.url(), newRequest.method());
+            log.info("Request headers: {}", newRequest.headers());
             return chain.proceed(newRequest);
         });
         return builder.build();
