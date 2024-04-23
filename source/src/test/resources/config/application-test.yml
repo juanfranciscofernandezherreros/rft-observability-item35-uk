@@ -125,8 +125,8 @@ component-config:
   TR:
     REPORT_TYPE: TR
     REPORT_TYPE_QUERY:
-      - RL
-      - TD
+      - RL078
+      - TD107
     TYPES:
       RL:
         REPORT_NAME: RL
@@ -140,12 +140,8 @@ component-config:
         REPORT_NAME: RL078
         SLA: yyyy-MM-ddT12:00:00Z
         INIT: yyyy-MM-ddT00:00:00Z
-      RECO091:
-        REPORT_NAME: RECO091
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-      TDD107:
-        REPORT_NAME: TDD107
+      TD107:
+        REPORT_NAME: TD107
         SLA: yyyy-MM-ddT12:00:00Z
         INIT: yyyy-MM-ddT00:00:00Z
 

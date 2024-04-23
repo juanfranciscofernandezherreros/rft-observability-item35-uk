@@ -58,3 +58,7 @@ INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,
     VALUES('TRRGS_DATTAR_ESMAS_R99996-240301_001001-0.zip', 'TD', '2024-02-04 05:12:55.421', '2024-02-04 07:12:55.421', 'trdrif3q0000');
 INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
     VALUES('TRRGS_DATTSR_ESMAS_R11526-240301_001001-0.zip', 'RL', '2024-02-05 05:12:55.421', '2024-02-05 08:12:55.421', 'trdrif3q0000');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
+    VALUES('TRRGS_DATTAR_ESMAS_R99996-240301_001001-0.zip', 'RL078', '2024-02-04 05:12:55.421', '2024-02-04 07:12:55.421', 'trdrif3q0000');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
+    VALUES('TRRGS_DATTSR_ESMAS_R11526-240301_001001-0.zip', 'TD107', '2024-02-05 05:12:55.421', '2024-02-05 08:12:55.421', 'trdrif3q0000');

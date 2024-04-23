@@ -49,9 +49,7 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
         log.debug("File created and written: " + filePath);
         stateService.nextStep(
             StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).fileUrl(filePath).build());
-        File file = new File(filePath);
-        LogService.logInfo("Save file", itemCommandDTO);
-        return file;
+        return new File(filePath);
     }
 
     private void writeHeader(CSVWriter csvWriter) {

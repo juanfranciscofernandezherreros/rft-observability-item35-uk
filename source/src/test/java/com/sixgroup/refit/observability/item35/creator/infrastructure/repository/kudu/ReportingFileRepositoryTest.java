@@ -3,6 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.ParticipantDTO;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.RegulatorDTO;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.TrDTO;
@@ -31,6 +32,8 @@ class ReportingFileRepositoryTest {
     private ParticipantFileTypeProperties participantFileTypeProperties;
     @Mock
     private RegulatorFileTypeProperties regulatorFileTypeProperties;
+    @Mock
+    private TrFileTypeProperties trFileTypeProperties;
 
     @Test
     void findParticipantsByDayAndFileType() {
@@ -62,11 +65,13 @@ class ReportingFileRepositoryTest {
     @Test
     void findTrByDayAccountAndFileType() {
         doReturn(List.of(new TrDTO())).when(reportingFileKudu)
-            .findTrByDayAccountAndFileType(any(), any());
+            .findTrByDayAccountAndFileType(any(), any(), any());
+
+        when(trFileTypeProperties.getREPORT_TYPE_QUERY()).thenReturn(List.of("TD107", "RL078"));
 
         reportingFileRepository.findTrByDayAccountAndFileType("2024-02-01", "2024-03-01");
 
-        verify(reportingFileKudu, times(1)).findTrByDayAccountAndFileType(any(), any());
+        verify(reportingFileKudu, times(1)).findTrByDayAccountAndFileType(any(), any(), any());
     }
 
 }

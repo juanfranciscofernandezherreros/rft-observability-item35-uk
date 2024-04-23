@@ -47,9 +47,7 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
         log.debug("File created and written: " + filePath);
         stateService.nextStep(
             StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).fileUrl(filePath).build());
-        File file = new File(filePath);
-        LogService.logInfo("Save file", itemCommandDTO);
-        return file;
+        return new File(filePath);
     }
 
 

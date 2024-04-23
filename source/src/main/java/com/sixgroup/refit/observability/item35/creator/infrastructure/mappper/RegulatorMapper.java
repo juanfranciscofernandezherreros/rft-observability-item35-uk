@@ -70,16 +70,7 @@ public abstract class RegulatorMapper {
     }
 
     private String getReportName(String fileName, String fileType, RegulatorFileTypeProperties fileTypeProperties) {
-        String[] splitBy_char = fileName.split("_");
-        if (splitBy_char.length <= 2) {
-            log.error("'FileName: " + fileName + "' not contain expected position");
-            throw new RuntimeException("'FileName: " + fileName + "' not contain expected position");
-        }
-        String fileNameValue = splitBy_char[2];
-        if (!fileTypeProperties.getTYPES().containsValue(fileType)) {
-            log.error("'FileType: " + fileType + "' not exist in regulator config map");
-            throw new RuntimeException("'FileType: " + fileType + "' not exist in regulator config map");
-        }
+        String fileNameValue = fileName.split("_")[2];
         return fileNameValue + "-" + fileTypeProperties.getTYPES().get(fileType + ".REPORT_NAME");
     }
 

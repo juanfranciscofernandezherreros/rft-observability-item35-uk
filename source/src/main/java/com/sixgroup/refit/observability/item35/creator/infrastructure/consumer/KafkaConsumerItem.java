@@ -2,8 +2,6 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.consumer;
 
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
-import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
-import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseSubmissionVolumes;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -23,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.CREATING_AND_SAVING_FILE;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 
 @Slf4j
@@ -31,7 +28,6 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 @RequiredArgsConstructor
 public class KafkaConsumerItem {
 
-    private final UseCaseSubmissionVolumes useCaseSubmissionVolumes;
     private final RftKafkaConsumerTracing kafkaConsumerTracing;
     private final StateService stateService;
 
@@ -45,7 +41,6 @@ public class KafkaConsumerItem {
 
             kafkaConsumerTracing.initTrace(item.headers());
             ItemCommandDTO itemCommand = ItemCommandDTO.generateItemCommandDTO(item.value());
-            LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommand);
             if (isRequestTypeAccepted(item.value().getItemType())) {
                 stateService.nextStep(
                     StateRequest.builder().fileName(Utils.getFileName(itemCommand))
@@ -53,7 +48,7 @@ public class KafkaConsumerItem {
                 log.debug("Consumed message to generate file: {}", item.value().getItemType());
                 ItemTypeStrategy itemTypeStrategy = itemType.get(ItemType.getItemTypeFromName(item.value().getItemType()));
                 itemTypeStrategy.execute(itemCommand, item.headers());
-                log.debug("Generate file item35: {}", item.value().getItemType());
+                log.debug("Generated file item35: {}", item.value().getItemType());
             }
         }
     }
@@ -63,8 +58,8 @@ public class KafkaConsumerItem {
         Optional.ofNullable(requestItemType)
             .filter(type -> type.equals(ItemType.SUBMISSION_VOLUMES.getName()) || type.equals(ItemType.COMPUTE_CAPACITY.getName())
                 || type.equals(ItemType.STORAGE_CAPACITY.getName()) || type.equals(ItemType.REPORT_GENERATION.getName()))
-            .orElseThrow(() -> new IllegalArgumentException("'type' cannot be nul or blank, and must be any of accepted values"));
-
+            .orElseThrow(() -> new IllegalArgumentException("'type' cannot be null or blank, " +
+                "and must be any of accepted values"));
 
         return true;
     }
