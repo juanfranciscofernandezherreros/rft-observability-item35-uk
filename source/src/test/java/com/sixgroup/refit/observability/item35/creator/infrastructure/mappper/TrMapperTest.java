@@ -33,29 +33,6 @@ class TrMapperTest {
     private TrFileTypeProperties fileTypeProperties;
 
     @Test
-    void findParticipants_not_exist_report_type() {
-        TrDTO tr_1 = new TrDTO("NOT_EXIST", Timestamp.valueOf("2024-02-20 18:55:23.512"),
-            "trkdp", Timestamp.valueOf("2024-02-20 18:55:29.771"));
-
-        when(fileTypeProperties.getTYPES())
-            .thenReturn(Map.of("RL.REPORT_NAME", "RL",
-                "RL.SLA", "yyyy-MM-ddT12:00:00Z",
-                "RL.INIT", "yyyy-MM-ddT00:00:00Z",
-                "TD.REPORT_NAME", "TD",
-                "TD.SLA", "yyyy-MM-ddT06:00:00Z",
-                "TD.INIT", "yyyy-MM-ddT00:00:00Z"));
-
-        TrMapper trMapper = mock(TrMapper.class, Mockito.CALLS_REAL_METHODS);
-
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> trMapper.manageData(tr_1, fileTypeProperties, new ReportGenerationDto()));
-
-        assertEquals(runtimeException.getMessage(),"'FileType: NOT_EXIST' not exist in tr config map");
-
-        verify(trMapper, times(1)).manageData(any(), any(), any());
-    }
-
-    @Test
     void findTr_ok() {
         TrDTO tr_1 = new TrDTO("TD", Timestamp.valueOf("2024-02-22 14:08:12.550"),
             "trkdp", Timestamp.valueOf("2024-02-22 14:08:12.550"));

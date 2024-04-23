@@ -49,9 +49,7 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
                 .fileName(Utils.getFileName(itemCommandDTO))
                 .itemType(ITEM35).fileUrl(filePath)
                 .build());
-        File file = new File(filePath);
-        LogService.logInfo("Saved file", itemCommandDTO);
-        return file;
+        return new File(filePath);
     }
 
     private void writeHeader(CSVWriter csvWriter) {

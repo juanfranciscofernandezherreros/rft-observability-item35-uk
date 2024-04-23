@@ -33,27 +33,6 @@ class ParticipantMapperTest {
     private ParticipantFileTypeProperties fileTypeProperties;
 
     @Test
-    void not_exist_report_type() {
-        ParticipantDTO participant_1 = new ParticipantDTO("NOT_EXIST", Timestamp.valueOf("2024-02-20 18:55:23.512"),
-            Timestamp.valueOf("2024-02-20 18:55:23.512"), Timestamp.valueOf("2024-02-20 18:55:29.771"));
-
-        when(fileTypeProperties.getTYPES())
-            .thenReturn(Map.of("TSR107.REPORT_NAME", "TSR107",
-                "TSR107.SLA", "yyyy-MM-ddT06:00:00Z",
-                "TAR108.REPORT_NAME", "TAR108",
-                "TAR108.SLA", "yyyy-MM-ddT06:00:00Z"));
-
-        ParticipantMapper participantMapper = mock(ParticipantMapper.class, Mockito.CALLS_REAL_METHODS);
-
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> participantMapper.manageData(participant_1, fileTypeProperties, new ReportGenerationDto()));
-
-        assertEquals(runtimeException.getMessage(),
-            "'FileType: NOT_EXIST' not exist in participant config map");
-
-    }
-
-    @Test
     void mapper_participants_ok() {
         ParticipantDTO participant_1 = new ParticipantDTO("TAR108", Timestamp.valueOf("2024-02-20 18:55:23.512"),
             Timestamp.valueOf("2024-02-20 18:55:23.512"), Timestamp.valueOf("2024-02-20 18:55:29.771"));

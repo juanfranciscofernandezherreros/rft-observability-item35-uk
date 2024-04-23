@@ -47,7 +47,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
     @Override
     public File execute(ItemCommandDTO itemCommandDTO, Headers headers) {
-        log.debug("Generating storage capacity volumes file ...");
+        log.debug("Generating storage capacity file ...");
         File fileStorageCapacity;
         try {
             stateService.nextStep(

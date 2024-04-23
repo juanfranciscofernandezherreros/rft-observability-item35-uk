@@ -70,10 +70,6 @@ public abstract class TrMapper {
     }
 
     private String getReportName(String accountId, String fileType, TrFileTypeProperties fileTypeProperties) {
-        if (!fileTypeProperties.getTYPES().containsValue(fileType)) {
-            log.error("'FileType: " + fileType + "' not exist in tr config map");
-            throw new RuntimeException("'FileType: " + fileType + "' not exist in tr config map");
-        }
         return accountId + "-" + fileTypeProperties.getTYPES().get(fileType + ".REPORT_NAME");
     }
 

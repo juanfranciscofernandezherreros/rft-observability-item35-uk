@@ -47,9 +47,7 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
                 .fileName(Utils.getFileName(itemCommandDTO))
                 .itemType(ITEM35).fileUrl(filePath)
                 .build());
-        File file = new File(filePath);
-        LogService.logInfo("Saved file", itemCommandDTO);
-        return file;
+        return new File(filePath);
     }
 
     private void writeHeader(CSVWriter csvWriter) {

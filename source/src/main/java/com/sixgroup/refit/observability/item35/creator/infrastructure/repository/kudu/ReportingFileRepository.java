@@ -2,6 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 
 import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class ReportingFileRepository implements com.sixgroup.refit.observability
 
     private final ParticipantFileTypeProperties participantFileTypeProperties;
     private final RegulatorFileTypeProperties regulatorFileTypeProperties;
+    private final TrFileTypeProperties trFileTypeProperties;
 
     @Override
     public List<ParticipantDTO> findParticipantsByDayAccountAndFileType(String initDate, String endDate) {
@@ -46,7 +48,8 @@ public class ReportingFileRepository implements com.sixgroup.refit.observability
         log.debug("Find Regulators by day and fileType");
         Timestamp startDate = Timestamp.valueOf(LocalDate.parse(initDate).atStartOfDay());
         Timestamp endDateDate = Timestamp.valueOf(LocalDate.parse(endDate).atStartOfDay());
-        return reportingFileKudu.findTrByDayAccountAndFileType(startDate, endDateDate);
+        return reportingFileKudu.findTrByDayAccountAndFileType(startDate, endDateDate,
+            trFileTypeProperties.getREPORT_TYPE_QUERY());
     }
 
 }

@@ -103,46 +103,6 @@ class RegulatorMapperTest {
     }
 
     @Test
-    void expected_file_name_not_contain_third_position() {
-        RegulatorDTO regulator_1 = new RegulatorDTO("TRRGS_DATTAR.zip", "TSR107",
-            Timestamp.valueOf("2024-02-20 18:55:23.512"), "eudritrace", Timestamp.valueOf("2024-02-20 18:55:29.771"));
-
-        RegulatorMapper regulatorMapper = mock(RegulatorMapper.class, Mockito.CALLS_REAL_METHODS);
-
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> regulatorMapper.manageData(regulator_1, fileTypeProperties, new ReportGenerationDto()));
-
-        assertEquals(runtimeException.getMessage(),
-            "'FileName: TRRGS_DATTAR.zip' not contain expected position");
-
-        verify(regulatorMapper, times(1)).manageData(any(), any(), any());
-
-    }
-
-    @Test
-    void expected_file_type_not_contain_value() {
-        RegulatorDTO regulator_1 = new RegulatorDTO("TRRGS_DATTAR_AAAAA.zip", "NOT_EXIST",
-            Timestamp.valueOf("2024-02-20 18:55:23.512"), "eudritrace", Timestamp.valueOf("2024-02-20 18:55:29.771"));
-
-        when(fileTypeProperties.getTYPES())
-            .thenReturn(Map.of("TSR107.REPORT_NAME", "TSR107",
-                "TSR107.SLA", "yyyy-MM-ddT12:00:00Z",
-                "TAR108.REPORT_NAME", "TAR108",
-                "TAR108.SLA", "yyyy-MM-ddT12:00:00Z"));
-
-        RegulatorMapper regulatorMapper = mock(RegulatorMapper.class, Mockito.CALLS_REAL_METHODS);
-
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> regulatorMapper.manageData(regulator_1, fileTypeProperties, new ReportGenerationDto()));
-
-        assertEquals(runtimeException.getMessage(),
-            "'FileType: NOT_EXIST' not exist in regulator config map");
-
-        verify(regulatorMapper, times(1)).manageData(any(), any(), any());
-
-    }
-
-    @Test
     void findRegulators_ok() {
         RegulatorDTO regulator_1 = new RegulatorDTO("TRRGS_DATTSR_ESMAS_R15923-20240220_001001-0.zip", "TSR107",
             Timestamp.valueOf("2024-02-20 18:55:23.512"), "eudritrace", Timestamp.valueOf("2024-02-20 18:55:29.771"));

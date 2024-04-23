@@ -50,14 +50,7 @@ public abstract class ParticipantMapper {
                                                               ParticipantFileTypeProperties fileTypeProperties);
 
     private String getReportName(String fileType, ParticipantFileTypeProperties fileTypeProperties) {
-        String reportName;
-        if (fileTypeProperties.getTYPES().containsValue(fileType)) {
-            reportName = fileTypeProperties.getTYPES().get(fileType + ".REPORT_NAME");
-        } else {
-            log.error("'FileType: " + fileType + "' not exist in participant config map");
-            throw new RuntimeException("'FileType: " + fileType + "' not exist in participant config map");
-        }
-        return reportName;
+        return fileTypeProperties.getTYPES().get(fileType + ".REPORT_NAME");
     }
 
     private static BigDecimal calculateDifference(ParticipantDTO participant) {

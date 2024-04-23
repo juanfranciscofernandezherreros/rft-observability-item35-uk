@@ -38,7 +38,8 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
         "FROM ReportingFileEntity as rfo " +
         "WHERE (rfo.reportingSessionTimeStamp >= ?1 AND rfo.reportingSessionTimeStamp < ?2) " +
         "AND rfo.accountId LIKE 'tr%' " +
+        "AND rfo.fileType IN (?3) " +
         "ORDER BY rfo.reportingSessionTimeStamp, rfo.accountId"
     )
-    List<TrDTO> findTrByDayAccountAndFileType(Timestamp initDate, Timestamp endDate);
+    List<TrDTO> findTrByDayAccountAndFileType(Timestamp initDate, Timestamp endDate, List<String> fileTypes);
 }
