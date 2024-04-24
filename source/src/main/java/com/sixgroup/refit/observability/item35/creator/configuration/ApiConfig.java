@@ -7,11 +7,14 @@ import okhttp3.Credentials;
 import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.net.ssl.*;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.security.cert.CertificateException;
 
 @Configuration
 @AllArgsConstructor
@@ -31,8 +34,9 @@ public class ApiConfig {
             Request.Builder requestBuilder = originalRequest.newBuilder()
                 .header("Authorization", Credentials.basic(apiClouderaProperties.getUsername(), apiClouderaProperties.getPassword()));
             Request newRequest = requestBuilder.build();
+            log.info("ApiClouderaProperties: {}", apiClouderaProperties.toString());
             log.info("Sending request to URL: {} with method: {}", newRequest.url(), newRequest.method());
-            log.info("Request headers: {}", newRequest.headers());
+            log.info("Request Authorization Header: {}", newRequest.headers("Authorization"));
             return chain.proceed(newRequest);
         });
         return builder.build();
