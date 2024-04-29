@@ -108,9 +108,7 @@ class UseCaseStorageCapacityTest {
     @Test
     void execute_resource_not_found_total_capacity_error() {
         when(storageService.getTotalCapacity(any(), any())).thenReturn(null);
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders));
-        assertEquals(runtimeException.getMessage(), "Not exist 'total capacity data' between 2024-09-01 and 2024-10-01");
+        useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders);
         verify(stateService, times(1)).setError(any());
         verify(producerItemService, times(0)).send(any(), any());
         verify(storageService, times(1)).getTotalCapacity(any(), any());
@@ -123,9 +121,7 @@ class UseCaseStorageCapacityTest {
             new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
         when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(null);
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders));
-        assertEquals(runtimeException.getMessage(), "Not exist 'total free capacity data' between 2024-09-01 and 2024-10-01");
+        useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders);
         verify(stateService, times(1)).setError(any());
         verify(producerItemService, times(0)).send(any(), any());
         verify(storageService, times(1)).getTotalCapacity(any(), any());
@@ -153,11 +149,7 @@ class UseCaseStorageCapacityTest {
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
 
         when(writeFileSubmissionVolumesService.writeFile(anyList(), any())).thenThrow(new IOException("Error"));
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders));
-
-        assertEquals(runtimeException.getMessage(), "java.io.IOException: Error");
-
+        useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders);
         verify(storageService, times(1)).getTotalCapacity(any(), any());
         verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
         verify(stateService, times(1)).nextStep(any(StateRequest.class));

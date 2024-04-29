@@ -3,11 +3,9 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
-import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Response;
+import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityCpuRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.CapacityMapper;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
-import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,9 +29,9 @@ public class CapacityCpuClouderaMock implements CapacityCpuRepository {
     public List<Capacity> findByCapacityCpu(String dateFrom, String dateTo) {
         List<Capacity> listCapacityCpu = null;
         try {
-            Response response = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .readValue(getClass().getClassLoader().getResourceAsStream("json/capacity-cpu.json"), Response.class);
-            listCapacityCpu = CapacityMapper.mapperResponseToListCapacity(response);
+            StorageCapacityResponse storageCapacityResponse = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .readValue(getClass().getClassLoader().getResourceAsStream("json/capacity-cpu.json"), StorageCapacityResponse.class);
+            listCapacityCpu = CapacityMapper.mapperResponseToListCapacity(storageCapacityResponse);
         } catch (IOException e) {
             log.error("Error to call Cloudera CPU Mock with message: {}, and code: {}",
                 e.getMessage(), ERROR_CALL_CLOUDERA);

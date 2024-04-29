@@ -6,11 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
-import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Response;
+import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityRamRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.CapacityMapper;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
-import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
@@ -58,19 +56,25 @@ public class CapacityRamCloudera implements CapacityRamRepository {
             .method(HttpMethod.GET.name(), null)
             .build();
         ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        okhttp3.Response response = null;
         try {
-            okhttp3.Response response = okHttpClient.newCall(request).execute();
+            response = okHttpClient.newCall(request).execute();
             if (!response.isSuccessful()) {
                 log.error("Error to call Cloudera with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
                 return null;
             }
             if (Objects.nonNull(response.body())) {
-                Response responseBody = objectMapper.readValue(response.body().string(), Response.class);
-                listCapacityRam = CapacityMapper.mapperResponseToListCapacity(responseBody);
+                StorageCapacityResponse storageCapacityResponseBody = objectMapper.readValue(response.body().string(), StorageCapacityResponse.class);
+                listCapacityRam = CapacityMapper.mapperResponseToListCapacity(storageCapacityResponseBody);
             }
         } catch (IOException e) {
-            log.error("Error to call Cloudera with message: {}, and code: {}", e.getMessage(), ERROR_CALL_CLOUDERA);
+            log.error("Error to call Cloudera Ram with message: {}, code: {}, exception: ",
+                e.getMessage(), ERROR_CALL_CLOUDERA, e);
             return null;
+        } finally {
+            if (Objects.nonNull(response)) {
+                response.close();
+            }
         }
         return listCapacityRam;
     }
