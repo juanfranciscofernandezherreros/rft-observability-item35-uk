@@ -53,7 +53,7 @@ api:
     username:
     password:
     host: https://mqmblclutil01.internal.six-group.net
-    port: 7183
+    port: 8443
     url: /api/v54/timeseries
 
 component-config:
@@ -154,6 +154,7 @@ component-config:
     schema: EMIR_REFIT_DEV_CONTROL_REFIT
   api:
     cloudera:
+      knox-auth: true
       cpu:
         enabled: false
         selectCpu: select cpu_percent_across_hosts where category=CLUSTER
@@ -163,10 +164,11 @@ component-config:
         selectRam: select physical_memory_used
         desiredRollup: DAILY
       storage:
+        enabled: false
         selectTotalApi: select total_capacity_across_filesystems
         selectFreeApi: select total_capacity_free_across_filesystems
         desiredRollup: DAILY
-        enabled: false
+        entityName: rftemir-cldr-qa-mbt
 
 logging:
   level:

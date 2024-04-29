@@ -23,18 +23,24 @@ public class ApiConfig {
 
     private final ApiClouderaProperties apiClouderaProperties;
 
+    private final ComponentProperties componentProperties;
+
     @Bean
     public OkHttpClient okHttpClient() {
 
-        CookieManager cookieManager = new CookieManager();
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-        OkHttpClient.Builder builder = new OkHttpClient.Builder().cookieJar(new JavaNetCookieJar(cookieManager));
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        if (componentProperties.isKnoxAuth()) {
+            CookieManager cookieManager = new CookieManager();
+            cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+            builder.cookieJar(new JavaNetCookieJar(cookieManager));
+        }
         builder.addInterceptor(chain -> {
             Request originalRequest = chain.request();
             Request.Builder requestBuilder = originalRequest.newBuilder()
                 .header("Authorization", Credentials.basic(apiClouderaProperties.getUsername(), apiClouderaProperties.getPassword()));
             Request newRequest = requestBuilder.build();
-            log.info("ApiClouderaProperties: {}", apiClouderaProperties.toString());
+            log.info("ComponentProperties: isKnoxAuth {}", componentProperties.isKnoxAuth());
+            log.info("ApiClouderaProperties: {}", apiClouderaProperties);
             log.info("Sending request to URL: {} with method: {}", newRequest.url(), newRequest.method());
             log.info("Request Authorization Header: {}", newRequest.headers("Authorization"));
             return chain.proceed(newRequest);

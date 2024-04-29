@@ -2,7 +2,9 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
+import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import okhttp3.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -57,7 +59,7 @@ class StorageCapacityTest {
         when(mockStorage.getSelectTotalApi()).thenReturn("select total_capacity_across_filesystems");
 
         // Execute the method under test
-        com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Response result =
+        StorageCapacityResponse result =
             storageCapacity.findTotalStorage(testDateFrom, testDateTo);
 
         // Verify results
@@ -89,11 +91,11 @@ class StorageCapacityTest {
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
 
         // Execute the method under test
-        com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Response result =
+        StorageCapacityResponse storageCapacityResponse =
             storageCapacity.findFreeStorage(testDateFrom, testDateTo);
 
         // Verify results
-        assertNotNull(result);
+        assertNotNull(storageCapacityResponse);
         verify(mockOkHttpClient).newCall(any(Request.class));
     }
 
@@ -111,12 +113,10 @@ class StorageCapacityTest {
         when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectTotalApi()).thenReturn("select total_capacity_across_filesystems");
 
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> storageCapacity.findTotalStorage(testDateFrom, testDateTo));
+        StorageCapacityResponse storageCapacityResponse = storageCapacity.findTotalStorage(testDateFrom, testDateTo);
 
-        assertEquals(runtimeException.getMessage(),
-            "Error to call Cloudera Storage with select total_capacity_across_filesystems");
-
+        // Verify results
+        assertNull(storageCapacityResponse);
         verify(mockOkHttpClient).newCall(any(Request.class));
     }
 
@@ -133,13 +133,8 @@ class StorageCapacityTest {
         ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
         when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
-
-        RuntimeException runtimeException = assertThrows(RuntimeException.class,
-            () -> storageCapacity.findFreeStorage(testDateFrom, testDateTo));
-
-        assertEquals(runtimeException.getMessage(),
-            "Error to call Cloudera Storage with select total_capacity_free_across_filesystems");
-
+        StorageCapacityResponse storageCapacityResponse = storageCapacity.findFreeStorage(testDateFrom, testDateTo);
+        Assertions.assertNull(storageCapacityResponse);
         verify(mockOkHttpClient).newCall(any(Request.class));
     }
 

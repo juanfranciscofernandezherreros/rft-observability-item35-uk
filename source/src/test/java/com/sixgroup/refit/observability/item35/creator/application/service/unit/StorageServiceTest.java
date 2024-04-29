@@ -3,6 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.application.service.unit
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.application.service.StorageServiceImpl;
+import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.*;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.cloudera.StorageCapacity;
@@ -23,8 +24,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class StorageServiceTest {
@@ -33,6 +33,9 @@ class StorageServiceTest {
     private StorageServiceImpl storageService;
     @Mock
     private StorageCapacity storageCapacity;
+
+    @Mock
+    private ComponentProperties componentProperties;
 
     ObjectMapper objectMapper = new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -43,11 +46,14 @@ class StorageServiceTest {
         String responseTotalAll =
             new String(Files.readAllBytes(Paths.get("src/test/resources/json/total_all.json")));
 
-        Response response = objectMapper.readValue(responseTotalAll, Response.class);
+        StorageCapacityResponse storageCapacityResponse = objectMapper.readValue(responseTotalAll, StorageCapacityResponse.class);
 
         when(storageCapacity.findTotalStorage(anyString(), anyString()))
-            .thenReturn(response);
+            .thenReturn(storageCapacityResponse);
 
+        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
+        when(componentProperties.getStorage()).thenReturn(mockStorage);
+        when(mockStorage.getEntityName()).thenReturn("rftemir-cldr-qa-mbt");
         List<Storage> storageList = storageService.getTotalCapacity("2024-01-01", "2024-02-01");
 
         assertNotNull(storageList);
@@ -77,7 +83,7 @@ class StorageServiceTest {
     void getTotalCapacity_response_cloudera_empty() {
 
         when(storageCapacity.findTotalStorage(anyString(), anyString()))
-            .thenReturn(new Response());
+            .thenReturn(new StorageCapacityResponse());
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalCapacity("2024-01-01", "2024-02-01"));
@@ -92,11 +98,11 @@ class StorageServiceTest {
     @NullAndEmptySource
     void getTotalCapacity_response_cloudera_item_null_or_empty(List<Items> items) {
 
-        Response response = new Response();
-        response.setItems(items);
+        StorageCapacityResponse storageCapacityResponse = new StorageCapacityResponse();
+        storageCapacityResponse.setItems(items);
 
         when(storageCapacity.findTotalStorage(anyString(), anyString()))
-            .thenReturn(response);
+            .thenReturn(storageCapacityResponse);
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalCapacity("2024-01-01", "2024-02-01"));
@@ -111,13 +117,13 @@ class StorageServiceTest {
     @NullAndEmptySource
     void getTotalCapacity_response_cloudera_time_series_null_or_empty(List<TimeSeries> timeSeries) {
 
-        Response response = new Response();
+        StorageCapacityResponse storageCapacityResponse = new StorageCapacityResponse();
         Items items = new Items();
         items.setTimeSeries(timeSeries);
-        response.setItems(List.of(items));
+        storageCapacityResponse.setItems(List.of(items));
 
         when(storageCapacity.findTotalStorage(anyString(), anyString()))
-            .thenReturn(response);
+            .thenReturn(storageCapacityResponse);
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalCapacity("2024-01-01", "2024-02-01"));
@@ -132,7 +138,7 @@ class StorageServiceTest {
     @NullAndEmptySource
     void getTotalCapacity_response_cloudera_no_data_in_node(List<Data> data) {
 
-        Response response = new Response();
+        StorageCapacityResponse storageCapacityResponse = new StorageCapacityResponse();
         Items items = new Items();
         TimeSeries series = new TimeSeries();
         Metadata metadata = new Metadata();
@@ -142,10 +148,10 @@ class StorageServiceTest {
         series.setMetadata(metadata);
         series.setData(data);
         items.setTimeSeries(List.of(series));
-        response.setItems(List.of(items));
+        storageCapacityResponse.setItems(List.of(items));
 
         when(storageCapacity.findTotalStorage(anyString(), anyString()))
-            .thenReturn(response);
+            .thenReturn(storageCapacityResponse);
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalCapacity("2024-01-01", "2024-02-01"));
@@ -162,10 +168,10 @@ class StorageServiceTest {
         String responseFreeAll =
             new String(Files.readAllBytes(Paths.get("src/test/resources/json/free_all.json")));
 
-        Response response = objectMapper.readValue(responseFreeAll, Response.class);
+        StorageCapacityResponse storageCapacityResponse = objectMapper.readValue(responseFreeAll, StorageCapacityResponse.class);
 
         when(storageCapacity.findFreeStorage(anyString(), anyString()))
-            .thenReturn(response);
+            .thenReturn(storageCapacityResponse);
 
         List<Storage> storageList = storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01");
 
@@ -199,7 +205,7 @@ class StorageServiceTest {
     void getTotalFreeCapacity_response_cloudera_empty() {
 
         when(storageCapacity.findFreeStorage(anyString(), anyString()))
-            .thenReturn(new Response());
+            .thenReturn(new StorageCapacityResponse());
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01"));
@@ -214,11 +220,11 @@ class StorageServiceTest {
     @NullAndEmptySource
     void getTotalFreeCapacity_response_cloudera_item_null_or_empty(List<Items> items) {
 
-        Response response = new Response();
-        response.setItems(items);
+        StorageCapacityResponse storageCapacityResponse = new StorageCapacityResponse();
+        storageCapacityResponse.setItems(items);
 
         when(storageCapacity.findFreeStorage(anyString(), anyString()))
-            .thenReturn(response);
+            .thenReturn(storageCapacityResponse);
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01"));
@@ -233,13 +239,13 @@ class StorageServiceTest {
     @NullAndEmptySource
     void getTotalFreeCapacity_response_cloudera_time_series_null_or_empty(List<TimeSeries> timeSeries) {
 
-        Response response = new Response();
+        StorageCapacityResponse storageCapacityResponse = new StorageCapacityResponse();
         Items items = new Items();
         items.setTimeSeries(timeSeries);
-        response.setItems(List.of(items));
+        storageCapacityResponse.setItems(List.of(items));
 
         when(storageCapacity.findFreeStorage(anyString(), anyString()))
-            .thenReturn(response);
+            .thenReturn(storageCapacityResponse);
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01"));
@@ -254,7 +260,7 @@ class StorageServiceTest {
     @NullAndEmptySource
     void getTotalFreeCapacity_response_cloudera_no_data_in_node(List<Data> data) {
 
-        Response response = new Response();
+        StorageCapacityResponse storageCapacityResponse = new StorageCapacityResponse();
         Items items = new Items();
         TimeSeries series = new TimeSeries();
         Metadata metadata = new Metadata();
@@ -264,10 +270,10 @@ class StorageServiceTest {
         series.setMetadata(metadata);
         series.setData(data);
         items.setTimeSeries(List.of(series));
-        response.setItems(List.of(items));
+        storageCapacityResponse.setItems(List.of(items));
 
         when(storageCapacity.findFreeStorage(anyString(), anyString()))
-            .thenReturn(response);
+            .thenReturn(storageCapacityResponse);
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01"));

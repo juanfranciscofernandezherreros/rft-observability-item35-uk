@@ -1,8 +1,10 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
+import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Data;
-import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Response;
+import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.TimeSeries;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
 import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
@@ -29,9 +31,11 @@ public class StorageServiceImpl implements StorageService {
 
     private final StorageCapacityRepository storageCapacityRepository;
 
+    private final ComponentProperties componentProperties;
+
     @Override
     public List<Storage> getTotalCapacity(String dateFrom, String dateTo) {
-        Response totalStorage = storageCapacityRepository.findTotalStorage(dateFrom, dateTo);
+        StorageCapacityResponse totalStorage = storageCapacityRepository.findTotalStorage(dateFrom, dateTo);
         Optional.ofNullable(totalStorage).orElseThrow(() -> new RuntimeException("'apiCloudera findTotalStorage()' response" +
             " cannot be null"));
         return manageClouderaApiTotalCapacityResponseData(totalStorage);
@@ -39,23 +43,23 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public List<Storage> getTotalFreeCapacity(String dateFrom, String dateTo) {
-        Response freeStorage = storageCapacityRepository.findFreeStorage(dateFrom, dateTo);
+        StorageCapacityResponse freeStorage = storageCapacityRepository.findFreeStorage(dateFrom, dateTo);
         Optional.ofNullable(freeStorage).orElseThrow(() -> new RuntimeException("'apiCloudera findFreeStorage()' response" +
             " cannot be null"));
         return manageClouderaApiTotalCapacityFreeResponseData(freeStorage);
     }
 
-    private static List<Storage> manageClouderaApiTotalCapacityResponseData(Response response) {
+    private List<Storage> manageClouderaApiTotalCapacityResponseData(StorageCapacityResponse storageCapacityResponse) {
 
         List<Storage> storageList = new ArrayList<>();
 
-        if (CollectionUtils.isNotEmpty(response.getItems())) {
-            response.getItems().forEach(items -> {
+        if (CollectionUtils.isNotEmpty(storageCapacityResponse.getItems())) {
+            storageCapacityResponse.getItems().forEach(items -> {
                 if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
                     List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
                         .filter(timeSeries -> null != timeSeries.getMetadata()
                             && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
-                            && timeSeries.getMetadata().getEntityName().equals(NODE_STORAGE_TOTAL))
+                            && timeSeries.getMetadata().getEntityName().equals(componentProperties.getStorage().getEntityName()))
                         .toList();
 
                     if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
@@ -84,12 +88,12 @@ public class StorageServiceImpl implements StorageService {
         return storageList;
     }
 
-    private static List<Storage> manageClouderaApiTotalCapacityFreeResponseData(Response response) {
+    private static List<Storage> manageClouderaApiTotalCapacityFreeResponseData(StorageCapacityResponse storageCapacityResponse) {
 
         List<Storage> storageList = new ArrayList<>();
 
-        if (CollectionUtils.isNotEmpty(response.getItems())) {
-            response.getItems().forEach(items -> {
+        if (CollectionUtils.isNotEmpty(storageCapacityResponse.getItems())) {
+            storageCapacityResponse.getItems().forEach(items -> {
                 if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
                     List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
                         .filter(timeSeries -> null != timeSeries.getMetadata()

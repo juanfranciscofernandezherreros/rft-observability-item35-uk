@@ -96,11 +96,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
                     .itemType(ITEM35)
                     .errorDescription("Error to generate file storage capacity: " + e.getMessage())
                     .build());
-            if (e instanceof ResourceNotFoundException) {
-                throw new RuntimeException(e.getMessage());
-            }
-            throw new RuntimeException(e);
-
+            return null;
         }
     }
 

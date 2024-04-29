@@ -81,12 +81,7 @@ class CapacityCpuClouderaTest {
             .build();
 
         // Simulate a server error response
-        okhttp3.Response okHttpResponse = new okhttp3.Response.Builder()
-            .request(fakeRequest)
-            .protocol(Protocol.HTTP_1_1)
-            .code(500)
-            .message("Internal Server Error")
-            .build();
+        okhttp3.Response okHttpResponse = mock(okhttp3.Response.class);
 
         when(mockApiClouderaProperties.getHost()).thenReturn("https://example.com");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");

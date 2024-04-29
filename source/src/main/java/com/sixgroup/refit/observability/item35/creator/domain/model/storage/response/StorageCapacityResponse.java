@@ -7,6 +7,6 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Data
-public class Response {
+public class StorageCapacityResponse {
     List<Items> items;
 }

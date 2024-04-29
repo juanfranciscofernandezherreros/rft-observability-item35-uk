@@ -4,22 +4,19 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
-import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Response;
+import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
-import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.ResponseBody;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Objects;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_CALL_CLOUDERA;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
@@ -36,15 +33,15 @@ public class StorageCapacity implements StorageCapacityRepository {
     private final ApiClouderaProperties apiClouderaProperties;
     private final ComponentProperties componentProperties;
 
-    public Response findTotalStorage(String dateFrom, String dateTo) {
+    public StorageCapacityResponse findTotalStorage(String dateFrom, String dateTo) {
         return doClouderaCaller(dateFrom, dateTo, componentProperties.getStorage().getSelectTotalApi());
     }
 
-    public Response findFreeStorage(String dateFrom, String dateTo) {
+    public StorageCapacityResponse findFreeStorage(String dateFrom, String dateTo) {
         return doClouderaCaller(dateFrom, dateTo, componentProperties.getStorage().getSelectFreeApi());
     }
 
-    private Response doClouderaCaller(String dateFrom, String dateTo, String query) {
+    private StorageCapacityResponse doClouderaCaller(String dateFrom, String dateTo, String query) {
         HttpUrl.Builder urlBuilder
             = HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl()).newBuilder();
         urlBuilder.addQueryParameter(QUERY, query);
@@ -58,15 +55,28 @@ public class StorageCapacity implements StorageCapacityRepository {
             .method(HttpMethod.GET.name(), null)
             .build();
         ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        ResponseBody responseBody = null;
+        okhttp3.Response response = null;
         try {
-            responseBody = okHttpClient.newCall(request).execute().body();
-            return objectMapper.readValue(responseBody.string(), Response.class);
+            response = okHttpClient.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                log.error("Error to call Cloudera Storage with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
+                return null;
+            }
+            if (Objects.isNull(response.body())) {
+                log.error("Error to call Cloudera Storage - Message is null, and code: {}", ERROR_CALL_CLOUDERA);
+                return null;
+            }
+            log.info("StorageCapacity response: {}", response.body());
+            return objectMapper.readValue(response.body().string(), StorageCapacityResponse.class);
         } catch (Exception e) {
-            String api = query.split("\\s+")[1];
-            log.error("Error to call Cloudera Storage with message: {}, and code: {}",
-                e.getMessage(), ERROR_CALL_CLOUDERA);
-            throw new RuntimeException("Error to call Cloudera Storage with select " + api, e);
+            final String api = query.split("\\s+")[1];
+            log.error("Error to call Cloudera Storage with message: {}, api: {}, code: {}, exception: ",
+                e.getMessage(), api, ERROR_CALL_CLOUDERA, e);
+            return null;
+        } finally {
+            if (Objects.nonNull(response)) {
+                response.close();
+            }
         }
     }
 
