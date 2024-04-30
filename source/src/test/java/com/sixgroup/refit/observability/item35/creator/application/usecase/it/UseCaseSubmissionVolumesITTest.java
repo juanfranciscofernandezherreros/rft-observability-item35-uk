@@ -85,7 +85,7 @@ public class UseCaseSubmissionVolumesITTest {
                             .itemDate("20240229")
                             .itemType(ItemType.SUBMISSION_VOLUMES.getName())
                             .build()))
-                    .getFileUrl().equals("work-repository-observability/upload/TRRGS_EMIR_PR_IN_ND_ITEM35A_20240229.csv")
+                    .getFileUrl().equals("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35A_20240229.csv")
             );
 
     }
