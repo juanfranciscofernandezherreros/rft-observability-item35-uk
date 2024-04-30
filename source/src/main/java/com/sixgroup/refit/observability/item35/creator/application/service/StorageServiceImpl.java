@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.FOUR_DECIMALS;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.NODE_STORAGE_TOTAL;
+
 
 @Service
 @RequiredArgsConstructor
@@ -88,7 +88,7 @@ public class StorageServiceImpl implements StorageService {
         return storageList;
     }
 
-    private static List<Storage> manageClouderaApiTotalCapacityFreeResponseData(StorageCapacityResponse storageCapacityResponse) {
+    private List<Storage> manageClouderaApiTotalCapacityFreeResponseData(StorageCapacityResponse storageCapacityResponse) {
 
         List<Storage> storageList = new ArrayList<>();
 
@@ -98,7 +98,7 @@ public class StorageServiceImpl implements StorageService {
                     List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
                         .filter(timeSeries -> null != timeSeries.getMetadata()
                             && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
-                            && timeSeries.getMetadata().getEntityName().equals(NODE_STORAGE_TOTAL)).toList();
+                            && timeSeries.getMetadata().getEntityName().equals(componentProperties.getStorage().getEntityName())).toList();
                     if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
                         filteredTimeseries.forEach(timeSeries -> {
                             List<Data> dataList = timeSeries.getData();
