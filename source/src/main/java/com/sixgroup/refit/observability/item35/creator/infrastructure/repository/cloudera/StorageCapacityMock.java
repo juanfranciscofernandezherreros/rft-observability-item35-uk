@@ -26,7 +26,7 @@ public class StorageCapacityMock implements StorageCapacityRepository {
     public StorageCapacityResponse findTotalStorage(String dateFrom, String dateTo) {
         try {
             return new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .readValue(getClass().getClassLoader().getResourceAsStream("json/total_all.json"),
+                .readValue(getClass().getClassLoader().getResourceAsStream("json/total_all_MBT.json"),
                     StorageCapacityResponse.class);
         } catch (IOException e) {
             log.error("Error to call 'findTotalStorage()' Cloudera Storage Mock, with message: {}, and code: {}",
@@ -39,7 +39,7 @@ public class StorageCapacityMock implements StorageCapacityRepository {
     public StorageCapacityResponse findFreeStorage(String dateFrom, String dateTo) {
         try {
             return new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .readValue(getClass().getClassLoader().getResourceAsStream("json/free_all.json"),
+                .readValue(getClass().getClassLoader().getResourceAsStream("json/free_all_MBT.json"),
                     StorageCapacityResponse.class);
         } catch (IOException e) {
             log.error("Error to call 'findFreeStorage()' Cloudera Storage Mock, with message: {}, and code: {}",

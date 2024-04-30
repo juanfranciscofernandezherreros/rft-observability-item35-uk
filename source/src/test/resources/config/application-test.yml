@@ -168,7 +168,7 @@ component-config:
         selectTotalApi: select total_capacity_across_filesystems
         selectFreeApi: select total_capacity_free_across_filesystems
         desiredRollup: DAILY
-        entityName: rftemir-cldr-qa-mbt
+        entityName: dm-rftemir-light-qa
 
 logging:
   level:

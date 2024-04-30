@@ -172,6 +172,9 @@ class StorageServiceTest {
 
         when(storageCapacity.findFreeStorage(anyString(), anyString()))
             .thenReturn(storageCapacityResponse);
+        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
+        when(componentProperties.getStorage()).thenReturn(mockStorage);
+        when(mockStorage.getEntityName()).thenReturn("rftemir-cldr-qa-mbt");
 
         List<Storage> storageList = storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01");
 
