@@ -16,6 +16,94 @@ spring:
         "schema.registry.url": "http://localhost:8081"
 
 component-config:
+  participant:
+    reportType: PARTICIPANT
+    reports:
+      - name: TAR030
+        reportName: TAR030
+      - name: TAR108
+        reportName: TAR108
+      - name: TSR107
+        reportName: TSR107
+      - name: TSR109
+        reportName: TSR109
+      - name: RJ092
+        reportName: RJ092
+      - name: RJCT000
+        reportName: RJCT000
+  regulator:
+    reportTypeEsma: ESMA
+    reportTypeNca: NCA
+    reports:
+      - name: TAR030
+        reportName: TAR030
+      - name: TAR108
+        reportName: TAR108
+      - name: TSR107
+        reportName: TSR107
+      - name: TSR109
+        reportName: TSR109
+      - name: RJ092
+        reportName: RJ092
+      - name: RJCT000
+        reportName: RJCT000
+  tr:
+    reportType: TR
+    reportTypeQuery:
+      - RL078
+      - TD107
+    reports:
+      - name: RL078
+        reportName: RL078
+      - name: TD107
+        reportName: TD107
+  sla:
+    entity:
+      customer:
+        - name: TAR030
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: TAR108
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: TSR107
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: TSR109
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: RJ092
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: RJCT000
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+      authority:
+        - name: TAR030
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: TAR108
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: TSR107
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: TSR109
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: RJ092
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: RJCT000
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+      tr:
+        - name: RL078
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: TD107
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
 
 logging:
   level:

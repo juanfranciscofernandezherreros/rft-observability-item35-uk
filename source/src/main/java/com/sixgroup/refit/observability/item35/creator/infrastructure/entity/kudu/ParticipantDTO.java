@@ -2,20 +2,20 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.entity.ku
 
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 public class ParticipantDTO {
 
     private String fileType;
-    private Timestamp reportingSession;
-    private Timestamp initDate;
-    private Timestamp endDate;
+    private LocalDateTime reportingSession;
+    private LocalDateTime initDate;
+    private LocalDateTime endDate;
 
     public ParticipantDTO() {
     }
 
-    public ParticipantDTO(String fileType, Timestamp reportingSession, Timestamp initDate, Timestamp endDate) {
+    public ParticipantDTO(String fileType, LocalDateTime reportingSession, LocalDateTime initDate, LocalDateTime endDate) {
         this.fileType = fileType;
         this.reportingSession = reportingSession;
         this.initDate = initDate;

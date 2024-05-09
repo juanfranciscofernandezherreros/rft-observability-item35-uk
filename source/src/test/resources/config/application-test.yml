@@ -57,93 +57,96 @@ api:
     url: /api/v54/timeseries
 
 component-config:
-  TR_CODE: TRRGS
-  REGULATION_REFERENCE: EMIR
-  PARTICIPANT:
-    REPORT_TYPE: PARTICIPANT
-    REPORT_TYPE_QUERY:
-      - TAR030
-      - TAR108
-      - TSR107
-      - TSR109
-      - RJ092
-      - RJCT000
-    TYPES:
-      TAR030:
-        REPORT_NAME: TAR030
-        SLA: yyyy-MM-ddT06:00:00Z
-      TAR108:
-        REPORT_NAME: TAR108
-        SLA: yyyy-MM-ddT06:00:00Z
-      TSR107:
-        REPORT_NAME: TSR107
-        SLA: yyyy-MM-ddT06:00:00Z
-      TSR109:
-        REPORT_NAME: TSR109
-        SLA: yyyy-MM-ddT06:00:00Z
-      RJ092:
-        REPORT_NAME: RJ092
-        SLA: yyyy-MM-ddT06:00:00Z
-      RJCT000:
-        REPORT_NAME: RJCT000
-        SLA: yyyy-MM-ddT06:00:00Z
-  REGULATOR:
-    REPORT_TYPE_ESMA: ESMA
-    REPORT_TYPE_NCA: NCA
-    REPORT_TYPE_QUERY:
-      - TAR030
-      - TAR108
-      - TSR107
-      - TSR109
-      - RJ092
-      - RJCT000
-    TYPES:
-      TAR030:
-        REPORT_NAME: TAR030
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-      TAR108:
-        REPORT_NAME: TAR108
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-      TSR107:
-        REPORT_NAME: TSR107
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-      TSR109:
-        REPORT_NAME: TSR109
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-      RJ092:
-        REPORT_NAME: RJ092
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-      RJCT000:
-        REPORT_NAME: RJCT000
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-  TR:
-    REPORT_TYPE: TR
-    REPORT_TYPE_QUERY:
+  trCode: TRRGS
+  regulationReference: EMIR
+  participant:
+    reportType: PARTICIPANT
+    reports:
+      - name: TAR030
+        reportName: TAR030
+      - name: TAR108
+        reportName: TAR108
+      - name: TSR107
+        reportName: TSR107
+      - name: TSR109
+        reportName: TSR109
+      - name: RJ092
+        reportName: RJ092
+      - name: RJCT000
+        reportName: RJCT000
+  regulator:
+    reportTypeEsma: ESMA
+    reportTypeNca: NCA
+    reports:
+      - name: TAR030
+        reportName: TAR030
+      - name: TAR108
+        reportName: TAR108
+      - name: TSR107
+        reportName: TSR107
+      - name: TSR109
+        reportName: TSR109
+      - name: RJ092
+        reportName: RJ092
+      - name: RJCT000
+        reportName: RJCT000
+  tr:
+    reportType: TR
+    reportTypeQuery:
       - RL078
       - TD107
-    TYPES:
-      RL:
-        REPORT_NAME: RL
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-      TD:
-        REPORT_NAME: TD
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-      RL078:
-        REPORT_NAME: RL078
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
-      TD107:
-        REPORT_NAME: TD107
-        SLA: yyyy-MM-ddT12:00:00Z
-        INIT: yyyy-MM-ddT00:00:00Z
+    reports:
+      - name: RL078
+        reportName: RL078
+      - name: TD107
+        reportName: TD107
+  sla:
+    entity:
+      customer:
+        - name: TAR030
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: TAR108
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: TSR107
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: TSR109
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: RJ092
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: RJCT000
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+      authority:
+        - name: TAR030
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: TAR108
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: TSR107
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: TSR109
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: RJ092
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: RJCT000
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+      tr:
+        - name: RL078
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: TD107
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
 
   csv:
     output_path: "work-repository-observability/upload/item35/"
@@ -152,23 +155,22 @@ component-config:
     observability-item-consumer-group-id: rft.dev.rft-observability-item35-creator
   db:
     schema: EMIR_REFIT_DEV_CONTROL_REFIT
-  api:
-    cloudera:
-      knox-auth: true
-      cpu:
-        enabled: false
-        selectCpu: select cpu_percent_across_hosts where category=CLUSTER
-        desiredRollup: DAILY
-      ram:
-        enabled: false
-        selectRam: select physical_memory_used
-        desiredRollup: DAILY
-      storage:
-        enabled: false
-        selectTotalApi: select total_capacity_across_filesystems
-        selectFreeApi: select total_capacity_free_across_filesystems
-        desiredRollup: DAILY
-        entityName: dm-rftemir-light-qa
+  cloudera:
+    knox-auth: true
+    cpu:
+      enabled: false
+      selectCpu: select cpu_percent_across_hosts where category=CLUSTER
+      desiredRollup: DAILY
+    ram:
+      enabled: false
+      selectRam: select physical_memory_used
+      desiredRollup: DAILY
+    storage:
+      enabled: false
+      selectTotalApi: select total_capacity_across_filesystems
+      selectFreeApi: select total_capacity_free_across_filesystems
+      desiredRollup: DAILY
+      entityName: dm-rftemir-light-qa
 
 logging:
   level:

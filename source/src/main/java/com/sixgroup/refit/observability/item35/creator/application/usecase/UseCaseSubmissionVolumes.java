@@ -3,16 +3,14 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase;
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
+import com.sixgroup.refit.observability.item35.creator.application.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
-import com.sixgroup.refit.observability.item35.creator.domain.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
-import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -31,11 +29,8 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
 
     private final RecordStatusService recordStatusService;
-
     private final WriteFileItem35Service<RecordStatus> writeFileSubmissionVolumes;
-
     private final ProducerItemService producerItemService;
-
     private final StateService stateService;
 
     @Override
@@ -48,7 +43,7 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
             log.debug("No record status found, skipping file generation");
             stateService.setError(
                 StateRequest.builder()
-                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .fileName(FileUtils.getFileName(itemCommandDTO))
                     .itemType(ITEM35)
                     .errorDescription("No record status found, skipping file generation")
                     .build());
@@ -56,7 +51,7 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
         }
         try {
             stateService.nextStep(
-                StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
+                StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
             LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
             file = writeFileSubmissionVolumes.writeFile(recordStatusList, itemCommandDTO);
             log.debug("Generated submission volumes file");
@@ -67,7 +62,7 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
             log.error("Error to generate file submission volumes: {}", e.getMessage(), e);
             stateService.setError(
                 StateRequest.builder()
-                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .fileName(FileUtils.getFileName(itemCommandDTO))
                     .itemType(ITEM35)
                     .errorDescription("Error to generate file submission volumes: " + e.getMessage())
                     .build());

@@ -3,17 +3,16 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase;
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
+import com.sixgroup.refit.observability.item35.creator.application.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.StorageCapacityDto;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
-import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
-import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -28,21 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
-import static com.sixgroup.refit.observability.item35.creator.shared.utils.Utils.createFileDateFromTimeStamp;
-import static com.sixgroup.refit.observability.item35.creator.shared.utils.Utils.getItemDateFormatted;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
-
     private final WriteFileItem35Service<StorageCapacityDto> writeFileStorageCapacityService;
-
     private final ProducerItemService producerItemService;
-
     private final StateService stateService;
-
     private final StorageService storageService;
 
     @Override
@@ -51,11 +44,11 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
         File fileStorageCapacity;
         try {
             stateService.nextStep(
-                StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
+                StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
             LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
 
-            String firstDayOfMonth = Utils.getFirstDayOfMonthAndYear(itemCommandDTO.getItemDate());
-            String firstDayOfNextMonth = Utils.getFirstDayOfNextMonthAndYear(itemCommandDTO.getItemDate());
+            String firstDayOfMonth = DateUtils.firstDayOfMonth(itemCommandDTO.getItemDate());
+            String firstDayOfNextMonth = DateUtils.firstDayOfNextMonth(itemCommandDTO.getItemDate());
 
             List<Storage> totalCapacityList = storageService.getTotalCapacity(firstDayOfMonth, firstDayOfNextMonth);
 
@@ -92,7 +85,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             log.error("Error to generate file storage capacity: {}", e.getMessage(), e);
             stateService.setError(
                 StateRequest.builder()
-                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .fileName(FileUtils.getFileName(itemCommandDTO))
                     .itemType(ITEM35)
                     .errorDescription("Error to generate file storage capacity: " + e.getMessage())
                     .build());
@@ -100,30 +93,25 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
         }
     }
 
-    @Override
-    public ItemType getItemType() {
-        return ItemType.STORAGE_CAPACITY;
-    }
-
-    private static List<StorageCapacityDto> calculateFinalList(String itemDate, List<Storage> totalCapacityList,
-                                                               List<Storage> totalFreeCapacityList) {
+    private List<StorageCapacityDto> calculateFinalList(String itemDate, List<Storage> totalCapacityList,
+                                                        List<Storage> totalFreeCapacityList) {
         List<StorageCapacityDto> storageCapacityFinalList = new ArrayList<>();
         totalCapacityList.forEach(totalStorage ->
             totalFreeCapacityList.forEach(totalFreeStorage -> {
                 if (totalStorage.getTimeStamp().equals(totalFreeStorage.getTimeStamp())) {
                     StorageCapacityDto storageCapacityDto = new StorageCapacityDto();
                     storageCapacityDto.setTimeStamp(totalStorage.getTimeStamp());
-                    storageCapacityDto.setCapacity(BigDecimal.valueOf(totalStorage.getCapacity()).setScale(FOUR_DECIMALS, RoundingMode.HALF_UP).floatValue());
-                    storageCapacityDto.setAvailableCapacity(BigDecimal.valueOf(totalFreeStorage.getCapacity()).setScale(FOUR_DECIMALS, RoundingMode.HALF_UP).floatValue());
+                    storageCapacityDto.setCapacity(BigDecimal.valueOf(totalStorage.getCapacity()).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
+                    storageCapacityDto.setAvailableCapacity(BigDecimal.valueOf(totalFreeStorage.getCapacity()).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
                     // CALCULATED VALUES
                     float usedCapacity = storageCapacityDto.getCapacity() - storageCapacityDto.getAvailableCapacity();
-                    storageCapacityDto.setUsedCapacity(BigDecimal.valueOf(usedCapacity).setScale(FOUR_DECIMALS, RoundingMode.HALF_UP).floatValue());
+                    storageCapacityDto.setUsedCapacity(BigDecimal.valueOf(usedCapacity).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
                     float utilization = storageCapacityDto.getUsedCapacity() / storageCapacityDto.getCapacity();
-                    storageCapacityDto.setUtilization(BigDecimal.valueOf(utilization).setScale(FOUR_DECIMALS, RoundingMode.HALF_UP).floatValue());
-                    String date = createFileDateFromTimeStamp(storageCapacityDto.getTimeStamp());
+                    storageCapacityDto.setUtilization(BigDecimal.valueOf(utilization).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
+                    String date = DateUtils.createFileDateFromTimeStamp(storageCapacityDto.getTimeStamp());
                     storageCapacityDto.setDate(date);
 
-                    String itemDateFormatted = getItemDateFormatted(itemDate);
+                    String itemDateFormatted = DateUtils.itemDateFormatted(itemDate);
                     storageCapacityDto.setReportingDate(itemDateFormatted);
 
                     storageCapacityFinalList.add(storageCapacityDto);
@@ -131,5 +119,11 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             }));
         return storageCapacityFinalList;
     }
+
+    @Override
+    public ItemType getItemType() {
+        return ItemType.STORAGE_CAPACITY;
+    }
+
 
 }

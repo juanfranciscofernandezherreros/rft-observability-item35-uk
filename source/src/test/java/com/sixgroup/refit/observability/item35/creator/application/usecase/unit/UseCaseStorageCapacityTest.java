@@ -2,6 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase.unit
 
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
+import com.sixgroup.refit.observability.item35.creator.application.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseStorageCapacity;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
@@ -9,7 +10,6 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandD
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.StorageCapacityDto;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
-import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import org.apache.kafka.common.header.Headers;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;

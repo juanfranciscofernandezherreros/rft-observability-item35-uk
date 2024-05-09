@@ -2,18 +2,16 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase;
 
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
+import com.sixgroup.refit.observability.item35.creator.application.service.CapacityCpuService;
+import com.sixgroup.refit.observability.item35.creator.application.service.CapacityRamService;
 import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
-import com.sixgroup.refit.observability.item35.creator.domain.service.CapacityCpuService;
-import com.sixgroup.refit.observability.item35.creator.domain.service.CapacityRamService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
-import com.sixgroup.refit.observability.modules.log.rft.domain.logobject.base.NameObject;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -35,17 +33,13 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 public class UseCaseComputeCapacity implements ItemTypeStrategy {
 
     private final CapacityCpuService capacityCpuService;
-
     private final CapacityRamService capacityRamService;
-
     private final WriteFileItem35Service<Capacity> writeFileComputeCapacity;
-
     private final ProducerItemService producerItemService;
-
     private final StateService stateService;
 
     @Override
-    public File execute(ItemCommandDTO itemCommandDTO, Headers headers) throws ExecutionException, InterruptedException {
+    public File execute(final ItemCommandDTO itemCommandDTO, final Headers headers) throws ExecutionException, InterruptedException {
 
         log.debug("Generating compute capacity file ...");
         File fileComputeCapacity = null;
@@ -57,7 +51,7 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
             log.debug("No record ram or cpu found from Cloudera api, skipping file generation");
             stateService.setError(
                 StateRequest.builder()
-                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .fileName(FileUtils.getFileName(itemCommandDTO))
                     .itemType(ITEM35)
                     .errorDescription("No record ram or cpu found from Cloudera api, skipping file generation")
                     .build());
@@ -69,7 +63,7 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
             recordsCapacity.addAll(capacityRam);
             recordsCapacity.sort(Comparator.comparing(Capacity::getDate));
             stateService.nextStep(
-                StateRequest.builder().fileName(Utils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
+                StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
             LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
             fileComputeCapacity = writeFileComputeCapacity.writeFile(recordsCapacity, itemCommandDTO);
             log.debug("Generated capacity file");
@@ -80,7 +74,7 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
             log.error("Error to generate file compute capacity {}", e.getMessage(), e);
             stateService.setError(
                 StateRequest.builder()
-                    .fileName(Utils.getFileName(itemCommandDTO))
+                    .fileName(FileUtils.getFileName(itemCommandDTO))
                     .itemType(ITEM35)
                     .errorDescription("Error to generate file compute capacity: " + e.getMessage())
                     .build());

@@ -7,9 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties("component-config.api.cloudera")
-public class ComponentProperties {
-
+@ConfigurationProperties("component-config.cloudera")
+public class ClouderaProperties {
 
     @NotNull
     private boolean knoxAuth;

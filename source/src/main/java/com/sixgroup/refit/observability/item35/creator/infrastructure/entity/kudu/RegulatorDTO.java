@@ -1,28 +1,19 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
-
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class RegulatorDTO {
 
-    public RegulatorDTO(String fileName, String fileType, Timestamp reportingSession, String accountId,
-                        Timestamp creationDate) {
-        this.fileName = fileName;
-        this.fileType = fileType;
-        this.reportingSession = reportingSession;
-        this.accountId = accountId;
-        this.creationDate = creationDate;
-    }
-
-    public RegulatorDTO() {
-    }
-
     private String fileName;
     private String fileType;
-    private Timestamp reportingSession;
+    private LocalDateTime reportingSession;
     private String accountId;
-    private Timestamp creationDate;
+    private LocalDateTime creationDate;
 }

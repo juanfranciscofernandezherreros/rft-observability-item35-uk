@@ -7,7 +7,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.consumer.RftKafkaConsumerTracing;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
@@ -43,7 +43,7 @@ public class KafkaConsumerItem {
             ItemCommandDTO itemCommand = ItemCommandDTO.generateItemCommandDTO(item.value());
             if (isRequestTypeAccepted(item.value().getItemType())) {
                 stateService.nextStep(
-                    StateRequest.builder().fileName(Utils.getFileName(itemCommand))
+                    StateRequest.builder().fileName(FileUtils.getFileName(itemCommand))
                         .itemType(ITEM35).build());
                 log.debug("Consumed message to generate file: {}", item.value().getItemType());
                 ItemTypeStrategy itemTypeStrategy = itemType.get(ItemType.getItemTypeFromName(item.value().getItemType()));

@@ -20,7 +20,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalo
 @RequiredArgsConstructor
 @Slf4j
 @ConditionalOnProperty(
-    value = "component-config.api.cloudera.ram.enabled",
+    value = "component-config.cloudera.ram.enabled",
     havingValue = "false")
 public class CapacityRamClouderaMock implements CapacityRamRepository {
     @Override

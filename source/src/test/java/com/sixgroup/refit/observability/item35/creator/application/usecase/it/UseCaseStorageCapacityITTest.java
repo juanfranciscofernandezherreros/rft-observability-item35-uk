@@ -8,7 +8,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
@@ -83,7 +83,7 @@ public class UseCaseStorageCapacityITTest {
 
         waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
-                Utils.getFileName(ItemCommandDTO.builder()
+                FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240229")
                     .itemType(ItemType.STORAGE_CAPACITY.getName()).build())).getStateName().equals("sent_response"));
     }

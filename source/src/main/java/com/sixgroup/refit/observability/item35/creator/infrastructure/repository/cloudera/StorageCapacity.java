@@ -3,7 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,20 +25,20 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 @RequiredArgsConstructor
 @Slf4j
 @ConditionalOnProperty(
-    value = "component-config.api.cloudera.storage.enabled",
+    value = "component-config.cloudera.storage.enabled",
     havingValue = "true")
 public class StorageCapacity implements StorageCapacityRepository {
 
     private final OkHttpClient okHttpClient;
     private final ApiClouderaProperties apiClouderaProperties;
-    private final ComponentProperties componentProperties;
+    private final ClouderaProperties clouderaProperties;
 
     public StorageCapacityResponse findTotalStorage(String dateFrom, String dateTo) {
-        return doClouderaCaller(dateFrom, dateTo, componentProperties.getStorage().getSelectTotalApi());
+        return doClouderaCaller(dateFrom, dateTo, clouderaProperties.getStorage().getSelectTotalApi());
     }
 
     public StorageCapacityResponse findFreeStorage(String dateFrom, String dateTo) {
-        return doClouderaCaller(dateFrom, dateTo, componentProperties.getStorage().getSelectFreeApi());
+        return doClouderaCaller(dateFrom, dateTo, clouderaProperties.getStorage().getSelectFreeApi());
     }
 
     private StorageCapacityResponse doClouderaCaller(String dateFrom, String dateTo, String query) {

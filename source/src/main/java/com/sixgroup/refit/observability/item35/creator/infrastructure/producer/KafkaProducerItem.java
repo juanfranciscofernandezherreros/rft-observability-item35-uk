@@ -6,9 +6,8 @@ import com.sixgroup.refit.observability.item35.creator.application.service.LogSe
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.producer.RftKafkaProducerTracing;
-import com.sixgroup.refit.observability.modules.log.rft.application.RftLog;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
@@ -43,7 +42,7 @@ public class KafkaProducerItem implements ProducerItemService {
         var future = producerTracing.createMessage(topic, itemId, itemCommand, headers);
         stateService.nextStep(
             StateRequest.builder()
-                .fileName(Utils.getFileName(itemCommandDTO))
+                .fileName(FileUtils.getFileName(itemCommandDTO))
                 .itemType(ITEM35)
                 .build());
         LogService.logInfo("Producer Item", itemCommandDTO);

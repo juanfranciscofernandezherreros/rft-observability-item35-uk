@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.cloudera;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import okhttp3.*;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -27,7 +28,7 @@ class StorageCapacityTest {
     private ApiClouderaProperties mockApiClouderaProperties;
 
     @Mock
-    private ComponentProperties mockComponentProperties;
+    private ClouderaProperties mockClouderaProperties;
 
     @Mock
     private Call mockCall;
@@ -54,8 +55,8 @@ class StorageCapacityTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
-        when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
+        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
+        when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectTotalApi()).thenReturn("select total_capacity_across_filesystems");
 
         // Execute the method under test
@@ -86,8 +87,8 @@ class StorageCapacityTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
-        when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
+        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
+        when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
 
         // Execute the method under test
@@ -109,8 +110,8 @@ class StorageCapacityTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
-        when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
+        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
+        when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectTotalApi()).thenReturn("select total_capacity_across_filesystems");
 
         StorageCapacityResponse storageCapacityResponse = storageCapacity.findTotalStorage(testDateFrom, testDateTo);
@@ -130,8 +131,8 @@ class StorageCapacityTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
-        when(mockComponentProperties.getStorage()).thenReturn(mockStorage);
+        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
+        when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
         StorageCapacityResponse storageCapacityResponse = storageCapacity.findFreeStorage(testDateFrom, testDateTo);
         Assertions.assertNull(storageCapacityResponse);

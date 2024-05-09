@@ -1,7 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.domain.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 

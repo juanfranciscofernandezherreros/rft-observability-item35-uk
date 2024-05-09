@@ -7,14 +7,11 @@ import okhttp3.Credentials;
 import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.net.ssl.*;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.security.cert.CertificateException;
 
 @Configuration
 @AllArgsConstructor
@@ -22,14 +19,13 @@ import java.security.cert.CertificateException;
 public class ApiConfig {
 
     private final ApiClouderaProperties apiClouderaProperties;
-
-    private final ComponentProperties componentProperties;
+    private final ClouderaProperties clouderaProperties;
 
     @Bean
     public OkHttpClient okHttpClient() {
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        if (componentProperties.isKnoxAuth()) {
+        if (clouderaProperties.isKnoxAuth()) {
             CookieManager cookieManager = new CookieManager();
             cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
             builder.cookieJar(new JavaNetCookieJar(cookieManager));
@@ -39,7 +35,7 @@ public class ApiConfig {
             Request.Builder requestBuilder = originalRequest.newBuilder()
                 .header("Authorization", Credentials.basic(apiClouderaProperties.getUsername(), apiClouderaProperties.getPassword()));
             Request newRequest = requestBuilder.build();
-            log.info("ComponentProperties: isKnoxAuth {}", componentProperties.isKnoxAuth());
+            log.info("ComponentProperties: isKnoxAuth {}", clouderaProperties.isKnoxAuth());
             log.info("ApiClouderaProperties: {}", apiClouderaProperties);
             log.info("Sending request to URL: {} with method: {}", newRequest.url(), newRequest.method());
             log.info("Request Authorization Header: {}", newRequest.headers("Authorization"));
