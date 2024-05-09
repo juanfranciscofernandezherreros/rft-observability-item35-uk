@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.application.service.unit;
 
-import com.sixgroup.refit.observability.item35.creator.application.service.CapacityCpuServiceImpl;
+import com.sixgroup.refit.observability.item35.creator.application.service.CapacityCpuService;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityCpuRepository;
 import org.junit.jupiter.api.Test;
@@ -18,13 +18,13 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-public class CapacityCpuServiceTest {
+class CapacityCpuServiceTest {
 
     @Mock
     private CapacityCpuRepository capacityCpuRepository;
 
     @InjectMocks
-    private CapacityCpuServiceImpl capacityCpuService;
+    private CapacityCpuService capacityCpuService;
 
 
     @Test
@@ -55,7 +55,7 @@ public class CapacityCpuServiceTest {
     @Test
     void findByCapacityCpu_WithEmptyResult_ShouldReturnEmptyList() {
         when(capacityCpuRepository.findByCapacityCpu(any(), any())).thenReturn(null);
-        List<Capacity> result = capacityCpuService.findByCapacityCpu("2024-01-01");
+        List<Capacity> result = capacityCpuService.findByCapacityCpu("20240101");
         assertNotNull(result);
         assertTrue(result.isEmpty());
 

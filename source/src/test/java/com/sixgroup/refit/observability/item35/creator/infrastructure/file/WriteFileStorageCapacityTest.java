@@ -2,11 +2,11 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.StorageCapacityDto;
-import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,8 +21,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WriteFileStorageCapacityTest {
@@ -34,12 +34,16 @@ class WriteFileStorageCapacityTest {
     private StateService stateService;
     @Mock
     private CsvProperties csvProperties;
+    @Mock
+    private ReportProperties reportProperties;
 
     @Test
     void writeFile() throws IOException {
 
         doReturn(TEST_CSV_FILE_PATH)
             .when(csvProperties).getOutputPath();
+        when(reportProperties.getTrCode()).thenReturn("TRRGS");
+        when(reportProperties.getRegulationReference()).thenReturn("EMIR");
 
         Path locationPath = FileSystems.getDefault().getPath("src/test/resources/work-repository-observability/upload/");
 

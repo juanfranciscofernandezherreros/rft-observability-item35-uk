@@ -1,11 +1,13 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
@@ -26,10 +28,10 @@ public class ReportingFileEntity {
     private String outgoingFileName;
 
     @Column(name = "reportingsessiontimestamp")
-    private Timestamp reportingSessionTimeStamp;
+    private LocalDateTime reportingSessionTimeStamp;
 
     @Column(name = "creationtimestamp")
-    private Timestamp creationTimestamp;
+    private LocalDateTime creationTimestamp;
 
     @Column(name = "accountid")
     private String accountId;

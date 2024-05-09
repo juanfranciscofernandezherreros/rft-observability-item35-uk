@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.application.service.unit;
 
 
-import com.sixgroup.refit.observability.item35.creator.application.service.CapacityRamServiceImpl;
+import com.sixgroup.refit.observability.item35.creator.application.service.CapacityRamService;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityRamRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants;
@@ -29,7 +29,7 @@ public class CapacityRamServiceTest {
     private CapacityRamRepository capacityRamRepository;
 
     @InjectMocks
-    private CapacityRamServiceImpl capacityRamService;
+    private CapacityRamService capacityRamService;
 
     @Test
     void testFindByCapacityRam() {

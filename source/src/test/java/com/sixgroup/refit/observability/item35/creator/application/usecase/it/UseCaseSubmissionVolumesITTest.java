@@ -7,7 +7,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
@@ -34,7 +34,7 @@ import static org.awaitility.Awaitility.waitAtMost;
 @SpringBootTest(classes = {ApplicationMain.class})
 @ActiveProfiles("test")
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
-public class UseCaseSubmissionVolumesITTest {
+class UseCaseSubmissionVolumesITTest {
 
     private Producer<ItemId, ItemCommand> producer;
 
@@ -76,12 +76,12 @@ public class UseCaseSubmissionVolumesITTest {
 
         waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
-                Utils.getFileName(ItemCommandDTO.builder()
+                FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240229")
                     .itemType(ItemType.SUBMISSION_VOLUMES.getName()).build())).getStateName().equals("sent_response")
                 &&
                 sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
-                        Utils.getFileName(ItemCommandDTO.builder()
+                        FileUtils.getFileName(ItemCommandDTO.builder()
                             .itemDate("20240229")
                             .itemType(ItemType.SUBMISSION_VOLUMES.getName())
                             .build()))
@@ -108,7 +108,7 @@ public class UseCaseSubmissionVolumesITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(Constants.ITEM35, Utils.getFileName(ItemCommandDTO.builder()
+                findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240129")
                     .itemType(ItemType.SUBMISSION_VOLUMES.getName())
                     .build())).getStateName().equals("error")

@@ -2,8 +2,8 @@ package com.sixgroup.refit.observability.item35.creator.application.service;
 
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityRamRepository;
-import com.sixgroup.refit.observability.item35.creator.domain.service.CapacityRamService;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,17 +19,16 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CapacityRamServiceImpl implements CapacityRamService {
+public class CapacityRamService {
 
     private final CapacityRamRepository capacityRamRepository;
 
-    @Override
     public List<Capacity> findByCapacityRam(String itemDate) {
 
         log.debug("Find Capacity Ram by date");
 
         List<Capacity> listCapacityRam = capacityRamRepository.
-            findByCapacityRam(Utils.getFirstDayOfMonthAndYear(itemDate), Utils.getFirstDayOfNextMonthAndYear(itemDate));
+            findByCapacityRam(DateUtils.firstDayOfMonth(itemDate), DateUtils.firstDayOfNextMonth(itemDate));
 
         List<Capacity> capacityRams = new ArrayList<>();
 

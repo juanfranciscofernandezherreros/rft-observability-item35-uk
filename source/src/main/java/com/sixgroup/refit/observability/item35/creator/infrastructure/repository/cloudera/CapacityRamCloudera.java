@@ -4,7 +4,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityRamRepository;
@@ -30,13 +30,13 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 @RequiredArgsConstructor
 @Slf4j
 @ConditionalOnProperty(
-    value = "component-config.api.cloudera.ram.enabled",
+    value = "component-config.cloudera.ram.enabled",
     havingValue = "true")
 public class CapacityRamCloudera implements CapacityRamRepository {
 
     private final OkHttpClient okHttpClient;
     private final ApiClouderaProperties apiClouderaProperties;
-    private final ComponentProperties componentProperties;
+    private final ClouderaProperties clouderaProperties;
 
     @Override
     public List<Capacity> findByCapacityRam(String dateFrom, String dateTo) {
@@ -45,11 +45,11 @@ public class CapacityRamCloudera implements CapacityRamRepository {
 
         List<Capacity> listCapacityRam = null;
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl())).newBuilder();
-        urlBuilder.addQueryParameter(QUERY, componentProperties.getRam().getSelectRam());
+        urlBuilder.addQueryParameter(QUERY, clouderaProperties.getRam().getSelectRam());
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         urlBuilder.addQueryParameter(DATE_FROM, dateFrom);
         urlBuilder.addQueryParameter(DATE_TO, dateTo);
-        urlBuilder.addQueryParameter(DESIRED_ROLLUP, componentProperties.getRam().getDesiredRollup());
+        urlBuilder.addQueryParameter(DESIRED_ROLLUP, clouderaProperties.getRam().getDesiredRollup());
 
         Request request = new Request.Builder()
             .url(urlBuilder.build().toString())

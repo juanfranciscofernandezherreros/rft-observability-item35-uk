@@ -13,8 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_yyyy_MM_dd;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_yyyy_MM_dd_hh_mm_ss;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_YYYY_MM_DD;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS;
 
 public class CapacityMapper {
 
@@ -26,8 +26,8 @@ public class CapacityMapper {
                     for (TimeSeries timeSeriesNode : items.getTimeSeries()) {
                         if (CollectionUtils.isNotEmpty(timeSeriesNode.getData())) {
                             for (Data data : timeSeriesNode.getData()) {
-                                String date = LocalDateTime.parse(data.getTimestamp(), DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd_hh_mm_ss))
-                                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT_yyyy_MM_dd));
+                                String date = LocalDateTime.parse(data.getTimestamp(), DateTimeFormatter.ofPattern(DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS))
+                                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT_YYYY_MM_DD));
                                 String minValue = data.getAggregateStatistics().getMin().toString();
                                 String maxValue = data.getAggregateStatistics().getMax().toString();
                                 String mean = data.getAggregateStatistics().getMean().toString();

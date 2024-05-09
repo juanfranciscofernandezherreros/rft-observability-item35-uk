@@ -1,13 +1,11 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.Data;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.TimeSeries;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
-import com.sixgroup.refit.observability.item35.creator.domain.service.StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -21,19 +19,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.FOUR_DECIMALS;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.NUM_DECIMALS;
 
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class StorageServiceImpl implements StorageService {
+public class StorageService {
 
     private final StorageCapacityRepository storageCapacityRepository;
 
-    private final ComponentProperties componentProperties;
+    private final ClouderaProperties clouderaProperties;
 
-    @Override
     public List<Storage> getTotalCapacity(String dateFrom, String dateTo) {
         StorageCapacityResponse totalStorage = storageCapacityRepository.findTotalStorage(dateFrom, dateTo);
         Optional.ofNullable(totalStorage).orElseThrow(() -> new RuntimeException("'apiCloudera findTotalStorage()' response" +
@@ -41,7 +38,6 @@ public class StorageServiceImpl implements StorageService {
         return manageClouderaApiTotalCapacityResponseData(totalStorage);
     }
 
-    @Override
     public List<Storage> getTotalFreeCapacity(String dateFrom, String dateTo) {
         StorageCapacityResponse freeStorage = storageCapacityRepository.findFreeStorage(dateFrom, dateTo);
         Optional.ofNullable(freeStorage).orElseThrow(() -> new RuntimeException("'apiCloudera findFreeStorage()' response" +
@@ -59,7 +55,7 @@ public class StorageServiceImpl implements StorageService {
                     List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
                         .filter(timeSeries -> null != timeSeries.getMetadata()
                             && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
-                            && timeSeries.getMetadata().getEntityName().equals(componentProperties.getStorage().getEntityName()))
+                            && timeSeries.getMetadata().getEntityName().equals(clouderaProperties.getStorage().getEntityName()))
                         .toList();
 
                     if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
@@ -70,7 +66,7 @@ public class StorageServiceImpl implements StorageService {
                                     String timestamp = dataItem.getTimestamp();
                                     Float mean = dataItem.getAggregateStatistics().getMean();
                                     Float totalCapacityInTeras = new BigDecimal(mean)
-                                        .divide(new BigDecimal("1024").pow(4), FOUR_DECIMALS, RoundingMode.HALF_UP)
+                                        .divide(new BigDecimal("1024").pow(4), NUM_DECIMALS, RoundingMode.HALF_UP)
                                         .floatValue();
                                     Storage storage = new Storage(timestamp, totalCapacityInTeras);
                                     storageList.add(storage);
@@ -98,7 +94,7 @@ public class StorageServiceImpl implements StorageService {
                     List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
                         .filter(timeSeries -> null != timeSeries.getMetadata()
                             && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
-                            && timeSeries.getMetadata().getEntityName().equals(componentProperties.getStorage().getEntityName())).toList();
+                            && timeSeries.getMetadata().getEntityName().equals(clouderaProperties.getStorage().getEntityName())).toList();
                     if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
                         filteredTimeseries.forEach(timeSeries -> {
                             List<Data> dataList = timeSeries.getData();
@@ -107,7 +103,7 @@ public class StorageServiceImpl implements StorageService {
                                     String timestamp = dataItem.getTimestamp();
                                     Float max = dataItem.getAggregateStatistics().getMax();
                                     Float maxFreeDataInTeras = new BigDecimal(max)
-                                        .divide(new BigDecimal("1024").pow(4), FOUR_DECIMALS, RoundingMode.HALF_UP)
+                                        .divide(new BigDecimal("1024").pow(4), NUM_DECIMALS, RoundingMode.HALF_UP)
                                         .floatValue();
                                     Storage storage = new Storage(timestamp, maxFreeDataInTeras);
                                     storageList.add(storage);

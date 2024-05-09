@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.cloudera;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import okhttp3.*;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class CapacityCpuClouderaTest {
     private ApiClouderaProperties mockApiClouderaProperties;
 
     @Mock
-    private ComponentProperties mockComponentProperties;
+    private ClouderaProperties mockClouderaProperties;
 
     @Mock
     private Call mockCall;
@@ -55,8 +55,8 @@ class CapacityCpuClouderaTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("https://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ComponentProperties.Cpu mockCpu = mock(ComponentProperties.Cpu.class);
-        when(mockComponentProperties.getCpu()).thenReturn(mockCpu);
+        ClouderaProperties.Cpu mockCpu = mock(ClouderaProperties.Cpu.class);
+        when(mockClouderaProperties.getCpu()).thenReturn(mockCpu);
         when(mockCpu.getSelectCpu()).thenReturn("select * from test");
         when(mockCpu.getDesiredRollup()).thenReturn("DAILY");
         List<Capacity> result = capacityCpuCloudera.findByCapacityCpu(testDateFrom, testDateTo);
@@ -86,8 +86,8 @@ class CapacityCpuClouderaTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("https://example.com");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/test");
-        ComponentProperties.Cpu mockCpu = mock(ComponentProperties.Cpu.class);
-        when(mockComponentProperties.getCpu()).thenReturn(mockCpu);
+        ClouderaProperties.Cpu mockCpu = mock(ClouderaProperties.Cpu.class);
+        when(mockClouderaProperties.getCpu()).thenReturn(mockCpu);
         when(mockCpu.getSelectCpu()).thenReturn("select * from test");
         when(mockCpu.getDesiredRollup()).thenReturn("DAILY");
         when(mockOkHttpClient.newCall(any(Request.class))).thenAnswer(invocation -> {

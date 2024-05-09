@@ -2,8 +2,8 @@ package com.sixgroup.refit.observability.item35.creator.application.service.unit
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sixgroup.refit.observability.item35.creator.application.service.StorageServiceImpl;
-import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
+import com.sixgroup.refit.observability.item35.creator.application.service.StorageService;
+import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.*;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.cloudera.StorageCapacity;
@@ -30,12 +30,12 @@ import static org.mockito.Mockito.*;
 class StorageServiceTest {
 
     @InjectMocks
-    private StorageServiceImpl storageService;
+    private StorageService storageService;
     @Mock
     private StorageCapacity storageCapacity;
 
     @Mock
-    private ComponentProperties componentProperties;
+    private ClouderaProperties clouderaProperties;
 
     ObjectMapper objectMapper = new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -51,8 +51,8 @@ class StorageServiceTest {
         when(storageCapacity.findTotalStorage(anyString(), anyString()))
             .thenReturn(storageCapacityResponse);
 
-        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
-        when(componentProperties.getStorage()).thenReturn(mockStorage);
+        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
+        when(clouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getEntityName()).thenReturn("rftemir-cldr-qa-mbt");
         List<Storage> storageList = storageService.getTotalCapacity("2024-01-01", "2024-02-01");
 
@@ -172,8 +172,8 @@ class StorageServiceTest {
 
         when(storageCapacity.findFreeStorage(anyString(), anyString()))
             .thenReturn(storageCapacityResponse);
-        ComponentProperties.Storage mockStorage = mock(ComponentProperties.Storage.class);
-        when(componentProperties.getStorage()).thenReturn(mockStorage);
+        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
+        when(clouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getEntityName()).thenReturn("rftemir-cldr-qa-mbt");
 
         List<Storage> storageList = storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01");

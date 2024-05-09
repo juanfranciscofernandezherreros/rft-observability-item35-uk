@@ -5,11 +5,12 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kud
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.TrDTO;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface ReportingFileRepository {
-    List<ParticipantDTO> findParticipantsByDayAccountAndFileType(final String initDate, final String endDate);
+public interface ReportingFileAdapterRepository {
+    Optional<List<ParticipantDTO>> findParticipantsByDayAccountAndFileType(String initDate, String endDate);
 
-    List<RegulatorDTO> findRegulatorByDayAccountAndFileType(String initDate, String endDate);
+    Optional<List<RegulatorDTO>> findRegulatorByDayAccountAndFileType(String initDate, String endDate);
 
-    List<TrDTO> findTrByDayAccountAndFileType(String initDate, String endDate);
+    Optional<List<TrDTO>> findTrByDayAccountAndFileType(String initDate, String endDate);
 }

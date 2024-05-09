@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.cloudera;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ComponentProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import okhttp3.*;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ public class CapacityRamClouderaTest {
     private ApiClouderaProperties mockApiClouderaProperties;
 
     @Mock
-    private ComponentProperties mockComponentProperties;
+    private ClouderaProperties mockClouderaProperties;
 
     @Mock
     private Call mockCall;
@@ -54,8 +54,8 @@ public class CapacityRamClouderaTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
-        ComponentProperties.Ram mockRam = mock(ComponentProperties.Ram.class);
-        when(mockComponentProperties.getRam()).thenReturn(mockRam);
+        ClouderaProperties.Ram mockRam = mock(ClouderaProperties.Ram.class);
+        when(mockClouderaProperties.getRam()).thenReturn(mockRam);
         when(mockRam.getSelectRam()).thenReturn("select * from test");
         when(mockRam.getDesiredRollup()).thenReturn("DAILY");
         List<Capacity> result = capacityRamCloudera.findByCapacityRam(testDateFrom, testDateTo);
@@ -85,8 +85,8 @@ public class CapacityRamClouderaTest {
         when(mockApiClouderaProperties.getHost()).thenReturn("http://example.com");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/test");
-        ComponentProperties.Ram mockRam = mock(ComponentProperties.Ram.class);
-        when(mockComponentProperties.getRam()).thenReturn(mockRam);
+        ClouderaProperties.Ram mockRam = mock(ClouderaProperties.Ram.class);
+        when(mockClouderaProperties.getRam()).thenReturn(mockRam);
         when(mockRam.getSelectRam()).thenReturn("select * from test");
         when(mockRam.getDesiredRollup()).thenReturn("DAILY");
         when(mockOkHttpClient.newCall(any(Request.class))).thenAnswer(invocation -> {

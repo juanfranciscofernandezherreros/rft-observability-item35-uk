@@ -1,17 +1,18 @@
 package com.sixgroup.refit.observability.item35.creator.configuration;
 
+import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 @Data
 @ConfigurationProperties("component-config.participant")
 public class ParticipantFileTypeProperties {
 
-    private String REPORT_TYPE;
-    private List<String> REPORT_TYPE_QUERY;
-    private Map<String, String> TYPES;
-
+    private String reportType;
+    private List<ReportConfig> reports = new ArrayList<>();
 }

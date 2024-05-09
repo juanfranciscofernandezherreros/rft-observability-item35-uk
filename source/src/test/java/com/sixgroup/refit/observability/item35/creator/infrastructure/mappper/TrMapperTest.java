@@ -1,60 +1,57 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.mappper;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.TrDTO;
+import com.sixgroup.refit.observability.item35.creator.shared.DataTestUtils;
+import com.sixgroup.refit.observability.modules.validate.domain.data.SlaInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_dd_MM_yyyy;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_DD_MM_YYYY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class TrMapperTest {
 
-    @Mock
-    private TrFileTypeProperties fileTypeProperties;
-
     @Test
     void findTr_ok() {
-        TrDTO tr_1 = new TrDTO("TD", Timestamp.valueOf("2024-02-22 14:08:12.550"),
-            "trkdp", Timestamp.valueOf("2024-02-22 14:08:12.550"));
+        final String reportType = "TD107";
+        final LocalDateTime reportSessionDate = DataTestUtils.parseString("2024-02-22 14:08:12");
+        final String accountId = "trkdp";
+        final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-22 14:08:55");
 
-        when(fileTypeProperties.getREPORT_TYPE()).thenReturn("TR");
-        when(fileTypeProperties.getTYPES())
-            .thenReturn(Map.of("RL.REPORT_NAME", "RL",
-                "RL.SLA", "yyyy-MM-ddT12:00:00Z",
-                "RL.INIT", "yyyy-MM-ddT00:00:00Z",
-                "TD.REPORT_NAME", "TD",
-                "TD.SLA", "yyyy-MM-ddT06:00:00Z",
-                "TD.INIT", "yyyy-MM-ddT00:00:00Z"));
+        final TrFileTypeProperties fileTypeProperties = new TrFileTypeProperties();
+        fileTypeProperties.setReportType("TR");
+        final ReportConfig reportConfig = new ReportConfig();
+        reportConfig.setName(reportType);
+        reportConfig.setReportName(reportType);
+        fileTypeProperties.getReports().add(reportConfig);
 
-        TrMapper trMapper = mock(TrMapper.class, Mockito.CALLS_REAL_METHODS);
+        final TrDTO trDTO1 = new TrDTO(reportType, reportSessionDate, accountId, creationDate);
 
-        ReportGenerationDto result = new ReportGenerationDto();
-        trMapper.manageData(tr_1, fileTypeProperties, result);
+        final SlaInfo slaInfo = SlaInfo.builder()
+            .meetsSla(Boolean.TRUE)
+            .expectSlaDate(reportSessionDate.plusDays(1).truncatedTo(ChronoUnit.DAYS).plusHours(12))
+            .generationDuration(Duration.ofMinutes(14 * 60 + 8).plusSeconds(55))
+            .build();
+
+        final TrMapper trMapper = new TrMapper();
+        final ReportGenerationDto response = trMapper.toReportGenerationDto(trDTO1, fileTypeProperties, slaInfo);
 
         OffsetDateTime originDate = OffsetDateTime
             .of(1900, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 
-        OffsetDateTime offsetDateTimeCreationDate = tr_1.getCreationDate().toLocalDateTime().atOffset(ZoneOffset.UTC);
+        OffsetDateTime offsetDateTimeCreationDate = trDTO1.getCreationDate().atOffset(ZoneOffset.UTC);
 
         String reportGenerationTimeString = originDate
             .withHour(offsetDateTimeCreationDate.getHour())
@@ -62,48 +59,26 @@ class TrMapperTest {
             .withSecond(offsetDateTimeCreationDate.getSecond()).format(DateTimeFormatter.ISO_INSTANT);
 
 
-        String reportCompletionAndPubTime = tr_1.getCreationDate().toLocalDateTime().truncatedTo(ChronoUnit.SECONDS)
+        String reportCompletionAndPubTime = trDTO1.getCreationDate().truncatedTo(ChronoUnit.SECONDS)
             .atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
 
-        String date = tr_1.getReportingSession().toLocalDateTime()
-            .format(DateTimeFormatter.ofPattern(DATE_FORMAT_dd_MM_yyyy));
+        String date = trDTO1.getReportingSession()
+            .format(DateTimeFormatter.ofPattern(DATE_FORMAT_DD_MM_YYYY));
 
-        String sla = tr_1.getReportingSession().toLocalDateTime().truncatedTo(ChronoUnit.DAYS)
+        String sla = trDTO1.getReportingSession().truncatedTo(ChronoUnit.DAYS)
             .atOffset(ZoneOffset.UTC).plusDays(1).plusHours(12).format((DateTimeFormatter.ISO_INSTANT));
 
         ReportGenerationDto expectedValue = new ReportGenerationDto(
             null,
-            "trkdp-TD",
+            "trkdp-TD107",
             "TR",
             reportGenerationTimeString,
             reportCompletionAndPubTime,
             reportCompletionAndPubTime,
             date,
             sla,
-            calculateDifference(tr_1));
+            DataTestUtils.calculateDifference(trDTO1.getReportingSession(), trDTO1.getCreationDate()));
 
-        assertEquals(expectedValue, result);
-
-        verify(trMapper, times(1)).manageData(any(), any(), any());
-
+        assertEquals(expectedValue, response);
     }
-
-    private static String calculateDifference(TrDTO tr) {
-        OffsetDateTime creationDateOffsetDateTime = tr.getCreationDate().toLocalDateTime()
-            .truncatedTo(ChronoUnit.SECONDS).atOffset(ZoneOffset.UTC);
-        OffsetDateTime slaDateOffsetDateTime = tr.getReportingSession().toLocalDateTime().truncatedTo(ChronoUnit.DAYS)
-            .atOffset(ZoneOffset.UTC).plusDays(1).plusHours(12);
-
-        if (creationDateOffsetDateTime.isAfter(slaDateOffsetDateTime)) {
-            // NEXT DAY FROM reportingSession
-            slaDateOffsetDateTime = tr.getReportingSession().toLocalDateTime().atOffset(ZoneOffset.UTC).plusDays(1);
-            // REPORT_PUBLICATION_TIME (NOW IS USING creationDate) - SLA
-            // The format is a float that indicates the diference of time between this two dates.
-            float seconds = Duration.between(tr.getCreationDate().toLocalDateTime().atOffset(ZoneOffset.UTC),
-                slaDateOffsetDateTime).getSeconds() / 3600.00f;
-            return new BigDecimal(seconds).setScale(1, RoundingMode.DOWN).toString();
-        }
-        return "";
-    }
-
 }
