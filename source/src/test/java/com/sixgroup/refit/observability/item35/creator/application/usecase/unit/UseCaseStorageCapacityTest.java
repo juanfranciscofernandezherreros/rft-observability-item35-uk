@@ -113,7 +113,7 @@ class UseCaseStorageCapacityTest {
         verify(stateService, times(1)).setError(any());
         verify(producerItemService, times(0)).send(any(), any());
         verify(storageService, times(1)).getTotalCapacity(any(), any());
-        verify(storageService, times(0)).getTotalFreeCapacity(any(), any());
+        verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
     }
 
     @Test

@@ -29,13 +29,13 @@ public class TrService {
     private final TrMapper trMapper = new TrMapper();
 
     public List<ReportGenerationDto> findTr(final String initDate, final String endDate, final String itemDate) {
-        final Optional<List<TrDTO>> trs = reportingFileAdapterRepository.findTrByDayAccountAndFileType(initDate, endDate);
+        final List<TrDTO> trs = reportingFileAdapterRepository.findTrByDayAccountAndFileType(initDate, endDate);
         if (trs.isEmpty()) {
             return new ArrayList<>();
         }
 
         final List<ReportGenerationDto> trReportGenerationData = new ArrayList<>();
-        trs.get().forEach(tr -> {
+        trs.forEach(tr -> {
             final Optional<SlaInfo> slaInfo = slaInfoRepository.getSlaInfo(TR_ENTITY, tr.getFileType(), tr.getReportingSession(), tr.getCreationDate());
             if (slaInfo.isEmpty()) {
                 log.error("Error to find SlaInfo with entity {}, reportName {}, reportSession {}, reportDate {}. Configure properties",
