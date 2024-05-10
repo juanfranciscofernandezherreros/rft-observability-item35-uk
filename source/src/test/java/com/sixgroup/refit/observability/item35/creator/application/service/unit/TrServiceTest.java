@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +41,7 @@ class TrServiceTest {
 
     @Test
     void findTrs_repository_return_empty_list() {
-        when(reportingFileAdapterRepository.findTrByDayAccountAndFileType(anyString(), anyString())).thenReturn(Optional.empty());
+        when(reportingFileAdapterRepository.findTrByDayAccountAndFileType(anyString(), anyString())).thenReturn(new ArrayList<>());
 
         final List<ReportGenerationDto> response = trService.findTr("2024-02-01", "2024-03-01", "20240229");
 
@@ -85,7 +86,7 @@ class TrServiceTest {
         fileTypeProperties.getReports().add(reportConfig1);
         fileTypeProperties.getReports().add(reportConfig2);
 
-        when(reportingFileAdapterRepository.findTrByDayAccountAndFileType(anyString(), anyString())).thenReturn(Optional.of(List.of(trDTO1, trDTO2)));
+        when(reportingFileAdapterRepository.findTrByDayAccountAndFileType(anyString(), anyString())).thenReturn(List.of(trDTO1, trDTO2));
         when(slaInfoRepository.getSlaInfo(TR_ENTITY, reportType1, reportSessionDate1, creationDate1)).thenReturn(Optional.of(slaInfo1));
         when(slaInfoRepository.getSlaInfo(TR_ENTITY, reportType2, reportSessionDate2, creationDate2)).thenReturn(Optional.of(slaInfo2));
 

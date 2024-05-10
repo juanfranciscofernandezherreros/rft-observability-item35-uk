@@ -29,14 +29,14 @@ public class ParticipantService {
     private final ParticipantMapper participantMapper = new ParticipantMapper();
 
     public List<ReportGenerationDto> findParticipants(final String initDate, final String endDate, final String itemDate) {
-        final Optional<List<ParticipantDTO>> participants =
+        final List<ParticipantDTO> participants =
             reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(initDate, endDate);
         if (participants.isEmpty()) {
             return new ArrayList<>();
         }
 
         final List<ReportGenerationDto> participantReportGenerationData = new ArrayList<>();
-        participants.get().forEach(participant -> {
+        participants.forEach(participant -> {
             final Optional<SlaInfo> slaInfo =
                 slaInfoRepository.getSlaInfo(PARTICIPANT_ENTITY, participant.getFileType(), participant.getReportingSession(), participant.getInitDate(), participant.getEndDate());
             if (slaInfo.isEmpty()) {

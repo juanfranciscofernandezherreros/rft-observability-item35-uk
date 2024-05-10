@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 
 @Repository
@@ -29,31 +28,28 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
     private final RegulatorFileTypeProperties regulatorFileTypeProperties;
     private final TrFileTypeProperties trFileTypeProperties;
 
-    @Override
-    public Optional<List<ParticipantDTO>> findParticipantsByDayAccountAndFileType(final String initDate, final String endDate) {
+    public List<ParticipantDTO> findParticipantsByDayAccountAndFileType(final String initDate, final String endDate) {
         log.debug("Find Participants by day and fileType");
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-        return Optional.of(reportingFileKudu.
-            findParticipantsByDayAccountAndFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(participantFileTypeProperties.getReports())));
+        return reportingFileKudu.
+            findParticipantsByDayAccountAndFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(participantFileTypeProperties.getReports()));
     }
 
-    @Override
-    public Optional<List<RegulatorDTO>> findRegulatorByDayAccountAndFileType(final String initDate, final String endDate) {
+    public List<RegulatorDTO> findRegulatorByDayAccountAndFileType(final String initDate, final String endDate) {
         log.debug("Find Regulators by day and fileType");
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-        return Optional.of(reportingFileKudu.
-            findRegulatorByDayAccountAndFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(regulatorFileTypeProperties.getReports())));
+        return reportingFileKudu.
+            findRegulatorByDayAccountAndFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(regulatorFileTypeProperties.getReports()));
     }
 
-    @Override
-    public Optional<List<TrDTO>> findTrByDayAccountAndFileType(final String initDate, final String endDate) {
+    public List<TrDTO> findTrByDayAccountAndFileType(final String initDate, final String endDate) {
         log.debug("Find Regulators by day and fileType");
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-        return Optional.of(reportingFileKudu
-            .findTrByDayAccountAndFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(trFileTypeProperties.getReports())));
+        return reportingFileKudu
+            .findTrByDayAccountAndFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(trFileTypeProperties.getReports()));
     }
 
 }

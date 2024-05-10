@@ -16,7 +16,6 @@ import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
@@ -41,46 +40,47 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
     @Override
     public File execute(ItemCommandDTO itemCommandDTO, Headers headers) {
         log.debug("Generating storage capacity file ...");
-        File fileStorageCapacity;
+        File file;
         try {
+            final String firstDayOfMonth = DateUtils.firstDayOfMonth(itemCommandDTO.getItemDate());
+            final String firstDayOfNextMonth = DateUtils.firstDayOfNextMonth(itemCommandDTO.getItemDate());
+
+            final List<Storage> totalCapacityList = storageService.getTotalCapacity(firstDayOfMonth, firstDayOfNextMonth);
+            final List<Storage> totalFreeCapacityList = storageService.getTotalFreeCapacity(firstDayOfMonth, firstDayOfNextMonth);
+
+            if (CollectionUtils.isEmpty(totalCapacityList) || CollectionUtils.isEmpty(totalFreeCapacityList)) {
+                log.error("No data found in storage capacity, skipping report generation");
+                stateService.setError(
+                    StateRequest.builder()
+                        .fileName(FileUtils.getFileName(itemCommandDTO))
+                        .itemType(ITEM35)
+                        .errorDescription("No record status found, skipping file generation")
+                        .build());
+                return null;
+            }
+
+            final List<StorageCapacityDto> storageCapacityFinalList = calculateFinalList(itemCommandDTO.getItemDate(),
+                totalCapacityList, totalFreeCapacityList);
+            if (CollectionUtils.isEmpty(storageCapacityFinalList)) {
+                log.error("Not exist any match between 'total free capacity data' and 'total capacity data'");
+                stateService.setError(
+                    StateRequest.builder()
+                        .fileName(FileUtils.getFileName(itemCommandDTO))
+                        .itemType(ITEM35)
+                        .errorDescription("Not exist any match between 'total free capacity data' and 'total capacity data'")
+                        .build());
+                return null;
+            }
+
             stateService.nextStep(
                 StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
             LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
 
-            String firstDayOfMonth = DateUtils.firstDayOfMonth(itemCommandDTO.getItemDate());
-            String firstDayOfNextMonth = DateUtils.firstDayOfNextMonth(itemCommandDTO.getItemDate());
-
-            List<Storage> totalCapacityList = storageService.getTotalCapacity(firstDayOfMonth, firstDayOfNextMonth);
-
-            if (CollectionUtils.isEmpty(totalCapacityList)) {
-                log.debug("Not exist 'total capacity data' between {} and {}", firstDayOfMonth, firstDayOfNextMonth);
-                throw new
-                    ResourceNotFoundException("Not exist 'total capacity data' between " + firstDayOfMonth + " and " + firstDayOfNextMonth);
-            }
-
-            List<Storage> totalFreeCapacityList = storageService.getTotalFreeCapacity(firstDayOfMonth, firstDayOfNextMonth);
-
-            if (CollectionUtils.isEmpty(totalFreeCapacityList)) {
-                log.debug("Not exist 'total free capacity data' between {} and {}", firstDayOfMonth, firstDayOfNextMonth);
-                throw new
-                    ResourceNotFoundException("Not exist 'total free capacity data' between " + firstDayOfMonth + " and " + firstDayOfNextMonth);
-            }
-
-            List<StorageCapacityDto> storageCapacityFinalList = calculateFinalList(itemCommandDTO.getItemDate(),
-                totalCapacityList, totalFreeCapacityList);
-
-            if (CollectionUtils.isEmpty(storageCapacityFinalList)) {
-                log.debug("Not exist any match between 'total free capacity data' and 'total capacity data'");
-                throw new
-                    ResourceNotFoundException("Not exist any match between 'total free capacity data' and 'total capacity data'");
-            }
-
-            fileStorageCapacity = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommandDTO);
+            file = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommandDTO);
             log.debug("Generated storage capacity file");
-            itemCommandDTO.setFileUrl(fileStorageCapacity.toString());
-            itemCommandDTO.setFileName(fileStorageCapacity.getName());
+            itemCommandDTO.setFileUrl(file.toString());
+            itemCommandDTO.setFileName(file.getName());
             producerItemService.send(itemCommandDTO, headers);
-            return fileStorageCapacity;
         } catch (Exception e) {
             log.error("Error to generate file storage capacity: {}", e.getMessage(), e);
             stateService.setError(
@@ -91,6 +91,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
                     .build());
             return null;
         }
+        return file;
     }
 
     private List<StorageCapacityDto> calculateFinalList(String itemDate, List<Storage> totalCapacityList,
@@ -99,7 +100,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
         totalCapacityList.forEach(totalStorage ->
             totalFreeCapacityList.forEach(totalFreeStorage -> {
                 if (totalStorage.getTimeStamp().equals(totalFreeStorage.getTimeStamp())) {
-                    StorageCapacityDto storageCapacityDto = new StorageCapacityDto();
+                    final StorageCapacityDto storageCapacityDto = new StorageCapacityDto();
                     storageCapacityDto.setTimeStamp(totalStorage.getTimeStamp());
                     storageCapacityDto.setCapacity(BigDecimal.valueOf(totalStorage.getCapacity()).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
                     storageCapacityDto.setAvailableCapacity(BigDecimal.valueOf(totalFreeStorage.getCapacity()).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());

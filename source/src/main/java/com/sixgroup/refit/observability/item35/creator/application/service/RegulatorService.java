@@ -29,13 +29,13 @@ public class RegulatorService {
     private final RegulatorMapper regulatorMapper = new RegulatorMapper();
 
     public List<ReportGenerationDto> findRegulator(final String initDate, final String endDate, final String itemDate) {
-        final Optional<List<RegulatorDTO>> regulations = reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(initDate, endDate);
+        final List<RegulatorDTO> regulations = reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(initDate, endDate);
         if (regulations.isEmpty()) {
             return new ArrayList<>();
         }
 
         final List<ReportGenerationDto> regulatorReportGenerationData = new ArrayList<>();
-        regulations.get().forEach(regulator -> {
+        regulations.forEach(regulator -> {
             final Optional<SlaInfo> slaInfo = slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
             if (slaInfo.isEmpty()) {
                 log.error("Error to find SlaInfo with entity {}, reportName {}, reportSession {}, reportDate {}. Configure properties",

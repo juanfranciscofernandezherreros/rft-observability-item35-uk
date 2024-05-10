@@ -18,7 +18,6 @@ import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
@@ -44,12 +43,8 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
     @Override
     public File execute(final ItemCommandDTO itemCommandDTO, final Headers headers) {
         log.debug("Generating Report Generation file ...");
-        File fileReportGeneration = null;
+        File file = null;
         try {
-            stateService.nextStep(
-                StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
-            LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
-
             final String firstDayOfMonth = DateUtils.firstDayOfMonth(itemCommandDTO.getItemDate());
             final String firstDayOfNextMonth = DateUtils.firstDayOfNextMonth(itemCommandDTO.getItemDate());
 
@@ -67,19 +62,26 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
 
             if (CollectionUtils.isEmpty(joinedCollection)) {
                 log.error("No data found in report generation, skipping report generation");
-                throw new
-                    ResourceNotFoundException("No data found in report generation, skipping report generation");
+                stateService.setError(
+                    StateRequest.builder()
+                        .fileName(FileUtils.getFileName(itemCommandDTO))
+                        .itemType(ITEM35)
+                        .errorDescription("No record status found, skipping file generation")
+                        .build());
+                return null;
             }
+
+            stateService.nextStep(
+                StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
+            LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
 
             final List<ReportGenerationDto> orderedCollection = CollectionsUtils.getOrderCollectionsByDate(joinedCollection);
 
-            fileReportGeneration = writeFileReportGenerationService.writeFile(orderedCollection, itemCommandDTO);
-
-            log.debug("Generated report generation file");
-            itemCommandDTO.setFileUrl(fileReportGeneration.toString());
-            itemCommandDTO.setFileName(fileReportGeneration.getName());
+            file = writeFileReportGenerationService.writeFile(orderedCollection, itemCommandDTO);
+            log.debug("Generated report generation file with name {}, path {}", file.getName(), file.getAbsolutePath());
+            itemCommandDTO.setFileName(file.getName());
+            itemCommandDTO.setFileUrl(file.getAbsolutePath());
             producerItemService.send(itemCommandDTO, headers);
-            return fileReportGeneration;
         } catch (Exception e) {
             log.error("Error to generate file report generation: {}", e.getMessage(), e);
             stateService.setError(
@@ -89,7 +91,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
                     .errorDescription("Error to generate file report generation: " + e.getMessage())
                     .build());
         }
-        return fileReportGeneration;
+        return file;
     }
 
     @Override

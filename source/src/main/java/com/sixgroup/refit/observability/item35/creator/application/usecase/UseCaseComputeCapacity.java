@@ -42,33 +42,36 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
     public File execute(final ItemCommandDTO itemCommandDTO, final Headers headers) throws ExecutionException, InterruptedException {
 
         log.debug("Generating compute capacity file ...");
-        File fileComputeCapacity = null;
+        File file = null;
 
-        List<Capacity> capacityCpu = capacityCpuService.findByCapacityCpu(itemCommandDTO.getItemDate());
-        List<Capacity> capacityRam = capacityRamService.findByCapacityRam(itemCommandDTO.getItemDate());
-
-        if (CollectionUtils.isEmpty(capacityCpu) || CollectionUtils.isEmpty(capacityRam)) {
-            log.debug("No record ram or cpu found from Cloudera api, skipping file generation");
-            stateService.setError(
-                StateRequest.builder()
-                    .fileName(FileUtils.getFileName(itemCommandDTO))
-                    .itemType(ITEM35)
-                    .errorDescription("No record ram or cpu found from Cloudera api, skipping file generation")
-                    .build());
-            return null;
-        }
         try {
-            ArrayList<Capacity> recordsCapacity = new ArrayList<>();
-            recordsCapacity.addAll(capacityCpu);
-            recordsCapacity.addAll(capacityRam);
-            recordsCapacity.sort(Comparator.comparing(Capacity::getDate));
+            final List<Capacity> capacityCpu = capacityCpuService.findByCapacityCpu(itemCommandDTO.getItemDate());
+            final List<Capacity> capacityRam = capacityRamService.findByCapacityRam(itemCommandDTO.getItemDate());
+
+            if (CollectionUtils.isEmpty(capacityCpu) || CollectionUtils.isEmpty(capacityRam)) {
+                log.error("No data found in compute capacity, skipping report generation");
+                stateService.setError(
+                    StateRequest.builder()
+                        .fileName(FileUtils.getFileName(itemCommandDTO))
+                        .itemType(ITEM35)
+                        .errorDescription("No record status found, skipping file generation")
+                        .build());
+                return null;
+            }
+
             stateService.nextStep(
                 StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
             LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
-            fileComputeCapacity = writeFileComputeCapacity.writeFile(recordsCapacity, itemCommandDTO);
-            log.debug("Generated capacity file");
-            itemCommandDTO.setFileUrl(fileComputeCapacity.toString());
-            itemCommandDTO.setFileName(fileComputeCapacity.getName());
+
+            final List<Capacity> recordsCapacity = new ArrayList<>();
+            recordsCapacity.addAll(capacityCpu);
+            recordsCapacity.addAll(capacityRam);
+            recordsCapacity.sort(Comparator.comparing(Capacity::getDate));
+
+            file = writeFileComputeCapacity.writeFile(recordsCapacity, itemCommandDTO);
+            log.debug("Generated compute capacity file with name {}, path {}", file.getName(), file.getAbsolutePath());
+            itemCommandDTO.setFileName(file.getName());
+            itemCommandDTO.setFileUrl(file.getAbsolutePath());
             producerItemService.send(itemCommandDTO, headers);
         } catch (Exception e) {
             log.error("Error to generate file compute capacity {}", e.getMessage(), e);
@@ -79,8 +82,7 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
                     .errorDescription("Error to generate file compute capacity: " + e.getMessage())
                     .build());
         }
-
-        return fileComputeCapacity;
+        return file;
     }
 
     @Override

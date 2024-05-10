@@ -38,25 +38,27 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
 
         log.debug("Generating submission volumes file ...");
         File file = null;
-        List<RecordStatus> recordStatusList = recordStatusService.findRecordStatus(itemCommandDTO.getItemDate());
-        if (CollectionUtils.isEmpty(recordStatusList)) {
-            log.debug("No record status found, skipping file generation");
-            stateService.setError(
-                StateRequest.builder()
-                    .fileName(FileUtils.getFileName(itemCommandDTO))
-                    .itemType(ITEM35)
-                    .errorDescription("No record status found, skipping file generation")
-                    .build());
-            return null;
-        }
         try {
+            final List<RecordStatus> recordStatusList = recordStatusService.findRecordStatus(itemCommandDTO.getItemDate());
+            if (CollectionUtils.isEmpty(recordStatusList)) {
+                log.error("No data found in submission volumes, skipping report generation");
+                stateService.setError(
+                    StateRequest.builder()
+                        .fileName(FileUtils.getFileName(itemCommandDTO))
+                        .itemType(ITEM35)
+                        .errorDescription("No record status found, skipping file generation")
+                        .build());
+                return null;
+            }
+
             stateService.nextStep(
                 StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
             LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
+
             file = writeFileSubmissionVolumes.writeFile(recordStatusList, itemCommandDTO);
-            log.debug("Generated submission volumes file");
-            itemCommandDTO.setFileUrl(file.getAbsolutePath());
+            log.debug("Generated submission volumes file with name {}, path {}", file.getName(), file.getAbsolutePath());
             itemCommandDTO.setFileName(file.getName());
+            itemCommandDTO.setFileUrl(file.getAbsolutePath());
             producerItemService.send(itemCommandDTO, headers);
         } catch (Exception e) {
             log.error("Error to generate file submission volumes: {}", e.getMessage(), e);

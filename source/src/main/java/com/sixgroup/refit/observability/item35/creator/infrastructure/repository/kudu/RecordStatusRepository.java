@@ -21,8 +21,6 @@ public class RecordStatusRepository implements com.sixgroup.refit.observability.
     @Override
     public List<RecordStatus> findByRecordStatus(String dateFrom, String dateTo) {
         log.debug("Find Record status by dateFrom and dateTo");
-        return recordStatusKudu.
-            findByRecordStatus(dateFrom, dateTo)
-            .stream().map(recordStatusMapper::entityToDomain).toList();
+        return recordStatusKudu.findByRecordStatus(dateFrom, dateTo).stream().map(recordStatusMapper::entityToDomain).toList();
     }
 }
