@@ -58,6 +58,8 @@ component-config:
       - name: TD107
         reportName: TD107
   sla:
+    validator:
+      enabled: true
     entity:
       customer:
         - name: TAR030
