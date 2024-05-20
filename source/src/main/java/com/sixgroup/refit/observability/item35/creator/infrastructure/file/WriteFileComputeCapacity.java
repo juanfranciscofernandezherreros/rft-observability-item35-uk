@@ -9,6 +9,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
+import com.sixgroup.refit.observability.item35.creator.shared.csv.CSVCreator;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +36,11 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
     private final ReportProperties reportProperties;
 
     @Override
-    public File writeFile(List<Capacity> records, ItemCommandDTO itemCommandDTO) throws IOException {
+    public File writeFile(final List<Capacity> records, final ItemCommandDTO itemCommandDTO) throws IOException {
         log.debug("Creating and writing file");
         String filePath = csvProperties.getOutputPath() + FileUtils.getFileName(itemCommandDTO);
         try (FileWriter writer = new FileWriter(filePath);
-             CSVWriter csvWriter = new CSVWriter(writer)) {
+             CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
             for (Capacity record : records) {
                 writeRecord(csvWriter, record, itemCommandDTO.getItemDate());

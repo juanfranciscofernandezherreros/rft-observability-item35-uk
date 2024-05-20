@@ -23,10 +23,8 @@ public class ParticipantMapper {
         reportGenerationDto.setReportPublicationTime(DateUtils.localDateTimeToIsoFormat(participant.getEndDate()));
         reportGenerationDto.setDate(DateUtils.localDateTimeToSpainDateFormat(participant.getReportingSession()));
         reportGenerationDto.setSla(DateUtils.localDateTimeToIsoFormat(slaInfo.getExpectSlaDate()));
-        if (Boolean.FALSE.equals(slaInfo.getMeetsSla())) {
-            reportGenerationDto.setDifference(DateUtils.localDateTimeToIsoFormat(slaInfo.getDifferenceFromInit()));
-        } else {
-            reportGenerationDto.setDifference("");
+        if (Boolean.FALSE.equals(slaInfo.getMeetsSla()) && null != slaInfo.getDifferenceDuration()) {
+            reportGenerationDto.setDifference(slaInfo.getDifferenceInBigDecimal().toString());
         }
         return reportGenerationDto;
     }

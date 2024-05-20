@@ -22,10 +22,8 @@ public class TrMapper {
         reportGenerationDto.setReportPublicationTime(DateUtils.localDateTimeToIsoFormat(trDTO.getCreationDate()));
         reportGenerationDto.setDate(DateUtils.localDateTimeToSpainDateFormat(trDTO.getReportingSession()));
         reportGenerationDto.setSla(DateUtils.localDateTimeToIsoFormat(slaInfo.getExpectSlaDate()));
-        if (Boolean.FALSE.equals(slaInfo.getMeetsSla())) {
-            reportGenerationDto.setDifference(DateUtils.localDateTimeToIsoFormat(slaInfo.getDifferenceFromInit()));
-        } else {
-            reportGenerationDto.setDifference("");
+        if (Boolean.FALSE.equals(slaInfo.getMeetsSla()) && null != slaInfo.getDifferenceDuration()) {
+            reportGenerationDto.setDifference(slaInfo.getDifferenceInBigDecimal().toString());
         }
         return reportGenerationDto;
     }
