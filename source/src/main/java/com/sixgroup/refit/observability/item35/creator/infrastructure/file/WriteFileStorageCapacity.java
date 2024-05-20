@@ -9,6 +9,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.StorageCapacityDto;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
+import com.sixgroup.refit.observability.item35.creator.shared.csv.CSVCreator;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +32,11 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
     private final ReportProperties reportProperties;
 
     @Override
-    public File writeFile(List<StorageCapacityDto> storageCapacityDtoList, ItemCommandDTO itemCommandDTO) throws IOException {
+    public File writeFile(final List<StorageCapacityDto> storageCapacityDtoList, final ItemCommandDTO itemCommandDTO) throws IOException {
         log.debug("Creating and writing file");
         String filePath = csvProperties.getOutputPath() + getFileName(itemCommandDTO.getItemDate());
         try (FileWriter writer = new FileWriter(filePath);
-             CSVWriter csvWriter = new CSVWriter(writer)) {
+             CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
             for (StorageCapacityDto record : storageCapacityDtoList) {
                 writeRecord(csvWriter, record);

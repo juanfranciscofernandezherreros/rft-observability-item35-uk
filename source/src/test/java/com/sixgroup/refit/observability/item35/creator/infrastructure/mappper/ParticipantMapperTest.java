@@ -70,8 +70,7 @@ class ParticipantMapperTest {
             reportCompletionAndPubTime,
             reportCompletionAndPubTime,
             date,
-            sla,
-            DataTestUtils.calculateDifference(participantDTO.getReportingSession(), participantDTO.getEndDate()));
+            sla, null);
 
         assertEquals(expectedValue, response);
 

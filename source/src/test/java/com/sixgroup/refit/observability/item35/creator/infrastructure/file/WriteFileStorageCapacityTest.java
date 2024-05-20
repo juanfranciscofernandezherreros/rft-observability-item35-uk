@@ -64,13 +64,13 @@ class WriteFileStorageCapacityTest {
 
         assertNotNull(file);
 
-        String expectedResult = "\"TR_CODE\",\"REPORTING_DATE\",\"REGULATION_REFERENCE\",\"DATA_CENTER_LOCATION\"," +
-            "\"DATABASE_SERVER_OR_PLATFORM\",\"DATE\",\"CAPACITY\",\"USED_CAPACITY\",\"AVAILABLE_CAPACITY\",\"UTILIZATION\"" +
-            ",\"INCIDENT_RELATED\",\"TR_INCIDENT_ID\"\n" +
-            "\"TRRGS\",\"20240915\",\"EMIR\",\"Cloudera\",\"Cloudera data warehouse\",\"2023/09/01\",\"16.703632\"," +
-            "\"0.23867607\",\"16.464956\",\"0.0142888725\",\"NO\",\"\"\n" +
-            "\"TRRGS\",\"20240915\",\"EMIR\",\"Cloudera\",\"Cloudera data warehouse\",\"2023/09/02\",\"16.700466\"" +
-            ",\"0.21350479\",\"16.486961\",\"0.012784361\",\"NO\",\"\"";
+        String expectedResult = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;DATA_CENTER_LOCATION;" +
+            "DATABASE_SERVER_OR_PLATFORM;DATE;CAPACITY;USED_CAPACITY;AVAILABLE_CAPACITY;UTILIZATION" +
+            ";INCIDENT_RELATED;TR_INCIDENT_ID\n" +
+            "TRRGS;20240915;EMIR;Cloudera;Cloudera data warehouse;2023/09/01;16.703632;" +
+            "0.23867607;16.464956;0.0142888725;NO;\n" +
+            "TRRGS;20240915;EMIR;Cloudera;Cloudera data warehouse;2023/09/02;16.700466" +
+            ";0.21350479;16.486961;0.012784361;NO;";
 
         InputStream inputStream = new FileInputStream(file);
         String stringFile = readFromInputStream(inputStream);

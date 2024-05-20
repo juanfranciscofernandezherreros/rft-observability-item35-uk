@@ -164,8 +164,7 @@ class RegulatorMapperTest {
             reportCompletionAndPubTime,
             reportCompletionAndPubTime,
             date,
-            sla,
-            DataTestUtils.calculateDifference(regulatorDTO.getReportingSession(), regulatorDTO.getCreationDate()));
+            sla, null);
 
         assertEquals(expectedValue, response);
     }

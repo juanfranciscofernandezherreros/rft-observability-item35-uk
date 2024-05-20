@@ -10,6 +10,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.enums.Status;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
+import com.sixgroup.refit.observability.item35.creator.shared.csv.CSVCreator;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +34,11 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
     private final ReportProperties reportProperties;
 
     @Override
-    public File writeFile(List<RecordStatus> recordStatus, ItemCommandDTO itemCommandDTO) throws IOException {
+    public File writeFile(final List<RecordStatus> recordStatus, final ItemCommandDTO itemCommandDTO) throws IOException {
         log.debug("Creating and writing file");
-        String filePath = csvProperties.getOutputPath() + FileUtils.getFileName(itemCommandDTO);
+        final String filePath = csvProperties.getOutputPath() + FileUtils.getFileName(itemCommandDTO);
         try (FileWriter writer = new FileWriter(filePath);
-             CSVWriter csvWriter = new CSVWriter(writer)) {
+             CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
             for (RecordStatus record : recordStatus) {
                 writeRecord(csvWriter, record, itemCommandDTO.getItemDate());

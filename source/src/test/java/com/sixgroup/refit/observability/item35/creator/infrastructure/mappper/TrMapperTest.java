@@ -76,8 +76,7 @@ class TrMapperTest {
             reportCompletionAndPubTime,
             reportCompletionAndPubTime,
             date,
-            sla,
-            DataTestUtils.calculateDifference(trDTO1.getReportingSession(), trDTO1.getCreationDate()));
+            sla, null);
 
         assertEquals(expectedValue, response);
     }
