@@ -16,7 +16,7 @@ public final class ReportUtils {
     }
 
     public static String getReportName(final List<ReportConfig> reports, final String reportName) {
-        final Optional<String> reportFound = reports.stream().filter(report -> report.getName().equals(reportName)).map(report -> report.getReportName()).findFirst();
+        final Optional<String> reportFound = reports.stream().filter(report -> report.getName().equals(reportName)).map(ReportConfig::getReportName).findFirst();
         if (reportFound.isEmpty()) {
             log.error("Error to find report with reportName {}", reportName);
             return null;
