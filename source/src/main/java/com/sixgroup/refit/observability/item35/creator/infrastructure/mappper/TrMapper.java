@@ -18,8 +18,8 @@ public class TrMapper {
         reportGenerationDto.setReportType(fileTypeProperties.getReportType());
         reportGenerationDto.setReportGenerationTime(DateUtils.localDateTimeToIsoFormat(slaInfo.getDifferenceFromInit()));
         reportGenerationDto.setReportCompletionTime(DateUtils.localDateTimeToIsoFormat(trDTO.getCreationDate()));
-        //TODO: PUBLICATION TIME, PENDING NOW USE creationDate
-        reportGenerationDto.setReportPublicationTime(DateUtils.localDateTimeToIsoFormat(trDTO.getCreationDate()));
+        //TODO: PENDING PUBLICATION TIME
+        reportGenerationDto.setReportPublicationTime(null);
         reportGenerationDto.setDate(DateUtils.localDateTimeToSpainDateFormat(trDTO.getReportingSession()));
         reportGenerationDto.setSla(DateUtils.localDateTimeToIsoFormat(slaInfo.getExpectSlaDate()));
         if (Boolean.FALSE.equals(slaInfo.getMeetsSla()) && null != slaInfo.getDifferenceDuration()) {
