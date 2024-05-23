@@ -8,7 +8,7 @@ public final class CSVCreator {
 
     public static final char SEPARATOR = ';';
     public static final char NO_QUOTE_CHARACTER = '\u0000';
-    public static final char ESCAPECHAR = '"';
+    public static final char ESCAPECHAR = '\'';
     public static final String LINE_BREAK = "\n";
     private CSVCreator() {
     }
