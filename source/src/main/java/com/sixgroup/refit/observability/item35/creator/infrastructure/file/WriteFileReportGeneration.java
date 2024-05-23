@@ -62,7 +62,7 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
             reportProperties.getTrCode(),
             record.getReportingDate(),
             reportProperties.getRegulationReference(),
-            record.getReportName(),
+            "\"" + record.getReportName() + "\"",
             record.getReportType(),
             record.getReportGenerationTime(),
             record.getReportCompletionTime(),
