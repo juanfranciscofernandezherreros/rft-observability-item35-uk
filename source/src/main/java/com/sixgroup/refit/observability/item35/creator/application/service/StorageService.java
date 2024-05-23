@@ -65,7 +65,7 @@ public class StorageService {
                                 dataList.forEach(dataItem -> {
                                     String timestamp = dataItem.getTimestamp();
                                     Float mean = dataItem.getAggregateStatistics().getMean();
-                                    Float totalCapacityInTeras = new BigDecimal(mean)
+                                    Float totalCapacityInTeras = BigDecimal.valueOf(mean)
                                         .divide(new BigDecimal("1024").pow(4), NUM_DECIMALS, RoundingMode.HALF_UP)
                                         .floatValue();
                                     Storage storage = new Storage(timestamp, totalCapacityInTeras);
@@ -102,7 +102,7 @@ public class StorageService {
                                 dataList.forEach(dataItem -> {
                                     String timestamp = dataItem.getTimestamp();
                                     Float max = dataItem.getAggregateStatistics().getMax();
-                                    Float maxFreeDataInTeras = new BigDecimal(max)
+                                    Float maxFreeDataInTeras = BigDecimal.valueOf(max)
                                         .divide(new BigDecimal("1024").pow(4), NUM_DECIMALS, RoundingMode.HALF_UP)
                                         .floatValue();
                                     Storage storage = new Storage(timestamp, maxFreeDataInTeras);
