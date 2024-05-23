@@ -162,7 +162,7 @@ class RegulatorMapperTest {
             "ESMA",
             reportGenerationTimeString,
             reportCompletionAndPubTime,
-            reportCompletionAndPubTime,
+            null,
             date,
             sla, null);
 

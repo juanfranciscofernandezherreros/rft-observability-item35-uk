@@ -68,7 +68,7 @@ class ParticipantMapperTest {
             "participant",
             reportGenerationTimeString,
             reportCompletionAndPubTime,
-            reportCompletionAndPubTime,
+            null,
             date,
             sla, null);
 

@@ -74,7 +74,7 @@ class TrMapperTest {
             "TR",
             reportGenerationTimeString,
             reportCompletionAndPubTime,
-            reportCompletionAndPubTime,
+            null,
             date,
             sla, null);
 
