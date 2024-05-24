@@ -1,10 +1,16 @@
 package com.sixgroup.refit.observability.item35.creator.domain.enums;
 
-import java.util.stream.Stream;
+import com.sixgroup.refit.observability.item35.creator.shared.exception.InternalErrorException;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.*;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
 
+@Slf4j
 public enum ItemType {
     SUBMISSION_VOLUMES("submissionVolumes", "TRRGS_EMIR_PR_IN_ND_ITEM35A_",
         new String[]{
@@ -65,7 +71,6 @@ public enum ItemType {
 
     private final String name;
     private final String namePattern;
-
     private final String[] headers;
 
     ItemType(final String name, final String namePattern, String[] headers) {
@@ -88,7 +93,16 @@ public enum ItemType {
     }
 
     public static ItemType getItemTypeFromName(final String name) {
-        return Stream.of(ItemType.values()).filter(item -> name.equals(item.getName())).findFirst().get();
+        final Optional<ItemType> itemTypeFound = Arrays.stream(ItemType.values()).filter(itemType -> name.equals(itemType.getName())).findFirst();
+        if (itemTypeFound.isEmpty()) {
+            log.error("Error to find itemType by name {}", name);
+            throw new InternalErrorException("Error to find itemType by name " + name);
+        }
+        return itemTypeFound.get();
+    }
+
+    public static List<String> reportsName() {
+        return List.of(SUBMISSION_VOLUMES.getName(), COMPUTE_CAPACITY.getName(), STORAGE_CAPACITY.getName(), REPORT_GENERATION.getName());
     }
 
 }

@@ -1,7 +1,12 @@
 package com.sixgroup.refit.observability.item35.creator.domain.enums;
 
-import java.util.stream.Stream;
+import com.sixgroup.refit.observability.item35.creator.shared.exception.InternalErrorException;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
+import java.util.Optional;
+
+@Slf4j
 public enum Status {
 
     ACCEPTED("ACPT"),
@@ -18,7 +23,12 @@ public enum Status {
     }
 
     public static Status getStatusFromDescription(final String description) {
-        return Stream.of(Status.values()).filter(item -> description.equals(item.getDescription())).findFirst().get();
+        final Optional<Status> statusFound = Arrays.stream(Status.values()).filter(status -> description.equals(status.getDescription())).findFirst();
+        if (statusFound.isEmpty()) {
+            log.error("Error to find status by description {}", description);
+            throw new InternalErrorException("Error to find status by description " + description);
+        }
+        return statusFound.get();
     }
 
 }

@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -95,7 +95,7 @@ public class CapacityRamClouderaTest {
             return call;
         });
         List<Capacity> result = capacityRamCloudera.findByCapacityRam(dateFrom, dateTo);
-        assertNull(result, "Expected null result on API failure");
+        assertTrue(result.isEmpty());
     }
 
 }

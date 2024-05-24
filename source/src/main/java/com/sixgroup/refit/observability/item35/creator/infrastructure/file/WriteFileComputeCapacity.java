@@ -36,14 +36,14 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
     private final ReportProperties reportProperties;
 
     @Override
-    public File writeFile(final List<Capacity> records, final ItemCommandDTO itemCommandDTO) throws IOException {
+    public File writeFile(final List<Capacity> capacities, final ItemCommandDTO itemCommandDTO) throws IOException {
         log.debug("Creating and writing file");
         String filePath = csvProperties.getOutputPath() + FileUtils.getFileName(itemCommandDTO);
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
-            for (Capacity record : records) {
-                writeRecord(csvWriter, record, itemCommandDTO.getItemDate());
+            for (Capacity capacityData : capacities) {
+                writeRecord(csvWriter, capacityData, itemCommandDTO.getItemDate());
             }
         }
         log.debug("File created and written: " + filePath);
@@ -52,23 +52,23 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
         return new File(filePath);
     }
 
-    private void writeHeader(CSVWriter csvWriter) {
+    private void writeHeader(final CSVWriter csvWriter) {
         csvWriter.writeNext(ItemType.COMPUTE_CAPACITY.getHeaders());
     }
 
 
-    private void writeRecord(CSVWriter csvWriter, Capacity record, String itemDate) {
+    private void writeRecord(final CSVWriter csvWriter, final Capacity capacityData, final String itemDate) {
         String[] data = {
             reportProperties.getTrCode(),
             DateUtils.itemDateFormatted(itemDate),
             reportProperties.getRegulationReference(),
             DATA_CENTER_LOCATION,
             DATABASE_SERVER_OR_PLATFORM,
-            record.getTypeCapacity(),
-            record.getDate(),
-            record.getMin(),
-            record.getMean(),
-            record.getMax(),
+            capacityData.getTypeCapacity(),
+            capacityData.getDate(),
+            capacityData.getMin(),
+            capacityData.getMean(),
+            capacityData.getMax(),
             FIELD_INCIDENT_RELATED_FILE,
             FIELD_TR_INCIDENT_ID_RELATED_FILE};
         csvWriter.writeNext(data);

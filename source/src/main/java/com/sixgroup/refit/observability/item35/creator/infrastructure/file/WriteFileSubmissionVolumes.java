@@ -40,8 +40,8 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
-            for (RecordStatus record : recordStatus) {
-                writeRecord(csvWriter, record, itemCommandDTO.getItemDate());
+            for (RecordStatus recordStatusData : recordStatus) {
+                writeRecord(csvWriter, recordStatusData, itemCommandDTO.getItemDate());
             }
         }
         log.debug("File created and written: " + filePath);
@@ -51,19 +51,19 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
     }
 
 
-    private void writeHeader(CSVWriter csvWriter) {
+    private void writeHeader(final CSVWriter csvWriter) {
         csvWriter.writeNext(ItemType.SUBMISSION_VOLUMES.getHeaders());
     }
 
-    private void writeRecord(CSVWriter csvWriter, RecordStatus record, String itemDate) {
+    private void writeRecord(final CSVWriter csvWriter, final RecordStatus recordStatusData, final String itemDate) {
         String[] data = {
             reportProperties.getTrCode(),
             DateUtils.itemDateFormatted(itemDate),
             reportProperties.getRegulationReference(),
-            Status.getStatusFromDescription(record.messageType()).toString(),
-            record.submissionChannel().toUpperCase(),
-            String.valueOf(record.noMessagesOnGiveDate()),
-            record.reportingDate()
+            Status.getStatusFromDescription(recordStatusData.messageType()).toString(),
+            recordStatusData.submissionChannel().toUpperCase(),
+            String.valueOf(recordStatusData.noMessagesOnGiveDate()),
+            recordStatusData.reportingDate()
         };
         csvWriter.writeNext(data);
     }

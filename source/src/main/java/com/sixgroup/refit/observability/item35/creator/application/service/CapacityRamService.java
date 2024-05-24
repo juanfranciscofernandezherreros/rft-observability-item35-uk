@@ -23,33 +23,36 @@ public class CapacityRamService {
 
     private final CapacityRamRepository capacityRamRepository;
 
-    public List<Capacity> findByCapacityRam(String itemDate) {
+    public List<Capacity> findByCapacityRam(final String itemDate) {
 
-        log.debug("Find Capacity Ram by date");
+        log.debug("Find Capacity Ram by date {}", itemDate);
 
-        List<Capacity> listCapacityRam = capacityRamRepository.
+        final List<Capacity> listCapacityRam = capacityRamRepository.
             findByCapacityRam(DateUtils.firstDayOfMonth(itemDate), DateUtils.firstDayOfNextMonth(itemDate));
 
-        List<Capacity> capacityRams = new ArrayList<>();
-
-        if (CollectionUtils.isNotEmpty(listCapacityRam)) {
-            Map<String, List<Capacity>> groupedByTimestamp = listCapacityRam.stream()
-                .collect(Collectors.groupingBy(Capacity::getDate));
-            groupedByTimestamp.forEach((timestamp, capacityRamsGroup) -> {
-                BigDecimal bytesMax = BigDecimal.ZERO;
-                BigDecimal bytesMin = BigDecimal.ZERO;
-                BigDecimal bytesMean = BigDecimal.ZERO;
-
-                for (Capacity capacityRam : capacityRamsGroup) {
-                    bytesMax = bytesMax.add(new BigDecimal(capacityRam.getMax()));
-                    bytesMin = bytesMin.add(new BigDecimal(capacityRam.getMin()));
-                    bytesMean = bytesMean.add(new BigDecimal(capacityRam.getMean()));
-                }
-                capacityRams.add(new Capacity(timestamp,
-                    Utils.convertBytesToTeraBytes(bytesMax), Utils.convertBytesToTeraBytes(bytesMin), Utils.convertBytesToTeraBytes(bytesMean), CapacityConstants.RAM));
-
-            });
+        if (CollectionUtils.isEmpty(listCapacityRam)) {
+            return new ArrayList<>();
         }
+
+        final Map<String, List<Capacity>> groupedByTimestamp = listCapacityRam.stream()
+            .collect(Collectors.groupingBy(Capacity::getDate));
+
+        final List<Capacity> capacityRams = new ArrayList<>();
+        groupedByTimestamp.forEach((timestamp, capacityRamsGroup) -> {
+            BigDecimal bytesMax = BigDecimal.ZERO;
+            BigDecimal bytesMin = BigDecimal.ZERO;
+            BigDecimal bytesMean = BigDecimal.ZERO;
+
+            for (Capacity capacityRam : capacityRamsGroup) {
+                bytesMax = bytesMax.add(new BigDecimal(capacityRam.getMax()));
+                bytesMin = bytesMin.add(new BigDecimal(capacityRam.getMin()));
+                bytesMean = bytesMean.add(new BigDecimal(capacityRam.getMean()));
+            }
+            capacityRams.add(new Capacity(timestamp,
+                Utils.convertBytesToTeraBytes(bytesMax), Utils.convertBytesToTeraBytes(bytesMin),
+                Utils.convertBytesToTeraBytes(bytesMean), CapacityConstants.RAM));
+
+        });
 
         return capacityRams;
     }

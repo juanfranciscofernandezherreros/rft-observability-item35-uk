@@ -23,29 +23,30 @@ public class CapacityCpuService {
 
     private final CapacityCpuRepository capacityCpuRepository;
 
-    public List<Capacity> findByCapacityCpu(String itemDate) {
+    public List<Capacity> findByCapacityCpu(final String itemDate) {
 
-        log.debug("Find Capacity Cpu by date");
+        log.debug("Find Capacity Cpu by date {}", itemDate);
 
-        List<Capacity> capacityMonthList = capacityCpuRepository.
+        final List<Capacity> capacityMonthList = capacityCpuRepository.
             findByCapacityCpu(DateUtils.firstDayOfMonth(itemDate), DateUtils.firstDayOfNextMonth(itemDate));
 
-        List<Capacity> capacityCpu = new ArrayList<>();
-
-        if (CollectionUtils.isNotEmpty(capacityMonthList)) {
-            capacityMonthList.forEach(capacityDay -> {
-                BigDecimal minValue = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMin())).divide(BigDecimal.valueOf(100), NUM_DECIMALS, RoundingMode.UNNECESSARY);
-                BigDecimal maxValue = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMax())).divide(BigDecimal.valueOf(100), NUM_DECIMALS, RoundingMode.UNNECESSARY);
-                BigDecimal mean = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMean())).divide(BigDecimal.valueOf(100), NUM_DECIMALS, RoundingMode.HALF_UP);
-
-                capacityDay.setMin(minValue.toString());
-                capacityDay.setMax(maxValue.toString());
-                capacityDay.setMean(mean.toString());
-
-                capacityCpu.add(new Capacity(capacityDay.getDate(), maxValue.toString(), minValue.toString(), mean.toString(), CapacityConstants.CPU));
-
-            });
+        if (CollectionUtils.isEmpty(capacityMonthList)) {
+            return new ArrayList<>();
         }
+
+        final List<Capacity> capacityCpu = new ArrayList<>();
+        capacityMonthList.forEach(capacityDay -> {
+            final BigDecimal minValue = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMin())).divide(BigDecimal.valueOf(100), NUM_DECIMALS, RoundingMode.UNNECESSARY);
+            final BigDecimal maxValue = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMax())).divide(BigDecimal.valueOf(100), NUM_DECIMALS, RoundingMode.UNNECESSARY);
+            final BigDecimal mean = BigDecimal.valueOf(Double.parseDouble(capacityDay.getMean())).divide(BigDecimal.valueOf(100), NUM_DECIMALS, RoundingMode.HALF_UP);
+
+            capacityDay.setMin(minValue.toString());
+            capacityDay.setMax(maxValue.toString());
+            capacityDay.setMean(mean.toString());
+
+            capacityCpu.add(new Capacity(capacityDay.getDate(), maxValue.toString(), minValue.toString(), mean.toString(), CapacityConstants.CPU));
+
+        });
         return capacityCpu;
     }
 }

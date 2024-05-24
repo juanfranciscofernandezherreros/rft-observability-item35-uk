@@ -38,8 +38,8 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
-            for (StorageCapacityDto record : storageCapacityDtoList) {
-                writeRecord(csvWriter, record);
+            for (StorageCapacityDto storageCapacityData : storageCapacityDtoList) {
+                writeRecord(csvWriter, storageCapacityData);
             }
         }
         log.debug("File created and written: {}", filePath);
@@ -51,23 +51,23 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
         return new File(filePath);
     }
 
-    private void writeHeader(CSVWriter csvWriter) {
+    private void writeHeader(final CSVWriter csvWriter) {
         csvWriter.writeNext(ItemType.STORAGE_CAPACITY.getHeaders());
     }
 
 
-    private void writeRecord(CSVWriter csvWriter, StorageCapacityDto record) {
+    private void writeRecord(final CSVWriter csvWriter, final StorageCapacityDto storageCapacityData) {
         String[] data = {
             reportProperties.getTrCode(),
-            record.getReportingDate(),
+            storageCapacityData.getReportingDate(),
             reportProperties.getRegulationReference(),
             DATA_CENTER_LOCATION,
             DATABASE_SERVER_OR_PLATFORM,
-            record.getDate(),
-            String.valueOf(record.getCapacity()),
-            String.valueOf(record.getUsedCapacity()),
-            String.valueOf(record.getAvailableCapacity()),
-            String.valueOf(record.getUtilization()),
+            storageCapacityData.getDate(),
+            String.valueOf(storageCapacityData.getCapacity()),
+            String.valueOf(storageCapacityData.getUsedCapacity()),
+            String.valueOf(storageCapacityData.getAvailableCapacity()),
+            String.valueOf(storageCapacityData.getUtilization()),
             INCIDENT_RELATED,
             TR_INCIDENT_ID
         };

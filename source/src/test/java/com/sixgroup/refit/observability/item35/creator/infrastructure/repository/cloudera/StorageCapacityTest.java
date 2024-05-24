@@ -4,7 +4,6 @@ import com.sixgroup.refit.observability.item35.creator.configuration.ApiCloudera
 import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import okhttp3.*;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,9 +11,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -60,11 +59,10 @@ class StorageCapacityTest {
         when(mockStorage.getSelectTotalApi()).thenReturn("select total_capacity_across_filesystems");
 
         // Execute the method under test
-        StorageCapacityResponse result =
-            storageCapacity.findTotalStorage(testDateFrom, testDateTo);
+        final Optional<StorageCapacityResponse> result = storageCapacity.findTotalStorage(testDateFrom, testDateTo);
 
         // Verify results
-        assertNotNull(result);
+        assertTrue(result.isPresent());
         verify(mockOkHttpClient).newCall(any(Request.class));
     }
 
@@ -92,11 +90,10 @@ class StorageCapacityTest {
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
 
         // Execute the method under test
-        StorageCapacityResponse storageCapacityResponse =
-            storageCapacity.findFreeStorage(testDateFrom, testDateTo);
+        final Optional<StorageCapacityResponse> storageCapacityResponse = storageCapacity.findFreeStorage(testDateFrom, testDateTo);
 
         // Verify results
-        assertNotNull(storageCapacityResponse);
+        assertTrue(storageCapacityResponse.isPresent());
         verify(mockOkHttpClient).newCall(any(Request.class));
     }
 
@@ -114,10 +111,10 @@ class StorageCapacityTest {
         when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectTotalApi()).thenReturn("select total_capacity_across_filesystems");
 
-        StorageCapacityResponse storageCapacityResponse = storageCapacity.findTotalStorage(testDateFrom, testDateTo);
+        final Optional<StorageCapacityResponse> response = storageCapacity.findTotalStorage(testDateFrom, testDateTo);
 
         // Verify results
-        assertNull(storageCapacityResponse);
+        assertTrue(response.isEmpty());
         verify(mockOkHttpClient).newCall(any(Request.class));
     }
 
@@ -134,8 +131,8 @@ class StorageCapacityTest {
         ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
         when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
-        StorageCapacityResponse storageCapacityResponse = storageCapacity.findFreeStorage(testDateFrom, testDateTo);
-        Assertions.assertNull(storageCapacityResponse);
+        final Optional<StorageCapacityResponse> response = storageCapacity.findFreeStorage(testDateFrom, testDateTo);
+        assertTrue(response.isEmpty());
         verify(mockOkHttpClient).newCall(any(Request.class));
     }
 

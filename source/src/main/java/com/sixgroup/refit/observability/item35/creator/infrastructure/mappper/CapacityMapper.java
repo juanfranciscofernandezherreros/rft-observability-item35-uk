@@ -21,21 +21,22 @@ public final class CapacityMapper {
     private CapacityMapper() {
     }
 
-    public static List<Capacity> mapperResponseToListCapacity(StorageCapacityResponse storageCapacityResponse) {
-        List<Capacity> listCapacityForDay = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(storageCapacityResponse.getItems())) {
-            for (Items items : storageCapacityResponse.getItems()) {
-                if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
-                    for (TimeSeries timeSeriesNode : items.getTimeSeries()) {
-                        if (CollectionUtils.isNotEmpty(timeSeriesNode.getData())) {
-                            for (Data data : timeSeriesNode.getData()) {
-                                String date = LocalDateTime.parse(data.getTimestamp(), DateTimeFormatter.ofPattern(DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS))
-                                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT_YYYY_MM_DD));
-                                String minValue = data.getAggregateStatistics().getMin().toString();
-                                String maxValue = data.getAggregateStatistics().getMax().toString();
-                                String mean = data.getAggregateStatistics().getMean().toString();
-                                listCapacityForDay.add(new Capacity(date, maxValue, minValue, mean, StringUtils.EMPTY));
-                            }
+    public static List<Capacity> mapperResponseToListCapacity(final StorageCapacityResponse storageCapacityResponse) {
+        if (CollectionUtils.isEmpty(storageCapacityResponse.getItems())) {
+            return new ArrayList<>();
+        }
+        final List<Capacity> listCapacityForDay = new ArrayList<>();
+        for (Items items : storageCapacityResponse.getItems()) {
+            if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
+                for (TimeSeries timeSeriesNode : items.getTimeSeries()) {
+                    if (CollectionUtils.isNotEmpty(timeSeriesNode.getData())) {
+                        for (Data data : timeSeriesNode.getData()) {
+                            final String date = LocalDateTime.parse(data.getTimestamp(), DateTimeFormatter.ofPattern(DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS))
+                                .format(DateTimeFormatter.ofPattern(DATE_FORMAT_YYYY_MM_DD));
+                            final String minValue = data.getAggregateStatistics().getMin().toString();
+                            final String maxValue = data.getAggregateStatistics().getMax().toString();
+                            final String mean = data.getAggregateStatistics().getMean().toString();
+                            listCapacityForDay.add(new Capacity(date, maxValue, minValue, mean, StringUtils.EMPTY));
                         }
                     }
                 }
