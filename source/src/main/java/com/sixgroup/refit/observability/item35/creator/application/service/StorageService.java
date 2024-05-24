@@ -6,6 +6,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.storage.resp
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.TimeSeries;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
+import com.sixgroup.refit.observability.item35.creator.shared.exception.InternalErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -31,52 +32,46 @@ public class StorageService {
 
     private final ClouderaProperties clouderaProperties;
 
-    public List<Storage> getTotalCapacity(String dateFrom, String dateTo) {
-        StorageCapacityResponse totalStorage = storageCapacityRepository.findTotalStorage(dateFrom, dateTo);
-        Optional.ofNullable(totalStorage).orElseThrow(() -> new RuntimeException("'apiCloudera findTotalStorage()' response" +
-            " cannot be null"));
-        return manageClouderaApiTotalCapacityResponseData(totalStorage);
-    }
-
-    public List<Storage> getTotalFreeCapacity(String dateFrom, String dateTo) {
-        StorageCapacityResponse freeStorage = storageCapacityRepository.findFreeStorage(dateFrom, dateTo);
-        Optional.ofNullable(freeStorage).orElseThrow(() -> new RuntimeException("'apiCloudera findFreeStorage()' response" +
-            " cannot be null"));
-        return manageClouderaApiTotalCapacityFreeResponseData(freeStorage);
-    }
-
-    private List<Storage> manageClouderaApiTotalCapacityResponseData(StorageCapacityResponse storageCapacityResponse) {
-
-        List<Storage> storageList = new ArrayList<>();
-
-        if (CollectionUtils.isNotEmpty(storageCapacityResponse.getItems())) {
-            storageCapacityResponse.getItems().forEach(items -> {
-                if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
-                    List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
-                        .filter(timeSeries -> null != timeSeries.getMetadata()
-                            && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
-                            && timeSeries.getMetadata().getEntityName().equals(clouderaProperties.getStorage().getEntityName()))
-                        .toList();
-
-                    if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
-                        filteredTimeseries.forEach(timeSeries -> {
-                            List<Data> dataList = timeSeries.getData();
-                            if (CollectionUtils.isNotEmpty(dataList)) {
-                                dataList.forEach(dataItem -> {
-                                    String timestamp = dataItem.getTimestamp();
-                                    Float mean = dataItem.getAggregateStatistics().getMean();
-                                    Float totalCapacityInTeras = BigDecimal.valueOf(mean)
-                                        .divide(new BigDecimal("1024").pow(4), NUM_DECIMALS, RoundingMode.HALF_UP)
-                                        .floatValue();
-                                    Storage storage = new Storage(timestamp, totalCapacityInTeras);
-                                    storageList.add(storage);
-                                });
-                            }
-                        });
-                    }
-                }
-            });
+    public List<Storage> getTotalCapacity(final String dateFrom, final String dateTo) {
+        final Optional<StorageCapacityResponse> totalStorage = storageCapacityRepository.findTotalStorage(dateFrom, dateTo);
+        if (totalStorage.isEmpty()) {
+            throw new InternalErrorException("'apiCloudera getTotalCapacity()' response cannot be null with dateFrom " + dateFrom + " and dateTo " + dateTo);
         }
+        return manageClouderaApiTotalCapacityResponseData(totalStorage.get());
+    }
+
+    public List<Storage> getTotalFreeCapacity(final String dateFrom, final String dateTo) {
+        final Optional<StorageCapacityResponse> freeStorage = storageCapacityRepository.findFreeStorage(dateFrom, dateTo);
+        if (freeStorage.isEmpty()) {
+            throw new InternalErrorException("'apiCloudera getTotalFreeCapacity()' response cannot be null dateFrom " + dateFrom + " and dateTo " + dateTo);
+        }
+        return manageClouderaApiTotalCapacityFreeResponseData(freeStorage.get());
+    }
+
+    private List<Storage> manageClouderaApiTotalCapacityResponseData(final StorageCapacityResponse storageCapacityResponse) {
+        if (CollectionUtils.isEmpty(storageCapacityResponse.getItems())) {
+            return new ArrayList<>();
+        }
+
+        final List<Storage> storageList = new ArrayList<>();
+        storageCapacityResponse.getItems().forEach(items -> {
+            if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
+                final List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
+                    .filter(timeSeries -> null != timeSeries.getMetadata()
+                        && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
+                        && timeSeries.getMetadata().getEntityName().equals(clouderaProperties.getStorage().getEntityName()))
+                    .toList();
+
+                if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
+                    filteredTimeseries.forEach(timeSeries -> {
+                        final List<Data> dataList = timeSeries.getData();
+                        if (CollectionUtils.isNotEmpty(dataList)) {
+                            dataList.forEach(dataItem -> storageList.add(new Storage(dataItem.getTimestamp(), getCapacitiesInTeras(dataItem.getAggregateStatistics().getMean()))));
+                        }
+                    });
+                }
+            }
+        });
         if (CollectionUtils.isEmpty(storageList)) {
             log.debug("Empty list from Cloudera Api TotalCapacity");
             throw new ResourceNotFoundException("Empty list from Cloudera Api 'TotalCapacity' filter");
@@ -84,37 +79,35 @@ public class StorageService {
         return storageList;
     }
 
-    private List<Storage> manageClouderaApiTotalCapacityFreeResponseData(StorageCapacityResponse storageCapacityResponse) {
+    private Float getCapacitiesInTeras(final Float value) {
+        return BigDecimal.valueOf(value)
+            .divide(new BigDecimal("1024").pow(4), NUM_DECIMALS, RoundingMode.HALF_UP)
+            .floatValue();
+    }
 
-        List<Storage> storageList = new ArrayList<>();
-
-        if (CollectionUtils.isNotEmpty(storageCapacityResponse.getItems())) {
-            storageCapacityResponse.getItems().forEach(items -> {
-                if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
-                    List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
-                        .filter(timeSeries -> null != timeSeries.getMetadata()
-                            && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
-                            && timeSeries.getMetadata().getEntityName().equals(clouderaProperties.getStorage().getEntityName())).toList();
-                    if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
-                        filteredTimeseries.forEach(timeSeries -> {
-                            List<Data> dataList = timeSeries.getData();
-                            if (CollectionUtils.isNotEmpty(dataList)) {
-                                dataList.forEach(dataItem -> {
-                                    String timestamp = dataItem.getTimestamp();
-                                    Float max = dataItem.getAggregateStatistics().getMax();
-                                    Float maxFreeDataInTeras = BigDecimal.valueOf(max)
-                                        .divide(new BigDecimal("1024").pow(4), NUM_DECIMALS, RoundingMode.HALF_UP)
-                                        .floatValue();
-                                    Storage storage = new Storage(timestamp, maxFreeDataInTeras);
-                                    storageList.add(storage);
-                                });
-                            }
-                        });
-                    }
-                }
-            });
+    private List<Storage> manageClouderaApiTotalCapacityFreeResponseData(final StorageCapacityResponse storageCapacityResponse) {
+        if (CollectionUtils.isEmpty(storageCapacityResponse.getItems())) {
+            return new ArrayList<>();
         }
 
+        final List<Storage> storageList = new ArrayList<>();
+        storageCapacityResponse.getItems().forEach(items -> {
+            if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
+                final List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
+                    .filter(timeSeries -> null != timeSeries.getMetadata()
+                        && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
+                        && timeSeries.getMetadata().getEntityName().equals(clouderaProperties.getStorage().getEntityName())).toList();
+
+                if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
+                    filteredTimeseries.forEach(timeSeries -> {
+                        final List<Data> dataList = timeSeries.getData();
+                        if (CollectionUtils.isNotEmpty(dataList)) {
+                            dataList.forEach(dataItem -> storageList.add(new Storage(dataItem.getTimestamp(), getCapacitiesInTeras(dataItem.getAggregateStatistics().getMax()))));
+                        }
+                    });
+                }
+            }
+        });
         if (CollectionUtils.isEmpty(storageList)) {
             log.debug("Empty list from Cloudera Api 'TotalFreeCapacity' filter");
             throw new ResourceNotFoundException("Empty list from Cloudera Api 'TotalFreeCapacity' filter");

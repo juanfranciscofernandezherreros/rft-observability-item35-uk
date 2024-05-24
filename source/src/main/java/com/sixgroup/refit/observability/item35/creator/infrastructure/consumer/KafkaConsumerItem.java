@@ -18,7 +18,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
@@ -34,33 +33,29 @@ public class KafkaConsumerItem {
     private final Map<ItemType, ItemTypeStrategy> itemType;
 
     @KafkaListener(topics = "${component-config.topics.observability-item-topic}", groupId = "${component-config.topics.observability-item-consumer-group-id}")
-    public void consume(ConsumerRecord<ItemId, ItemCommand> item) throws ExecutionException, InterruptedException {
+    public void consume(final ConsumerRecord<ItemId, ItemCommand> item) throws ExecutionException, InterruptedException {
         log.debug("Consume message: {}", item);
         if (Constants.ITEM35.equals(item.key().getItemId())
             && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
 
             kafkaConsumerTracing.initTrace(item.headers());
-            ItemCommandDTO itemCommand = ItemCommandDTO.generateItemCommandDTO(item.value());
-            if (isRequestTypeAccepted(item.value().getItemType())) {
-                stateService.nextStep(
-                    StateRequest.builder().fileName(FileUtils.getFileName(itemCommand))
-                        .itemType(ITEM35).build());
-                log.debug("Consumed message to generate file: {}", item.value().getItemType());
-                ItemTypeStrategy itemTypeStrategy = itemType.get(ItemType.getItemTypeFromName(item.value().getItemType()));
-                itemTypeStrategy.execute(itemCommand, item.headers());
-                log.debug("Generated file item35: {}", item.value().getItemType());
+            final ItemCommandDTO itemCommand = ItemCommandDTO.generateItemCommandDTO(item.value());
+            if (!isRequestTypeAccepted(item.value().getItemType())) {
+                throw new IllegalArgumentException("'type' " + item.value().getItemType()
+                    + " cannot be null or blank, and must be any of accepted values");
             }
+
+            stateService.nextStep(
+                StateRequest.builder().fileName(FileUtils.getFileName(itemCommand))
+                    .itemType(ITEM35).build());
+            log.debug("Consumed message to generate file: {}", item.value().getItemType());
+            final ItemTypeStrategy itemTypeStrategy = itemType.get(ItemType.getItemTypeFromName(item.value().getItemType()));
+            itemTypeStrategy.execute(itemCommand, item.headers());
+            log.debug("Generated file item35: {}", item.value().getItemType());
         }
     }
 
-    private boolean isRequestTypeAccepted(String requestItemType) {
-
-        Optional.ofNullable(requestItemType)
-            .filter(type -> type.equals(ItemType.SUBMISSION_VOLUMES.getName()) || type.equals(ItemType.COMPUTE_CAPACITY.getName())
-                || type.equals(ItemType.STORAGE_CAPACITY.getName()) || type.equals(ItemType.REPORT_GENERATION.getName()))
-            .orElseThrow(() -> new IllegalArgumentException("'type' cannot be null or blank, " +
-                "and must be any of accepted values"));
-
-        return true;
+    private boolean isRequestTypeAccepted(final String requestItemType) {
+        return ItemType.reportsName().contains(requestItemType);
     }
 }

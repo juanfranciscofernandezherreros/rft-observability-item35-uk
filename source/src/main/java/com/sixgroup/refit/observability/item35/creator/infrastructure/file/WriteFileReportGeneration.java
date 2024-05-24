@@ -39,8 +39,8 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
-            for (ReportGenerationDto record : reportGenerationList) {
-                writeRecord(csvWriter, record);
+            for (ReportGenerationDto reportGenerationData : reportGenerationList) {
+                writeRecord(csvWriter, reportGenerationData);
             }
         }
         log.debug("File created and written: {}", filePath);
@@ -52,24 +52,24 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
         return new File(filePath);
     }
 
-    private void writeHeader(CSVWriter csvWriter) {
+    private void writeHeader(final CSVWriter csvWriter) {
         csvWriter.writeNext(ItemType.REPORT_GENERATION.getHeaders());
     }
 
 
-    private void writeRecord(CSVWriter csvWriter, ReportGenerationDto record) {
+    private void writeRecord(final CSVWriter csvWriter, final ReportGenerationDto reportGenerationData) {
         String[] data = {
             reportProperties.getTrCode(),
-            record.getReportingDate(),
+            reportGenerationData.getReportingDate(),
             reportProperties.getRegulationReference(),
-            "\"" + record.getReportName() + "\"",
-            record.getReportType(),
-            record.getReportGenerationTime(),
-            record.getReportCompletionTime(),
-            record.getReportPublicationTime(),
-            record.getDate(),
-            record.getSla(),
-            record.getDifference(),
+            "\"" + reportGenerationData.getReportName() + "\"",
+            reportGenerationData.getReportType(),
+            reportGenerationData.getReportGenerationTime(),
+            reportGenerationData.getReportCompletionTime(),
+            reportGenerationData.getReportPublicationTime(),
+            reportGenerationData.getDate(),
+            reportGenerationData.getSla(),
+            reportGenerationData.getDifference(),
             TR_INCIDENT_ID
         };
         csvWriter.writeNext(data);

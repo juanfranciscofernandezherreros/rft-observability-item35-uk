@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,43 +40,42 @@ public class CapacityRamCloudera implements CapacityRamRepository {
     private final ClouderaProperties clouderaProperties;
 
     @Override
-    public List<Capacity> findByCapacityRam(String dateFrom, String dateTo) {
+    public List<Capacity> findByCapacityRam(final String dateFrom, final String dateTo) {
 
-        log.debug("Find Compute capacity Ram by dateFrom and dateTo");
+        log.debug("Find Compute capacity Ram by dateFrom {} and dateTo {}", dateFrom, dateTo);
 
-        List<Capacity> listCapacityRam = null;
-        HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl())).newBuilder();
+        final HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl())).newBuilder();
         urlBuilder.addQueryParameter(QUERY, clouderaProperties.getRam().getSelectRam());
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         urlBuilder.addQueryParameter(DATE_FROM, dateFrom);
         urlBuilder.addQueryParameter(DATE_TO, dateTo);
         urlBuilder.addQueryParameter(DESIRED_ROLLUP, clouderaProperties.getRam().getDesiredRollup());
 
-        Request request = new Request.Builder()
+        final Request request = new Request.Builder()
             .url(urlBuilder.build().toString())
             .method(HttpMethod.GET.name(), null)
             .build();
-        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         okhttp3.Response response = null;
         try {
             response = okHttpClient.newCall(request).execute();
             if (!response.isSuccessful()) {
                 log.error("Error to call Cloudera with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
-                return null;
+                return new ArrayList<>();
             }
-            if (Objects.nonNull(response.body())) {
-                StorageCapacityResponse storageCapacityResponseBody = objectMapper.readValue(response.body().string(), StorageCapacityResponse.class);
-                listCapacityRam = CapacityMapper.mapperResponseToListCapacity(storageCapacityResponseBody);
+            if (Objects.isNull(response.body())) {
+                return new ArrayList<>();
             }
+            final StorageCapacityResponse storageCapacityResponseBody = objectMapper.readValue(response.body().string(), StorageCapacityResponse.class);
+            return CapacityMapper.mapperResponseToListCapacity(storageCapacityResponseBody);
         } catch (IOException e) {
             log.error("Error to call Cloudera Ram with message: {}, code: {}, exception: ",
                 e.getMessage(), ERROR_CALL_CLOUDERA, e);
-            return null;
+            return new ArrayList<>();
         } finally {
             if (Objects.nonNull(response)) {
                 response.close();
             }
         }
-        return listCapacityRam;
     }
 }
