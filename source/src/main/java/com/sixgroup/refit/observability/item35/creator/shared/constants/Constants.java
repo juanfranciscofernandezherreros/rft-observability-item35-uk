@@ -2,9 +2,6 @@ package com.sixgroup.refit.observability.item35.creator.shared.constants;
 
 public final class Constants {
 
-    private Constants() {
-    }
-
     public static final String HEADER_TR_CODE = "TR_CODE";
     public static final String HEADER_REPORTING_DATE = "REPORTING_DATE";
     public static final String HEADER_REGULATION_REFERENCE = "REGULATION_REFERENCE";
@@ -19,19 +16,15 @@ public final class Constants {
     public static final String HEADER_SUBMISSION_CHANNEL = "SUBMISSION_CHANNEL";
     public static final String HEADER_NO_MESSAGES_ON_GIVE = "NO_MESSAGES_ON_GIVE DATE";
     public static final String HEADER_DATE = "DATE";
-
     public static final String DATE_FORMAT_YYYY_MM_DD = "yyyy-MM-dd";
     public static final String DATE_FORMAT_DD_MM_YYYY = "dd-MM-yyyy";
     public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final String DATE_FORMAT_YYYYMMDD = "yyyyMMdd";
-
     public static final String SFTP = "sftp";
     public static final String API = "api";
     public static final String WEB = "web";
-
     public static final String ITEM35 = "item35";
-    public static final String CREATING_AND_SAVING_FILE = "Creating and saving file";
     public static final String HEADER_DATA_CENTER_LOCATION = "DATA_CENTER_LOCATION";
     public static final String HEADER_DATABASE_SERVER_OR_PLATFORM = "DATABASE_SERVER_OR_PLATFORM";
     public static final String HEADER_CAPACITY = "CAPACITY";
@@ -49,8 +42,9 @@ public final class Constants {
     public static final String QUERY = "query";
     public static final String CONTENT_TYPE = "contentType";
     public static final int NUM_DECIMALS = 4;
-
     public static final String PARTICIPANT_ENTITY = "customer";
     public static final String REGULATOR_ENTITY = "authority";
     public static final String TR_ENTITY = "tr";
+    private Constants() {
+    }
 }

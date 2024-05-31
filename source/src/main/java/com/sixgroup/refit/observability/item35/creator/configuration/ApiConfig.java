@@ -31,14 +31,16 @@ public class ApiConfig {
             builder.cookieJar(new JavaNetCookieJar(cookieManager));
         }
         builder.addInterceptor(chain -> {
-            Request originalRequest = chain.request();
-            Request.Builder requestBuilder = originalRequest.newBuilder()
+            final Request originalRequest = chain.request();
+            final Request.Builder requestBuilder = originalRequest.newBuilder()
                 .header("Authorization", Credentials.basic(apiClouderaProperties.getUsername(), apiClouderaProperties.getPassword()));
-            Request newRequest = requestBuilder.build();
-            log.info("ComponentProperties: isKnoxAuth {}", clouderaProperties.isKnoxAuth());
-            log.info("ApiClouderaProperties: {}", apiClouderaProperties);
-            log.info("Sending request to URL: {} with method: {}", newRequest.url(), newRequest.method());
-            log.info("Request Authorization Header: {}", newRequest.headers("Authorization"));
+            final Request newRequest = requestBuilder.build();
+
+            log.info("Cloudera properties: isKnoxAuth {}, ApiClouderaProperties: {}, request URL: {}, method: {}",
+                clouderaProperties.isKnoxAuth(), apiClouderaProperties.getLogProperties(), newRequest.url(), newRequest.method());
+            if (log.isDebugEnabled()) {
+                log.debug("Request Authorization Header: {}", newRequest.headers("Authorization"));
+            }
             return chain.proceed(newRequest);
         });
         return builder.build();

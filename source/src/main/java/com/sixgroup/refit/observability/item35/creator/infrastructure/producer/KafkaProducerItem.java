@@ -1,8 +1,8 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.producer;
 
+import com.sixgroup.refit.observability.item.log.ItemLog;
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
-import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 
+import static com.sixgroup.refit.observability.item.state.domain.enums.State.SENT_RESPONSE;
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_SENDING_MESSAGE_EFRH_031;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 
@@ -31,6 +32,8 @@ public class KafkaProducerItem implements ProducerItemService {
 
     private final RftKafkaProducerTracing<ItemId, ItemCommand> producerTracing;
     private final StateService stateService;
+    private final ItemLog iLog = new ItemLog();
+
     @Value("${component-config.topics.observability-item-topic}")
     private String topic;
 
@@ -45,7 +48,7 @@ public class KafkaProducerItem implements ProducerItemService {
                 .fileName(FileUtils.getFileName(itemCommandDTO))
                 .itemType(ITEM35)
                 .build());
-        LogService.logInfo("Producer Item", itemCommandDTO);
+        iLog.info(itemCommandDTO, SENT_RESPONSE);
         addCallBack(future, itemId, itemCommand);
     }
 
