@@ -13,7 +13,7 @@
     <artifactId>rft-observability-item35-creator</artifactId>
     <version>${revision}${sha1}${changelist}</version>
     <properties>
-        <revision>1.4.5</revision>
+        <revision>1.4.6</revision>
         <sha1></sha1>
         <changelist>-SNAPSHOT</changelist>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,6 +33,7 @@
         <rft-commons-spring-support.version>1.0.5</rft-commons-spring-support.version>
         <rft-observability-item-topic-version>1.0.2</rft-observability-item-topic-version>
         <rft-observability-sla-validator.version>0.2.0</rft-observability-sla-validator.version>
+        <rft-observability-item-state-library.version>1.1.0</rft-observability-item-state-library.version>
 
     </properties>
 
@@ -302,7 +303,7 @@
         <dependency>
             <groupId>com.sixgroup.refit.observability</groupId>
             <artifactId>rft-observability-item-state-library</artifactId>
-            <version>1.0.6-SNAPSHOT</version>
+            <version>${rft-observability-item-state-library.version}</version>
         </dependency>
 
         <dependency>

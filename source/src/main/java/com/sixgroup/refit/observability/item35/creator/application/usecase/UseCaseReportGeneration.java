@@ -1,8 +1,8 @@
 package com.sixgroup.refit.observability.item35.creator.application.usecase;
 
+import com.sixgroup.refit.observability.item.log.ItemLog;
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
-import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.application.service.ParticipantService;
 import com.sixgroup.refit.observability.item35.creator.application.service.RegulatorService;
 import com.sixgroup.refit.observability.item35.creator.application.service.TrService;
@@ -25,7 +25,7 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.CREATING_AND_SAVING_FILE;
+import static com.sixgroup.refit.observability.item.state.domain.enums.State.SAVING_INFORMATION;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 
 @Service
@@ -39,6 +39,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
     private final ParticipantService participantService;
     private final RegulatorService regulatorService;
     private final TrService trService;
+    private final ItemLog iLog = new ItemLog();
 
     @Override
     public File execute(final ItemCommandDTO itemCommandDTO, final Headers headers) {
@@ -73,7 +74,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
 
             stateService.nextStep(
                 StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
-            LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
+            iLog.info(itemCommandDTO, SAVING_INFORMATION);
 
             final List<ReportGenerationDto> orderedCollection = CollectionsUtils.getOrderCollectionsByDate(joinedCollection);
 

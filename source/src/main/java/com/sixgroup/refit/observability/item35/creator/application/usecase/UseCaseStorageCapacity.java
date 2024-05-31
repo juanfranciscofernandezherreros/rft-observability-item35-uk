@@ -1,8 +1,8 @@
 package com.sixgroup.refit.observability.item35.creator.application.usecase;
 
+import com.sixgroup.refit.observability.item.log.ItemLog;
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
-import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.application.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -25,7 +25,9 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
+import static com.sixgroup.refit.observability.item.state.domain.enums.State.SAVING_INFORMATION;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.NUM_DECIMALS;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +38,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
     private final ProducerItemService producerItemService;
     private final StateService stateService;
     private final StorageService storageService;
+    private final ItemLog iLog = new ItemLog();
 
     @Override
     public File execute(ItemCommandDTO itemCommandDTO, Headers headers) {
@@ -74,7 +77,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
             stateService.nextStep(
                 StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
-            LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
+            iLog.info(itemCommandDTO, SAVING_INFORMATION);
 
             file = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommandDTO);
             log.debug("Generated storage capacity file");

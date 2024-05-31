@@ -1,5 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.domain.model;
 
+import com.sixgroup.refit.observability.item.state.domain.model.LogItemData;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +11,7 @@ import java.util.Objects;
 
 @Builder
 @Data
-public class ItemCommandDTO {
+public class ItemCommandDTO implements LogItemData {
 
     private String itemId;
     private String itemType;

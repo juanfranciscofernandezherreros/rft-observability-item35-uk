@@ -67,7 +67,6 @@ public class StorageCapacity implements StorageCapacityRepository {
                 log.error("Error to call Cloudera Storage - Message is null, and code: {}", ERROR_CALL_CLOUDERA);
                 return Optional.empty();
             }
-            log.info("StorageCapacity response: {}", response.body());
             return Optional.of(objectMapper.readValue(response.body().string(), StorageCapacityResponse.class));
         } catch (Exception e) {
             final String api = query.split("\\s+")[1];

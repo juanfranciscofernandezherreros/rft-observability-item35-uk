@@ -1,8 +1,8 @@
 package com.sixgroup.refit.observability.item35.creator.application.usecase;
 
+import com.sixgroup.refit.observability.item.log.ItemLog;
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
-import com.sixgroup.refit.observability.item35.creator.application.service.LogService;
 import com.sixgroup.refit.observability.item35.creator.application.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.CREATING_AND_SAVING_FILE;
+import static com.sixgroup.refit.observability.item.state.domain.enums.State.SAVING_INFORMATION;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 
 @Service
@@ -32,6 +32,7 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
     private final WriteFileItem35Service<RecordStatus> writeFileSubmissionVolumes;
     private final ProducerItemService producerItemService;
     private final StateService stateService;
+    private final ItemLog iLog = new ItemLog();
 
     @Override
     public File execute(ItemCommandDTO itemCommandDTO, Headers headers) {
@@ -53,7 +54,7 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
 
             stateService.nextStep(
                 StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
-            LogService.logInfo(CREATING_AND_SAVING_FILE, itemCommandDTO);
+            iLog.info(itemCommandDTO, SAVING_INFORMATION);
 
             file = writeFileSubmissionVolumes.writeFile(recordStatusList, itemCommandDTO);
             log.debug("Generated submission volumes file with name {}, path {}", file.getName(), file.getAbsolutePath());
