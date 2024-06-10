@@ -2,8 +2,8 @@ package com.sixgroup.refit.observability.item35.creator.application.service;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.ReportingFileAdapterRepository;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.ParticipantDTO;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.ParticipantDTO;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.ParticipantMapper;
 import com.sixgroup.refit.observability.item35.creator.shared.sla.SlaInfoRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;

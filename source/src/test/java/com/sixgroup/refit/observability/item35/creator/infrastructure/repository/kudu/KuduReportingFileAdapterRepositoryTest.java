@@ -4,9 +4,11 @@ import com.sixgroup.refit.observability.item35.creator.configuration.Participant
 import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.ParticipantDTO;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.RegulatorDTO;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.TrDTO;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.ParticipantDTO;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.TrDTO;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.control.KuduReportingFileAdapterRepository;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.control.ReportingFileKudu;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

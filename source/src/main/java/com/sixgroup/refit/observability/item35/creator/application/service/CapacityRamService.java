@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityRamRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.CapacityRamRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.Utils;

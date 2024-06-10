@@ -31,6 +31,8 @@ component-config:
         reportName: RJ092
       - name: RJCT000
         reportName: RJCT000
+      - name: WARN000
+        reportName: WARN000
   regulator:
     reportTypeEsma: ESMA
     reportTypeNca: NCA
@@ -47,6 +49,8 @@ component-config:
         reportName: RJ092
       - name: RJCT000
         reportName: RJCT000
+      - name: WARN000
+        reportName: WARN000
   tr:
     reportType: TR
     reportTypeQuery:

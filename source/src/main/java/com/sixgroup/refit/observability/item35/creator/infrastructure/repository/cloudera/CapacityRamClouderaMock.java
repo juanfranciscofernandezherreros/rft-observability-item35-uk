@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityRamRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.CapacityRamRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.CapacityMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

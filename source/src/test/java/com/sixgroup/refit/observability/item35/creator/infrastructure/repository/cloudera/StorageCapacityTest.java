@@ -46,7 +46,7 @@ class StorageCapacityTest {
             .protocol(Protocol.HTTP_2)
             .code(200)
             .message("OK")
-            .body(ResponseBody.create(MediaType.get("application/json"), testResponseBody))
+            .body(ResponseBody.create(testResponseBody, MediaType.get("application/json")))
             .build();
 
         when(mockOkHttpClient.newCall(any(Request.class))).thenReturn(mockCall);
@@ -77,7 +77,7 @@ class StorageCapacityTest {
             .protocol(Protocol.HTTP_2)
             .code(200)
             .message("OK")
-            .body(ResponseBody.create(MediaType.get("application/json"), testResponseBody))
+            .body(ResponseBody.create(testResponseBody, MediaType.get("application/json")))
             .build();
 
         when(mockOkHttpClient.newCall(any(Request.class))).thenReturn(mockCall);

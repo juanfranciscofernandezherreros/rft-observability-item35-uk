@@ -4,8 +4,8 @@ import com.sixgroup.refit.observability.item35.creator.application.service.TrSer
 import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.ReportingFileAdapterRepository;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.TrDTO;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.TrDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.DataTestUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.sla.SlaInfoRepository;
 import com.sixgroup.refit.observability.modules.validate.domain.data.SlaInfo;

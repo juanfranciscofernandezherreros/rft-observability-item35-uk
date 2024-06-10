@@ -1,7 +1,8 @@
-package com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu;
+package com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.control;
 
 
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.RecordStatusEntity;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.properties.DatasourceKuduProperties;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RecordStatusEntity;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,21 +21,21 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.HashMap;
 
-import static com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.DatasourceKuduProperties.*;
+import static com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.properties.DatasourceKuduProperties.*;
 
 @Configuration
 @EnableJpaRepositories(
     entityManagerFactoryRef = "kudu-em",
     transactionManagerRef = "kudu-trm",
-    basePackages = "com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu"
+    basePackages = "com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.control"
 )
 @EnableTransactionManagement
 @RequiredArgsConstructor
-public class DatasourceKuduConfig {
+public class DatasourceKuduControlConfig {
 
     private final DatasourceKuduProperties properties;
 
-    @Value("${component-config.db.schema}")
+    @Value("${component-config.kududb-control.schema}")
     private String schema;
 
     @Bean("kudu-ds")

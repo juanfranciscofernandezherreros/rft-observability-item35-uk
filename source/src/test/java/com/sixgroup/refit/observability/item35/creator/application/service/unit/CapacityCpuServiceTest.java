@@ -2,7 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.application.service.unit
 
 import com.sixgroup.refit.observability.item35.creator.application.service.CapacityCpuService;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityCpuRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.CapacityCpuRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

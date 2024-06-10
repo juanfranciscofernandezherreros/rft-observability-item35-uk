@@ -45,6 +45,9 @@ public final class Constants {
     public static final String PARTICIPANT_ENTITY = "customer";
     public static final String REGULATOR_ENTITY = "authority";
     public static final String TR_ENTITY = "tr";
+
+    public static final String EUDRITRACE = "eudritrace";
+
     private Constants() {
     }
 }

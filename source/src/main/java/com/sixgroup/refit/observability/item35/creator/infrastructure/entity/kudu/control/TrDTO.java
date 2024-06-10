@@ -1,17 +1,16 @@
-package com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu;
+package com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@RequiredArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
-public class RegulatorDTO {
+public class TrDTO {
 
-    private String fileName;
     private String fileType;
     private LocalDateTime reportingSession;
     private String accountId;

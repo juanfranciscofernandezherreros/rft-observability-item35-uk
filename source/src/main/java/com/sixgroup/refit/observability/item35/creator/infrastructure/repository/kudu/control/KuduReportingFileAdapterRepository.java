@@ -1,12 +1,12 @@
-package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu;
+package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.control;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.ReportingFileAdapterRepository;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.ParticipantDTO;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.RegulatorDTO;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.TrDTO;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.ParticipantDTO;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.TrDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.ReportUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

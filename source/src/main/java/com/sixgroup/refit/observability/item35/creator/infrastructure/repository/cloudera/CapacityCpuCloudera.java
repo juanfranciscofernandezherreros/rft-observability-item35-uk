@@ -6,7 +6,7 @@ import com.sixgroup.refit.observability.item35.creator.configuration.ApiCloudera
 import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityCpuRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.CapacityCpuRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.CapacityMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
