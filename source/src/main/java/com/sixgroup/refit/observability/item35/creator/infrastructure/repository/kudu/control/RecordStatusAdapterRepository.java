@@ -1,7 +1,7 @@
-package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu;
+package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.control;
 
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.RecordStatusRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.RecordStatusRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.RecordStatusMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.sixgroup.refit.observability.item35.creator.domain.repository;
+package com.sixgroup.refit.observability.item35.creator.domain.repository.control;
 
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 

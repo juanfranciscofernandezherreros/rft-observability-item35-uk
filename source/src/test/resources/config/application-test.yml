@@ -37,7 +37,6 @@ spring:
       dialect: org.hibernate.dialect.HSQLDialect
       ddl-auto: validate
       persistence-unit: kududb
-      schema: EMIR_REFIT_DEV_CONTROL_REFIT
     sqlserverdb:
       jdbc-url: jdbc:h2:mem:DBO;MODE=MSSQLServer;INIT=RUNSCRIPT FROM 'classpath:db/sqlServer/init_mssql.sql' # init=CREATE SCHEMA DBO,CREATE TABLE RECOSTATS;
       username: sa
@@ -74,6 +73,8 @@ component-config:
         reportName: RJ092
       - name: RJCT000
         reportName: RJCT000
+      - name: WARN000
+        reportName: WARN000
   regulator:
     reportTypeEsma: ESMA
     reportTypeNca: NCA
@@ -90,6 +91,8 @@ component-config:
         reportName: RJ092
       - name: RJCT000
         reportName: RJCT000
+      - name: WARN000
+        reportName: WARN000
   tr:
     reportType: TR
     reportTypeQuery:
@@ -155,8 +158,11 @@ component-config:
   topics:
     observability-item-topic: rft.dev.observability.item.private.v1
     observability-item-consumer-group-id: rft.dev.rft-observability-item35-creator
-  db:
+  kududb-control:
     schema: EMIR_REFIT_DEV_CONTROL_REFIT
+  kududb-account:
+    schema: EMIR_REFIT_DEV_ACCOUNT_MNG
+    blockSize: 50
   cloudera:
     knox-auth: true
     cpu:

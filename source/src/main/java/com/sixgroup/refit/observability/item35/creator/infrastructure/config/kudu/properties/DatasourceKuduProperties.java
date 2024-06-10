@@ -1,4 +1,4 @@
-package com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu;
+package com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.properties;
 
 import lombok.Getter;
 import lombok.Setter;

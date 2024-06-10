@@ -47,7 +47,7 @@ class CapacityCpuClouderaTest {
             .protocol(Protocol.HTTP_1_1)
             .code(200)
             .message("OK")
-            .body(ResponseBody.create(MediaType.get("application/json"), testResponseBody))
+            .body(ResponseBody.create(testResponseBody, MediaType.get("application/json")))
             .build();
 
         when(mockOkHttpClient.newCall(any(Request.class))).thenReturn(mockCall);

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.StorageCapacityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;

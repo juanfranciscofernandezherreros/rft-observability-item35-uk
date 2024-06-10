@@ -1,4 +1,4 @@
-package com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu;
+package com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

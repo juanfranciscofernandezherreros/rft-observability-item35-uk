@@ -2,7 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.mappper;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.TrDTO;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.TrDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.ReportUtils;
 import com.sixgroup.refit.observability.modules.validate.domain.data.SlaInfo;

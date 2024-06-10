@@ -3,7 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.application.service.unit
 
 import com.sixgroup.refit.observability.item35.creator.application.service.CapacityRamService;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.CapacityRamRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.CapacityRamRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

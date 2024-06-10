@@ -3,7 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
-import com.sixgroup.refit.observability.item35.creator.domain.repository.StorageCapacityRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.control.StorageCapacityRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.exception.InternalErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

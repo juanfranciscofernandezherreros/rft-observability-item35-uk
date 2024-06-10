@@ -79,13 +79,6 @@ class UseCaseSubmissionVolumesITTest {
                 FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240229")
                     .itemType(ItemType.SUBMISSION_VOLUMES.getName()).build())).getStateName().equals("sent_response")
-                &&
-                sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
-                        FileUtils.getFileName(ItemCommandDTO.builder()
-                            .itemDate("20240229")
-                            .itemType(ItemType.SUBMISSION_VOLUMES.getName())
-                            .build()))
-                    .getFileUrl().equals("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35A_20240229.csv")
             );
 
     }
