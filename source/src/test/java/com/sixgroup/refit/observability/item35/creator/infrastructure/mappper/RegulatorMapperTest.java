@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_DD_MM_YYYY;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_YYYY_MM_DD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
@@ -191,7 +192,7 @@ class RegulatorMapperTest {
             .atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
 
         String date = regulatorDTO.getReportingSession()
-            .format(DateTimeFormatter.ofPattern(DATE_FORMAT_DD_MM_YYYY));
+            .format(DateTimeFormatter.ofPattern(DATE_FORMAT_YYYY_MM_DD));
 
         String sla = regulatorDTO.getReportingSession().truncatedTo(ChronoUnit.DAYS)
             .atOffset(ZoneOffset.UTC).plusDays(1).plusHours(12).format((DateTimeFormatter.ISO_INSTANT));

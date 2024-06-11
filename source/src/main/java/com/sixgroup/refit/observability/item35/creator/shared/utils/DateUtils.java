@@ -50,7 +50,7 @@ public final class DateUtils {
     }
 
     public static String localDateTimeToSpainDateFormat(final LocalDateTime localDateTime) {
-        return localDateTime.format(DATE_FORMAT_DD_MM_YYYY);
+        return localDateTime.format(DATE_FORMAT_YYYY_MM_DD);
     }
 
 }
