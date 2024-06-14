@@ -113,7 +113,7 @@ class RegulatorMapperTest {
         maps.put("CAESR", "eudri96jn000");
         final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, maps);
 
-        assertEquals("eudri2frb777-TSR107", response.getReportName());
+        assertEquals("eudri2frb777-TSR107 TRACE", response.getReportName());
     }
 
     @Test
@@ -121,7 +121,7 @@ class RegulatorMapperTest {
         final String fileName = "TRRGS_DATTAR_CAFAA_R99998-20240220_001001-0.zip";
         final String reportType = "TSR107";
         final LocalDateTime reportSessionDate = DataTestUtils.parseString("2024-02-20 18:55:23");
-        final String accountId = "eudritrace1";
+        final String accountId = "eudrira1051";
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
         final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
@@ -145,7 +145,7 @@ class RegulatorMapperTest {
         maps.put("CAESR", "eudri96jn000");
         final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, maps);
 
-        assertEquals("eudritrace1-TSR107", response.getReportName());
+        assertEquals("eudrira1051-TSR107 Portal XML", response.getReportName());
     }
 
     @Test
@@ -199,7 +199,7 @@ class RegulatorMapperTest {
 
         ReportGenerationDto expectedValue = new ReportGenerationDto(
             null,
-            "eudri96jn000-TSR107",
+            "eudri96jn000-TSR107 TRACE",
             "ESMA",
             reportGenerationTimeString,
             reportCompletionAndPubTime,
