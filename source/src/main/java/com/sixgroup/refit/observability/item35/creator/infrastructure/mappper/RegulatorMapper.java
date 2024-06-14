@@ -8,11 +8,10 @@ import com.sixgroup.refit.observability.item35.creator.shared.utils.ReportUtils;
 import com.sixgroup.refit.observability.modules.validate.domain.data.SlaInfo;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.EUDRITRACE;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
 
 @Slf4j
 public class RegulatorMapper {
@@ -38,7 +37,7 @@ public class RegulatorMapper {
 
     private String getReportName(final String accountId, final String fileType, final RegulatorFileTypeProperties fileTypeProperties, final String accountTrace, final Map<String, String> traceCodeRegulatorMap) {
         String result = accountId.equals(EUDRITRACE) && Objects.nonNull(traceCodeRegulatorMap.get(accountTrace)) ? traceCodeRegulatorMap.get(accountTrace) : accountId;
-        return result + "-" + ReportUtils.getReportName(fileTypeProperties.getReports(), fileType);
+        return result + "-" + ReportUtils.getReportName(fileTypeProperties.getReports(), fileType) + (accountId.equals(EUDRITRACE) ? TRACE : PORTAL_XML);
     }
 
     private String getReportType(final String fileName, final RegulatorFileTypeProperties fileTypeProperties) {
