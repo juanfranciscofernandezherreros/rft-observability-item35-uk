@@ -1,10 +1,10 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
+import com.google.gson.Gson;
 import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReguIdentityDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.account.ReguIdentityEntity;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.RegulatorMapper;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.account.ReguIdentityAdapterRepository;
@@ -14,14 +14,10 @@ import com.sixgroup.refit.observability.modules.validate.domain.data.SlaInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.REGULATOR_ENTITY;
@@ -48,6 +44,7 @@ public class RegulatorService {
             return new ArrayList<>();
         }
         Map<String, String> traceCodeRegulatorMap = buildRegulatorMap(definitiveList);
+        printTraceCodeRegulatorId(definitiveList);
         final List<ReportGenerationDto> regulatorReportGenerationData = new ArrayList<>();
         regulations.forEach(regulator -> {
             final Optional<SlaInfo> slaInfo = slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
@@ -83,6 +80,10 @@ public class RegulatorService {
         });
 
         return definitiveList;
+    }
+
+    private void printTraceCodeRegulatorId(List<ReguIdentityDTO> definitiveList) {
+        log.info("{}", new Gson().toJson(definitiveList));
     }
 
 }

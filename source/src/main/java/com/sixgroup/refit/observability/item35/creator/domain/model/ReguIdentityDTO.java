@@ -9,7 +9,6 @@ import lombok.*;
 @Builder
 public class ReguIdentityDTO {
 
-    private String regulatorId;
-
     private String traceCode;
+    private String regulatorId;
 }

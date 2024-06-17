@@ -181,6 +181,7 @@ component-config:
       entityName: dm-rftemir-light-qa
 
 logging:
+  config: classpath:unified-log-config/logback-unified-logging-1_2.xml
   level:
     org:
       hibernate:
