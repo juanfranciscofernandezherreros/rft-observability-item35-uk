@@ -2,8 +2,10 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase.it;
 
 
 import com.sixgroup.refit.observability.ApplicationMain;
+import com.sixgroup.refit.observability.item.state.domain.enums.State;
 import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
-import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
+import com.sixgroup.refit.observability.item35.creator.application.service.CapacityCpuService;
+import com.sixgroup.refit.observability.item35.creator.application.service.CapacityRamService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -12,7 +14,6 @@ import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
-import okhttp3.OkHttpClient;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -23,17 +24,30 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.waitAtMost;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest(classes = {ApplicationMain.class})
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 class UseCaseComputeCapacityITTest {
 
@@ -47,11 +61,11 @@ class UseCaseComputeCapacityITTest {
     @Autowired
     private ItemFileFinderRepository sqlServerItemFileFinderRepository;
 
-    @Autowired
-    private OkHttpClient okHttpClient;
+    @SpyBean
+    private CapacityCpuService capacityCpuService;
 
-    @Autowired
-    private ApiClouderaProperties apiClouderaProperties;
+    @SpyBean
+    private CapacityRamService capacityRamService;
 
     @BeforeEach
     public void setUp() {
@@ -67,7 +81,7 @@ class UseCaseComputeCapacityITTest {
 
     @Test
     @DisplayName("Given a message item35 with itemType ComputeCapacity from topic, validate create and save file")
-    void when_send_item_request_item_35_create_and_save_file_compute_capacity() throws InterruptedException {
+    void when_send_item_request_item_35_create_and_save_file_compute_capacity() throws IOException {
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
             ItemCommand
                 .newBuilder()
@@ -75,18 +89,125 @@ class UseCaseComputeCapacityITTest {
                 .setItemType(ItemType.COMPUTE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240129")
+                .setItemDate("20240229")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
                 .build()));
 
-
         waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
                 FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240129")
-                    .itemType(ItemType.COMPUTE_CAPACITY.getName()).build())).getStateName().equals("sent_response"));
+                    .itemDate("20240229")
+                    .itemType(ItemType.COMPUTE_CAPACITY.getName()).build())).getStateName()
+                .equals(State.SENT_RESPONSE.getName()));
+
+        Path path = FileSystems.getDefault()
+            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35D_20240229.csv");
+
+        assertNotNull(path);
+
+        String lineHeader = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;NAME;DESCRIPTION;CPU/RAM;DATE;MIN_USAGE;" +
+            "AVG_USAGE;MAX_USAGE;INCIDENT_RELATED;TR_INCIDENT_ID";
+        String lineOne = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-01;0.0050;0.0210;0.2570;NO;NO";
+        String lineTwo = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-01;0.2200;0.2236;0.2317;NO;NO";
+        String penultimateLine = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-31;0.0030;0.0354;0.4440;NO;NO";
+        String lastLine = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-31;0.1275;0.1989;0.2524;NO;NO";
+
+        List<String> allLines = Files.readAllLines(path);
+
+        assertEquals(lineHeader, allLines.get(0));
+        assertEquals(lineOne, allLines.get(1));
+        assertEquals(lineTwo, allLines.get(2));
+        assertEquals(penultimateLine, allLines.get(allLines.size() - 2));
+        assertEquals(lastLine, allLines.get(allLines.size() -1 ));
+
+        assertEquals(63, allLines.size());
+
+    }
+
+    @Test
+    @DisplayName("Given a message item from topic, when service return empty list validate state is error with no exist record")
+    void item_35_then_state_error_not_exist_records() {
+        doReturn(List.of()).when(capacityCpuService).findByCapacityCpu(any());
+        doReturn(List.of()).when(capacityRamService).findByCapacityRam(any());
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+            ItemCommand
+                .newBuilder()
+                .setItemId(Constants.ITEM35)
+                .setItemType(ItemType.COMPUTE_CAPACITY.getName())
+                .setCommand(Command.REQUEST.getDescription())
+                .setCreationTimestamp(Instant.now())
+                .setItemDate("20240229")
+                .setFileInfo(FileInfo.newBuilder()
+                    .setFileName("")
+                    .setFileUrl("").build())
+                .build()));
+
+        waitAtMost(15, TimeUnit.SECONDS)
+            .until(() -> sqlServerItemFileFinderRepository.
+                findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
+                    .itemDate("20240229")
+                    .itemType(ItemType.COMPUTE_CAPACITY.getName())
+                    .build())).getStateName().equals(State.ERROR.getName())
+            );
+
+    }
+
+    @Test
+    @DisplayName("Given a message item from topic, when error from service cpu then validate state is error")
+    void item_35_state_error_cpu() {
+
+        doThrow(new RuntimeException("error")).when(capacityCpuService).findByCapacityCpu(any());
+
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+            ItemCommand
+                .newBuilder()
+                .setItemId(Constants.ITEM35)
+                .setItemType(ItemType.COMPUTE_CAPACITY.getName())
+                .setCommand(Command.REQUEST.getDescription())
+                .setCreationTimestamp(Instant.now())
+                .setItemDate("20240229")
+                .setFileInfo(FileInfo.newBuilder()
+                    .setFileName("")
+                    .setFileUrl("").build())
+                .build()));
+
+        waitAtMost(15, TimeUnit.SECONDS)
+            .until(() -> sqlServerItemFileFinderRepository.
+                findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
+                    .itemDate("20240229")
+                    .itemType(ItemType.COMPUTE_CAPACITY.getName())
+                    .build())).getStateName().equals(State.ERROR.getName())
+            );
+    }
+
+    @Test
+    @DisplayName("Given a message item from topic, when error from service cpu then validate state is error")
+    void item_35_state_error_ram() {
+
+        doThrow(new RuntimeException("error")).when(capacityRamService).findByCapacityRam(any());
+
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+            ItemCommand
+                .newBuilder()
+                .setItemId(Constants.ITEM35)
+                .setItemType(ItemType.COMPUTE_CAPACITY.getName())
+                .setCommand(Command.REQUEST.getDescription())
+                .setCreationTimestamp(Instant.now())
+                .setItemDate("20240229")
+                .setFileInfo(FileInfo.newBuilder()
+                    .setFileName("")
+                    .setFileUrl("").build())
+                .build()));
+
+        waitAtMost(15, TimeUnit.SECONDS)
+            .until(() -> sqlServerItemFileFinderRepository.
+                findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
+                    .itemDate("20240229")
+                    .itemType(ItemType.COMPUTE_CAPACITY.getName())
+                    .build())).getStateName().equals(State.ERROR.getName())
+            );
     }
 
 

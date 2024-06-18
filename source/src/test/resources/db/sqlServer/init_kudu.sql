@@ -1,22 +1,30 @@
-CREATE SCHEMA IF NOT EXISTS EMIR_REFIT_DEV_CONTROL_REFIT;
 
-SET SCHEMA EMIR_REFIT_DEV_CONTROL_REFIT;
+DROP ALL OBJECTS;
 
-create table IF NOT EXISTS EMIR_REFIT_DEV_CONTROL_REFIT.record_status
+CREATE SCHEMA EMIR_REFIT_DEV_CONTROL_REFIT;
+CREATE SCHEMA EMIR_REFIT_DEV_ACCOUNT_MNG;
+
+CREATE TABLE EMIR_REFIT_DEV_CONTROL_REFIT.record_status
 (
     receiveddt            VARCHAR(255),
     status                VARCHAR(255),
     channel               VARCHAR(255)
 );
 
-create table IF NOT EXISTS EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing
+CREATE TABLE EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing
 (
     outgoingfilename            VARCHAR(255),
     filetype                    VARCHAR(255),
     reportingsessiontimestamp   timestamp,
     creationtimestamp           timestamp,
     accountid                   VARCHAR(255)
-    );
+);
+
+CREATE TABLE EMIR_REFIT_DEV_ACCOUNT_MNG.regu_identity
+(
+    tracecode            VARCHAR(255),
+    regulatorid          VARCHAR(255)
+);
 
 
 INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(receiveddt,status,channel)VALUES('2024-02-18', 'ACPT', 'sftp');
@@ -63,16 +71,6 @@ INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,
     VALUES('TRRGS_DATTAR_ESMAS_R99996-240301_001001-0.zip', 'RL078', '2024-02-04 05:12:55.421', '2024-02-04 07:12:55.421', 'trdrif3q0000');
 INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
     VALUES('TRRGS_DATTSR_ESMAS_R11526-240301_001001-0.zip', 'TD107', '2024-02-05 05:12:55.421', '2024-02-05 08:12:55.421', 'trdrif3q0000');
-
-CREATE SCHEMA IF NOT EXISTS EMIR_REFIT_DEV_ACCOUNT_MNG;
-
-SET SCHEMA EMIR_REFIT_DEV_ACCOUNT_MNG;
-
-create table IF NOT EXISTS EMIR_REFIT_DEV_ACCOUNT_MNG.regu_identity
-(
-    tracecode            VARCHAR(255),
-    regulatorid          VARCHAR(255)
-    );
 
 INSERT INTO EMIR_REFIT_DEV_ACCOUNT_MNG.regu_identity (tracecode,regulatorid) VALUES
                                                                           ('ESMAS','eudri2frb000'),
