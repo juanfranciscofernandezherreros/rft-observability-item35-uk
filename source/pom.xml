@@ -13,7 +13,7 @@
     <artifactId>rft-observability-item35-creator</artifactId>
     <version>${revision}${sha1}${changelist}</version>
     <properties>
-        <revision>1.5.0</revision>
+        <revision>1.5.1</revision>
         <sha1></sha1>
         <changelist>-SNAPSHOT</changelist>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,6 +34,7 @@
         <rft-observability-item-topic-version>1.0.2</rft-observability-item-topic-version>
         <rft-observability-sla-validator.version>0.2.0</rft-observability-sla-validator.version>
         <rft-observability-item-state-library.version>1.1.0</rft-observability-item-state-library.version>
+        <sonar-maven-plugin.version>3.4.0.905</sonar-maven-plugin.version>
 
     </properties>
 
@@ -337,14 +338,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <configuration>
-                    <argLine>-Dfile.encoding=UTF-8</argLine>
-                </configuration>
-            </plugin>
             <!-- Compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
