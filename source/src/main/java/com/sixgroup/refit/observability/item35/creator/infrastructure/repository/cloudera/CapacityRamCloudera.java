@@ -69,11 +69,11 @@ public class CapacityRamCloudera implements CapacityRamRepository {
         okhttp3.Response response = null;
         try {
             response = okHttpClient.newCall(request).execute();
-            if (!response.isSuccessful()) {
-                log.error("Error to call Cloudera with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
+            if (null == response || Objects.isNull(response.body())) {
                 return new ArrayList<>();
             }
-            if (Objects.isNull(response.body())) {
+            if (!response.isSuccessful()) {
+                log.error("Error to call Cloudera with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
                 return new ArrayList<>();
             }
             final StorageCapacityResponse storageCapacityResponseBody = objectMapper.readValue(response.body().string(), StorageCapacityResponse.class);
