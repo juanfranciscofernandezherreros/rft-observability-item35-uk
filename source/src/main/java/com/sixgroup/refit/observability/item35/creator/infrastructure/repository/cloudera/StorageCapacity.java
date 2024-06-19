@@ -75,12 +75,12 @@ public class StorageCapacity implements StorageCapacityRepository {
         okhttp3.Response response = null;
         try {
             response = okHttpClient.newCall(request).execute();
-            if (!response.isSuccessful()) {
-                log.error("Error to call Cloudera Storage with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
+            if (null == response || Objects.isNull(response.body())) {
+                log.error("Error to call Cloudera Storage - Message is null, and code: {}", ERROR_CALL_CLOUDERA);
                 return Optional.empty();
             }
-            if (Objects.isNull(response.body())) {
-                log.error("Error to call Cloudera Storage - Message is null, and code: {}", ERROR_CALL_CLOUDERA);
+            if (!response.isSuccessful()) {
+                log.error("Error to call Cloudera Storage with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
                 return Optional.empty();
             }
             return Optional.of(objectMapper.readValue(response.body().string(), StorageCapacityResponse.class));
