@@ -98,7 +98,7 @@ class StorageCapacityTest {
     }
 
     @Test
-    void call_cloudera_total_error() throws IOException {
+    void call_cloudera_total_error() {
         // Prepare test data and mocks
         String testDateFrom = "2020-01-01";
         String testDateTo = "2020-02-01";
@@ -119,7 +119,7 @@ class StorageCapacityTest {
     }
 
     @Test
-    void call_cloudera_free_total_error() throws IOException {
+    void call_cloudera_free_total_error() {
         // Prepare test data and mocks
         String testDateFrom = "2020-01-01";
         String testDateTo = "2020-02-01";

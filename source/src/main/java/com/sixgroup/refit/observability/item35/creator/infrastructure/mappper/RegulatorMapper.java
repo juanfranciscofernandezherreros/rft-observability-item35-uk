@@ -25,7 +25,6 @@ public class RegulatorMapper {
         reportGenerationDto.setReportType(getReportType(regulator.getFileName(), fileTypeProperties));
         reportGenerationDto.setReportGenerationTime(DateUtils.localDateTimeToIsoFormat(slaInfo.getDifferenceFromInit()));
         reportGenerationDto.setReportCompletionTime(DateUtils.localDateTimeToIsoFormat(regulator.getCreationDate()));
-        //TODO: PENDING PUBLICATION TIME
         reportGenerationDto.setReportPublicationTime(null);
         reportGenerationDto.setDate(DateUtils.localDateTimeToSpainDateFormat(regulator.getReportingSession()));
         reportGenerationDto.setSla(DateUtils.localDateTimeToIsoFormat(slaInfo.getExpectSlaDate()));

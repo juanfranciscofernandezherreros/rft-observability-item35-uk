@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_CALL_CLOUDERA;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
@@ -43,11 +45,19 @@ public class CapacityCpuCloudera implements CapacityCpuRepository {
 
         log.debug("Find Compute capacity Cpu by dateFrom {} and dateTo {}", dateFrom, dateTo);
 
+        String dateFromAux = Optional.ofNullable(dateFrom)
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'dateFrom' cannot be null or blank"));
+
+        String dateToAux = Optional.ofNullable(dateTo)
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new RuntimeException("'dateTo' cannot be null or blank"));
+
         final HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl())).newBuilder();
         urlBuilder.addQueryParameter(QUERY, clouderaProperties.getCpu().getSelectCpu());
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        urlBuilder.addQueryParameter(DATE_FROM, dateFrom);
-        urlBuilder.addQueryParameter(DATE_TO, dateTo);
+        urlBuilder.addQueryParameter(DATE_FROM, dateFromAux);
+        urlBuilder.addQueryParameter(DATE_TO, dateToAux);
         urlBuilder.addQueryParameter(DESIRED_ROLLUP, clouderaProperties.getCpu().getDesiredRollup());
 
         final Request request = new Request.Builder()

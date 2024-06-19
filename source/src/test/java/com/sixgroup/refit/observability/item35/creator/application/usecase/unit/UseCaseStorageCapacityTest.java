@@ -164,7 +164,7 @@ class UseCaseStorageCapacityTest {
 
     @Test
     void getItemType() {
-        assertEquals(useCaseStorageCapacity.getItemType(), ItemType.STORAGE_CAPACITY);
+        assertEquals(ItemType.STORAGE_CAPACITY, useCaseStorageCapacity.getItemType());
     }
 
 }

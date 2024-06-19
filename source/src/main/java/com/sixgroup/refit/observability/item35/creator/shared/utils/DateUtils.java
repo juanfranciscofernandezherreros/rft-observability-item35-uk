@@ -13,7 +13,6 @@ public final class DateUtils {
     private static final DateTimeFormatter DATE_FORMAT_YYYYMMDD = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYYMMDD);
     private static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYY_MM_DD);
     private static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH_MM_SS = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
-    private static final DateTimeFormatter DATE_FORMAT_DD_MM_YYYY = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_DD_MM_YYYY);
 
     private DateUtils() {
     }

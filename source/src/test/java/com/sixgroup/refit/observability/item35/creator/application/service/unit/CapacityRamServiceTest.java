@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-public class CapacityRamServiceTest {
+class CapacityRamServiceTest {
 
     @Mock
     private CapacityRamRepository capacityRamRepository;
