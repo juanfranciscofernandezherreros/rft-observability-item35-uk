@@ -29,7 +29,7 @@
         <imapala-jdbc.version>2.6.29.1035</imapala-jdbc.version>
         <sql-server-version>11.2.3.jre17</sql-server-version>
         <!-- rft libs -->
-        <rft-commons-observability.version>4.0.0</rft-commons-observability.version>
+        <rft-commons-observability.version>4.3.0</rft-commons-observability.version>
         <rft-commons-spring-support.version>1.0.5</rft-commons-spring-support.version>
         <rft-observability-item-topic-version>1.0.2</rft-observability-item-topic-version>
         <rft-observability-sla-validator.version>0.2.0</rft-observability-sla-validator.version>
