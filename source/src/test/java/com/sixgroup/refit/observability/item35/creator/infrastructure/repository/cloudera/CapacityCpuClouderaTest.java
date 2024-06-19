@@ -65,20 +65,10 @@ class CapacityCpuClouderaTest {
     }
 
     @Test
-    void testFindByCapacityCPUFailure() throws IOException {
+    void testFindByCapacityCPUFailure() {
 
         String dateFrom = "2020-01-01";
         String dateTo = "2020-01-02";
-
-        HttpUrl url = new HttpUrl.Builder()
-            .scheme("http")
-            .host("example.com")
-            .addPathSegment("test")
-            .build();
-
-        Request fakeRequest = new Request.Builder()
-            .url(url)
-            .build();
 
         // Simulate a server error response
         okhttp3.Response okHttpResponse = mock(okhttp3.Response.class);

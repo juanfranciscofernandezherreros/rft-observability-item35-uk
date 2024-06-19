@@ -17,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.DataTestUtils.ORIGIN_DATE;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_DD_MM_YYYY;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_YYYY_MM_DD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

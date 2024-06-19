@@ -19,7 +19,6 @@ public class ParticipantMapper {
         reportGenerationDto.setReportType(fileTypeProperties.getReportType());
         reportGenerationDto.setReportGenerationTime(DateUtils.localDateTimeToIsoFormat(slaInfo.getDifferenceFromInit()));
         reportGenerationDto.setReportCompletionTime(DateUtils.localDateTimeToIsoFormat(participant.getEndDate()));
-        //TODO: PENDING PUBLICATION TIME
         reportGenerationDto.setReportPublicationTime(null);
         reportGenerationDto.setDate(DateUtils.localDateTimeToSpainDateFormat(participant.getReportingSession()));
         reportGenerationDto.setSla(DateUtils.localDateTimeToIsoFormat(slaInfo.getExpectSlaDate()));

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_CALL_CLOUDERA;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
@@ -43,12 +44,27 @@ public class StorageCapacity implements StorageCapacityRepository {
     }
 
     private Optional<StorageCapacityResponse> doClouderaCaller(String dateFrom, String dateTo, String query) {
+
+        log.debug("Find Storage capacity dateFrom {}, dateTo {} and query {}", dateFrom, dateTo, query);
+
+        String dateFromAux = Optional.ofNullable(dateFrom)
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'dateFrom' cannot be null or blank"));
+
+        String dateToAux = Optional.ofNullable(dateTo)
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new RuntimeException("'dateTo' cannot be null or blank"));
+
+        String queryAux = Optional.ofNullable(query)
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new RuntimeException("'query' cannot be null or blank"));
+
         final HttpUrl.Builder urlBuilder
             = HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl()).newBuilder();
-        urlBuilder.addQueryParameter(QUERY, query);
+        urlBuilder.addQueryParameter(QUERY, queryAux);
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        urlBuilder.addQueryParameter(DATE_FROM, dateFrom);
-        urlBuilder.addQueryParameter(DATE_TO, dateTo);
+        urlBuilder.addQueryParameter(DATE_FROM, dateFromAux);
+        urlBuilder.addQueryParameter(DATE_TO, dateToAux);
         urlBuilder.addQueryParameter(DESIRED_ROLLUP, "DAILY");
 
         final Request request = new Request.Builder()

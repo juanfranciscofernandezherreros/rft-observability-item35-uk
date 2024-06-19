@@ -90,8 +90,7 @@ class StorageServiceTest {
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalCapacity("2024-01-01", "2024-02-01"));
 
-        assertEquals(runtimeException.getMessage(),
-            "Empty list from Cloudera Api 'TotalCapacity' filter");
+        assertEquals("Empty list from Cloudera Api 'TotalCapacity' filter", runtimeException.getMessage());
 
         verify(storageCapacity).findTotalStorage(eq("2024-01-01"), eq("2024-02-01"));
     }
@@ -118,8 +117,7 @@ class StorageServiceTest {
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalCapacity("2024-01-01", "2024-02-01"));
 
-        assertEquals(runtimeException.getMessage(),
-            "Empty list from Cloudera Api 'TotalCapacity' filter");
+        assertEquals("Empty list from Cloudera Api 'TotalCapacity' filter", runtimeException.getMessage());
 
         verify(storageCapacity).findTotalStorage(eq("2024-01-01"), eq("2024-02-01"));
     }
@@ -178,8 +176,7 @@ class StorageServiceTest {
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01"));
 
-        assertEquals(runtimeException.getMessage(),
-            "Empty list from Cloudera Api 'TotalFreeCapacity' filter");
+        assertEquals("Empty list from Cloudera Api 'TotalFreeCapacity' filter", runtimeException.getMessage());
 
         verify(storageCapacity).findFreeStorage(eq("2024-01-01"), eq("2024-02-01"));
     }
@@ -206,8 +203,7 @@ class StorageServiceTest {
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
             () -> storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01"));
 
-        assertEquals(runtimeException.getMessage(),
-            "Empty list from Cloudera Api 'TotalFreeCapacity' filter");
+        assertEquals("Empty list from Cloudera Api 'TotalFreeCapacity' filter", runtimeException.getMessage());
 
         verify(storageCapacity).findFreeStorage(eq("2024-01-01"), eq("2024-02-01"));
     }

@@ -11,7 +11,6 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.repository
 import com.sixgroup.refit.observability.item35.creator.shared.DataTestUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.sla.SlaInfoRepository;
 import com.sixgroup.refit.observability.modules.validate.domain.data.SlaInfo;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

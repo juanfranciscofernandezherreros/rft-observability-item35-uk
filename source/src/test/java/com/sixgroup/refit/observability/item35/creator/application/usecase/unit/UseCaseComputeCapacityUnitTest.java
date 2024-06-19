@@ -58,7 +58,7 @@ class UseCaseComputeCapacityUnitTest {
         when(capacityRamService.findByCapacityRam(anyString())).thenReturn(capacitiesRam);
         File mockFile = mock(File.class);
         when(writeFileComputeCapacity.writeFile(anyList(), any(ItemCommandDTO.class))).thenReturn(mockFile);
-        File result = useCaseComputeCapacity.execute(itemCommandDTO, mockHeaders);
+        useCaseComputeCapacity.execute(itemCommandDTO, mockHeaders);
         verify(capacityCpuService, times(1)).findByCapacityCpu(anyString());
         verify(capacityRamService, times(1)).findByCapacityRam(anyString());
         verify(writeFileComputeCapacity, times(1)).writeFile(anyList(), any(ItemCommandDTO.class));
@@ -74,7 +74,7 @@ class UseCaseComputeCapacityUnitTest {
         List<Capacity> capacitiesRam = CapacityMock.builderListCapacityRam();
         when(capacityCpuService.findByCapacityCpu(anyString())).thenReturn(capacitiesCpu);
         when(capacityRamService.findByCapacityRam(anyString())).thenReturn(capacitiesRam);
-        File result = useCaseComputeCapacity.execute(itemCommandDTO, mockHeaders);
+        useCaseComputeCapacity.execute(itemCommandDTO, mockHeaders);
         verify(capacityCpuService, times(1)).findByCapacityCpu(anyString());
         verify(capacityRamService, times(1)).findByCapacityRam(anyString());
         verify(writeFileComputeCapacity, times(0)).writeFile(anyList(), any(ItemCommandDTO.class));

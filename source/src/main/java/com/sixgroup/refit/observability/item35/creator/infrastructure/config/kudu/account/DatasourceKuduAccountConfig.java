@@ -3,7 +3,6 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.config.ku
 
 import com.sixgroup.refit.observability.item35.creator.infrastructure.config.kudu.properties.DatasourceKuduProperties;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.account.ReguIdentityEntity;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RecordStatusEntity;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -53,7 +53,7 @@ class UseCaseReportGenerationUnitTest {
 
     @Test
     void getItemType() {
-        assertEquals(useCaseReportGeneration.getItemType(), ItemType.REPORT_GENERATION);
+        assertEquals(ItemType.REPORT_GENERATION, useCaseReportGeneration.getItemType());
     }
 
     @Test
