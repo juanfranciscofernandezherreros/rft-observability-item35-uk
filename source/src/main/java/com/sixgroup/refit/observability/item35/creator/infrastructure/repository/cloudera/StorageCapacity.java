@@ -36,11 +36,33 @@ public class StorageCapacity implements StorageCapacityRepository {
     private final ClouderaProperties clouderaProperties;
 
     public Optional<StorageCapacityResponse> findTotalStorage(String dateFrom, String dateTo) {
-        return doClouderaCaller(dateFrom, dateTo, clouderaProperties.getStorage().getSelectTotalApi());
+
+        ClouderaProperties clouderaPropertiesAux = Optional.ofNullable(clouderaProperties)
+            .orElseThrow(() -> new IllegalArgumentException("'clouderaProperties' cannot be null"));
+
+        ClouderaProperties.Storage storage = Optional.ofNullable(clouderaPropertiesAux.getStorage())
+            .orElseThrow(() -> new IllegalArgumentException("'storage' cannot be null"));
+
+        String selectTotalApi = Optional.ofNullable(storage.getSelectTotalApi())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'selectTotalApi' cannot be null or blank"));
+
+        return doClouderaCaller(dateFrom, dateTo, selectTotalApi);
     }
 
     public Optional<StorageCapacityResponse> findFreeStorage(String dateFrom, String dateTo) {
-        return doClouderaCaller(dateFrom, dateTo, clouderaProperties.getStorage().getSelectFreeApi());
+
+        ClouderaProperties clouderaPropertiesAux = Optional.ofNullable(clouderaProperties)
+            .orElseThrow(() -> new IllegalArgumentException("'clouderaProperties' cannot be null"));
+
+        ClouderaProperties.Storage storage = Optional.ofNullable(clouderaPropertiesAux.getStorage())
+            .orElseThrow(() -> new IllegalArgumentException("'storage' cannot be null"));
+
+        String selectFreeApi = Optional.ofNullable(storage.getSelectFreeApi())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'selectFreeApi' cannot be null or blank"));
+
+        return doClouderaCaller(dateFrom, dateTo, selectFreeApi);
     }
 
     private Optional<StorageCapacityResponse> doClouderaCaller(String dateFrom, String dateTo, String query) {
@@ -53,14 +75,29 @@ public class StorageCapacity implements StorageCapacityRepository {
 
         String dateToAux = Optional.ofNullable(dateTo)
             .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new RuntimeException("'dateTo' cannot be null or blank"));
+            .orElseThrow(() -> new IllegalArgumentException("'dateTo' cannot be null or blank"));
 
         String queryAux = Optional.ofNullable(query)
             .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new RuntimeException("'query' cannot be null or blank"));
+            .orElseThrow(() -> new IllegalArgumentException("'query' cannot be null or blank"));
 
-        final HttpUrl.Builder urlBuilder
-            = HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl()).newBuilder();
+        ApiClouderaProperties apiClouderaPropertiesAux = Optional.ofNullable(apiClouderaProperties)
+            .orElseThrow(() -> new IllegalArgumentException("'apiClouderaProperties' cannot be null"));
+
+        String host = Optional.ofNullable(apiClouderaPropertiesAux.getHost())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'host' cannot be null or blank"));
+
+        String port = Optional.ofNullable(apiClouderaPropertiesAux.getPort())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'port' cannot be null or blank"));
+
+        String url = Optional.ofNullable(apiClouderaPropertiesAux.getUrl())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'url' cannot be null or blank"));
+
+        final HttpUrl.Builder urlBuilder = HttpUrl.parse(host + port + url).newBuilder();
+
         urlBuilder.addQueryParameter(QUERY, queryAux);
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         urlBuilder.addQueryParameter(DATE_FROM, dateFromAux);
@@ -71,7 +108,8 @@ public class StorageCapacity implements StorageCapacityRepository {
             .url(urlBuilder.build().toString())
             .method(HttpMethod.GET.name(), null)
             .build();
-        final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+            false);
         okhttp3.Response response = null;
         try {
             response = okHttpClient.newCall(request).execute();

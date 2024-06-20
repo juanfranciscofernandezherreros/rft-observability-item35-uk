@@ -3,9 +3,12 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.repositor
 import com.sixgroup.refit.observability.item35.creator.configuration.ApiClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
+import com.sixgroup.refit.observability.item35.creator.shared.exception.InternalErrorException;
 import okhttp3.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,8 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -89,5 +91,66 @@ class CapacityCpuClouderaTest {
         assertTrue(result.isEmpty());
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    void testFindByCapacityCPUFailure_dateFrom(String dateFrom) {
 
+        assertThrows(IllegalArgumentException.class,
+            ()-> capacityCpuCloudera.findByCapacityCpu(dateFrom, "2020-01-02"));
+
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void testFindByCapacityCPUFailure_dateTo(String dateTo) {
+
+        assertThrows(IllegalArgumentException.class,
+            ()-> capacityCpuCloudera.findByCapacityCpu("2020-01-02", dateTo));
+
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void testFindByCapacityCPUFailure_host(String host) {
+
+        String dateFrom = "2020-01-01";
+        String dateTo = "2020-01-02";
+
+        when(mockApiClouderaProperties.getHost()).thenReturn(host);
+
+        assertThrows(IllegalArgumentException.class,
+            ()-> capacityCpuCloudera.findByCapacityCpu(dateFrom, dateTo));
+
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void testFindByCapacityCPUFailure_port(String port) {
+
+        String dateFrom = "2020-01-01";
+        String dateTo = "2020-01-02";
+
+        when(mockApiClouderaProperties.getHost()).thenReturn("https://example.com");
+        when(mockApiClouderaProperties.getPort()).thenReturn(port);
+
+        assertThrows(IllegalArgumentException.class,
+            ()-> capacityCpuCloudera.findByCapacityCpu(dateFrom, dateTo));
+
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void testFindByCapacityCPUFailure_url(String url) {
+
+        String dateFrom = "2020-01-01";
+        String dateTo = "2020-01-02";
+
+        when(mockApiClouderaProperties.getHost()).thenReturn("https://example.com");
+        when(mockApiClouderaProperties.getPort()).thenReturn("8080");
+        when(mockApiClouderaProperties.getUrl()).thenReturn(url);
+
+        assertThrows(IllegalArgumentException.class,
+            ()-> capacityCpuCloudera.findByCapacityCpu(dateFrom, dateTo));
+
+    }
 }
