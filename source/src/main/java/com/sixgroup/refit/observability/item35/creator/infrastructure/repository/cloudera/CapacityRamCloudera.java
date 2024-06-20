@@ -52,14 +52,44 @@ public class CapacityRamCloudera implements CapacityRamRepository {
 
         String dateToAux = Optional.ofNullable(dateTo)
             .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new RuntimeException("'dateTo' cannot be null or blank"));
+            .orElseThrow(() -> new IllegalArgumentException("'dateTo' cannot be null or blank"));
 
-        final HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl())).newBuilder();
-        urlBuilder.addQueryParameter(QUERY, clouderaProperties.getRam().getSelectRam());
+        ApiClouderaProperties apiClouderaPropertiesAux = Optional.ofNullable(apiClouderaProperties)
+            .orElseThrow(() -> new IllegalArgumentException("'apiClouderaProperties' cannot be null"));
+
+        ClouderaProperties clouderaPropertiesAux = Optional.ofNullable(clouderaProperties)
+            .orElseThrow(() -> new IllegalArgumentException("'clouderaProperties' cannot be null"));
+
+        String host = Optional.ofNullable(apiClouderaPropertiesAux.getHost())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'host' cannot be null or blank"));
+
+        String port = Optional.ofNullable(apiClouderaPropertiesAux.getPort())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'port' cannot be null or blank"));
+
+        String url = Optional.ofNullable(apiClouderaPropertiesAux.getUrl())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'url' cannot be null or blank"));
+
+        ClouderaProperties.Ram ram = Optional.ofNullable(clouderaPropertiesAux.getRam())
+            .orElseThrow(() -> new IllegalArgumentException("'ram' cannot be null"));
+
+        String selecRam = Optional.ofNullable(ram.getSelectRam())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("'selecRam' cannot be null or blank"));
+
+        String desiredRollup = Optional.ofNullable(ram.getDesiredRollup())
+            .filter(Predicate.not(String::isBlank))
+            .orElseThrow(() -> new IllegalArgumentException("ram 'desiredRollup' cannot be null or blank"));
+
+        final HttpUrl.Builder urlBuilder = HttpUrl.parse(host + port + url).newBuilder();
+
+        urlBuilder.addQueryParameter(QUERY, selecRam);
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         urlBuilder.addQueryParameter(DATE_FROM, dateFromAux);
         urlBuilder.addQueryParameter(DATE_TO, dateToAux);
-        urlBuilder.addQueryParameter(DESIRED_ROLLUP, clouderaProperties.getRam().getDesiredRollup());
+        urlBuilder.addQueryParameter(DESIRED_ROLLUP, desiredRollup);
 
         final Request request = new Request.Builder()
             .url(urlBuilder.build().toString())
@@ -76,7 +106,8 @@ public class CapacityRamCloudera implements CapacityRamRepository {
                 log.error("Error to call Cloudera with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
                 return new ArrayList<>();
             }
-            final StorageCapacityResponse storageCapacityResponseBody = objectMapper.readValue(response.body().string(), StorageCapacityResponse.class);
+            final StorageCapacityResponse storageCapacityResponseBody = objectMapper.readValue(response.body().string(),
+                StorageCapacityResponse.class);
             return CapacityMapper.mapperResponseToListCapacity(storageCapacityResponseBody);
         } catch (IOException e) {
             log.error("Error to call Cloudera Ram with message: {}, code: {}, exception: ",
