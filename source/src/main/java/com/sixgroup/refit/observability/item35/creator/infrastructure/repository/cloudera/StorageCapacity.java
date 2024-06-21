@@ -18,7 +18,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_CALL_CLOUDERA;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
@@ -36,72 +35,41 @@ public class StorageCapacity implements StorageCapacityRepository {
     private final ClouderaProperties clouderaProperties;
 
     public Optional<StorageCapacityResponse> findTotalStorage(String dateFrom, String dateTo) {
-
-        ClouderaProperties clouderaPropertiesAux = Optional.ofNullable(clouderaProperties)
-            .orElseThrow(() -> new IllegalArgumentException("'clouderaProperties' cannot be null"));
-
-        ClouderaProperties.Storage storage = Optional.ofNullable(clouderaPropertiesAux.getStorage())
-            .orElseThrow(() -> new IllegalArgumentException("'storage' cannot be null"));
-
-        String selectTotalApi = Optional.ofNullable(storage.getSelectTotalApi())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'selectTotalApi' cannot be null or blank"));
-
-        return doClouderaCaller(dateFrom, dateTo, selectTotalApi);
+        return doClouderaCaller(dateFrom, dateTo, clouderaProperties.getStorage().getSelectTotalApi());
     }
 
     public Optional<StorageCapacityResponse> findFreeStorage(String dateFrom, String dateTo) {
-
-        ClouderaProperties clouderaPropertiesAux = Optional.ofNullable(clouderaProperties)
-            .orElseThrow(() -> new IllegalArgumentException("'clouderaProperties' cannot be null"));
-
-        ClouderaProperties.Storage storage = Optional.ofNullable(clouderaPropertiesAux.getStorage())
-            .orElseThrow(() -> new IllegalArgumentException("'storage' cannot be null"));
-
-        String selectFreeApi = Optional.ofNullable(storage.getSelectFreeApi())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'selectFreeApi' cannot be null or blank"));
-
-        return doClouderaCaller(dateFrom, dateTo, selectFreeApi);
+        return doClouderaCaller(dateFrom, dateTo, clouderaProperties.getStorage().getSelectFreeApi());
     }
 
     private Optional<StorageCapacityResponse> doClouderaCaller(String dateFrom, String dateTo, String query) {
 
         log.debug("Find Storage capacity dateFrom {}, dateTo {} and query {}", dateFrom, dateTo, query);
 
-        String dateFromAux = Optional.ofNullable(dateFrom)
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'dateFrom' cannot be null or blank"));
+        if (null == dateFrom) {
+            throw new IllegalArgumentException("'dateFrom' cannot be null or blank");
+        }
 
-        String dateToAux = Optional.ofNullable(dateTo)
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'dateTo' cannot be null or blank"));
+        if (null == dateTo) {
+            throw new IllegalArgumentException("'dateTo' cannot be null or blank");
+        }
 
-        String queryAux = Optional.ofNullable(query)
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'query' cannot be null or blank"));
+        if (null == query) {
+            throw new IllegalArgumentException("'query' cannot be null or blank");
+        }
 
-        ApiClouderaProperties apiClouderaPropertiesAux = Optional.ofNullable(apiClouderaProperties)
-            .orElseThrow(() -> new IllegalArgumentException("'apiClouderaProperties' cannot be null"));
+        final HttpUrl httpUrl = HttpUrl.parse(
+            apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl());
+        if (null == httpUrl) {
+            throw new IllegalArgumentException("'httpUrl' cannot be null");
+        }
 
-        String host = Optional.ofNullable(apiClouderaPropertiesAux.getHost())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'host' cannot be null or blank"));
+        final HttpUrl.Builder urlBuilder = httpUrl.newBuilder();
 
-        String port = Optional.ofNullable(apiClouderaPropertiesAux.getPort())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'port' cannot be null or blank"));
-
-        String url = Optional.ofNullable(apiClouderaPropertiesAux.getUrl())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'url' cannot be null or blank"));
-
-        final HttpUrl.Builder urlBuilder = HttpUrl.parse(host + port + url).newBuilder();
-
-        urlBuilder.addQueryParameter(QUERY, queryAux);
+        urlBuilder.addQueryParameter(QUERY, query);
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        urlBuilder.addQueryParameter(DATE_FROM, dateFromAux);
-        urlBuilder.addQueryParameter(DATE_TO, dateToAux);
+        urlBuilder.addQueryParameter(DATE_FROM, dateFrom);
+        urlBuilder.addQueryParameter(DATE_TO, dateTo);
         urlBuilder.addQueryParameter(DESIRED_ROLLUP, "DAILY");
 
         final Request request = new Request.Builder()
@@ -113,7 +81,7 @@ public class StorageCapacity implements StorageCapacityRepository {
         okhttp3.Response response = null;
         try {
             response = okHttpClient.newCall(request).execute();
-            if (null == response || Objects.isNull(response.body())) {
+            if (Objects.isNull(response.body())) {
                 log.error("Error to call Cloudera Storage - Message is null, and code: {}", ERROR_CALL_CLOUDERA);
                 return Optional.empty();
             }

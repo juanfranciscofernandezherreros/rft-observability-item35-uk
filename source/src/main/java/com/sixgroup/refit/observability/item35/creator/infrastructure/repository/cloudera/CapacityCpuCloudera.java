@@ -8,7 +8,6 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.CapacityCpuRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.CapacityMapper;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
@@ -23,8 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_CALL_CLOUDERA;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
@@ -46,61 +43,36 @@ public class CapacityCpuCloudera implements CapacityCpuRepository {
 
         log.debug("Find Compute capacity Cpu by dateFrom {} and dateTo {}", dateFrom, dateTo);
 
-        String dateFromAux = Optional.ofNullable(dateFrom)
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'dateFrom' cannot be null or blank"));
+        if (null == dateFrom) {
+            throw new IllegalArgumentException("'dateFrom' cannot be null or blank");
+        }
 
-        String dateToAux = Optional.ofNullable(dateTo)
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'dateTo' cannot be null or blank"));
+        if (null == dateTo) {
+            throw new IllegalArgumentException("'dateTo' cannot be null or blank");
+        }
 
-        ApiClouderaProperties apiClouderaPropertiesAux = Optional.ofNullable(apiClouderaProperties)
-            .orElseThrow(() -> new IllegalArgumentException("'apiClouderaProperties' cannot be null"));
+        final HttpUrl httpUrl = HttpUrl.parse(
+            apiClouderaProperties.getHost() + ":" + apiClouderaProperties.getPort() + apiClouderaProperties.getUrl());
+        if (null == httpUrl) {
+            throw new IllegalArgumentException("'httpUrl' cannot be null");
+        }
 
-        ClouderaProperties clouderaPropertiesAux = Optional.ofNullable(clouderaProperties)
-            .orElseThrow(() -> new IllegalArgumentException("'clouderaProperties' cannot be null"));
-
-        String host = Optional.ofNullable(apiClouderaPropertiesAux.getHost())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'host' cannot be null or blank"));
-
-        String port = Optional.ofNullable(apiClouderaPropertiesAux.getPort())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'port' cannot be null or blank"));
-
-        String url = Optional.ofNullable(apiClouderaPropertiesAux.getUrl())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'url' cannot be null or blank"));
-
-        ClouderaProperties.Cpu cpu = Optional.ofNullable(clouderaPropertiesAux.getCpu())
-            .orElseThrow(() -> new IllegalArgumentException("'cpu' cannot be null"));
-
-        String selectCpu = Optional.ofNullable(cpu.getSelectCpu())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("'selectCpu' cannot be null or blank"));
-
-        String desiredRollup = Optional.ofNullable(cpu.getDesiredRollup())
-            .filter(Predicate.not(String::isBlank))
-            .orElseThrow(() -> new IllegalArgumentException("cpu 'desiredRollup' cannot be null or blank"));
-
-        final HttpUrl.Builder urlBuilder = HttpUrl.parse(host + port + url).newBuilder();
-
-        urlBuilder.addQueryParameter(QUERY, selectCpu);
+        final HttpUrl.Builder urlBuilder = httpUrl.newBuilder();
+        urlBuilder.addQueryParameter(QUERY, clouderaProperties.getCpu().getSelectCpu());
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        urlBuilder.addQueryParameter(DATE_FROM, dateFromAux);
-        urlBuilder.addQueryParameter(DATE_TO, dateToAux);
-        urlBuilder.addQueryParameter(DESIRED_ROLLUP, desiredRollup);
+        urlBuilder.addQueryParameter(DATE_FROM, dateFrom);
+        urlBuilder.addQueryParameter(DATE_TO, dateTo);
+        urlBuilder.addQueryParameter(DESIRED_ROLLUP, clouderaProperties.getCpu().getDesiredRollup());
 
         final Request request = new Request.Builder()
             .url(urlBuilder.build().toString())
             .method(HttpMethod.GET.name(), null)
             .build();
-        final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-            false);
+        final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         okhttp3.Response response = null;
         try {
             response = okHttpClient.newCall(request).execute();
-            if (null == response || Objects.isNull(response.body())) {
+            if (Objects.isNull(response.body())) {
                 return new ArrayList<>();
             }
             if (!response.isSuccessful()) {

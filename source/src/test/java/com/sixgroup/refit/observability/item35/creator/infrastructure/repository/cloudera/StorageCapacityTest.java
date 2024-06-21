@@ -141,85 +141,87 @@ class StorageCapacityTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    void testFindByCapacityCPUFailure_dateFrom(String dateFrom) {
-
+    void findFreeShouldReturnIllegalArgumentExceptionWhenHostDateFromIsNullOrBlank(String dateFrom) {
         ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
         when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
-
-        assertThrows(IllegalArgumentException.class,
-            ()-> storageCapacity.findFreeStorage(dateFrom, "2020-01-02"));
-
+        assertThrows(IllegalArgumentException.class, () -> storageCapacity.findFreeStorage(dateFrom, "2020-01-31"));
     }
 
     @ParameterizedTest
     @NullAndEmptySource
-    void testFindByCapacityCPUFailure_dateTo(String dateTo) {
-
+    void findFreeShouldReturnIllegalArgumentExceptionWhenHostDateToIsNullOrBlank(String dateTo) {
         ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
         when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
         when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
-
-        assertThrows(IllegalArgumentException.class,
-            ()-> storageCapacity.findFreeStorage("2020-01-02", dateTo));
-
+        assertThrows(IllegalArgumentException.class, () -> storageCapacity.findFreeStorage("2020-01-31", dateTo));
     }
 
     @ParameterizedTest
     @NullAndEmptySource
-    void testFindByCapacityCPUFailure_host(String host) {
-
+    void findTotalShouldReturnIllegalArgumentExceptionWhenHostDateFromIsNullOrBlank(String dateFrom) {
         ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
         when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
-        when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
-
-        String dateFrom = "2020-01-01";
-        String dateTo = "2020-01-02";
-
-        when(mockApiClouderaProperties.getHost()).thenReturn(host);
-
-        assertThrows(IllegalArgumentException.class,
-            ()-> storageCapacity.findFreeStorage(dateFrom, dateTo));
-
+        assertThrows(IllegalArgumentException.class, () -> storageCapacity.findTotalStorage(dateFrom, "2020-01-31"));
     }
 
     @ParameterizedTest
     @NullAndEmptySource
-    void testFindByCapacityCPUFailure_port(String port) {
-
+    void findTotalShouldReturnIllegalArgumentExceptionWhenHostDateToIsNullOrBlank(String dateTo) {
         ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
         when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
-        when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
-
-        String dateFrom = "2020-01-01";
-        String dateTo = "2020-01-02";
-
-        when(mockApiClouderaProperties.getHost()).thenReturn("https://example.com");
-        when(mockApiClouderaProperties.getPort()).thenReturn(port);
-
-        assertThrows(IllegalArgumentException.class,
-            ()-> storageCapacity.findFreeStorage(dateFrom, dateTo));
-
+        assertThrows(IllegalArgumentException.class, () -> storageCapacity.findTotalStorage("2020-01-31", dateTo));
     }
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    void testFindByCapacityCPUFailure_url(String url) {
+    @Test
+    void shouldReturnIllegalArgumentExceptionWhenOnePropertiesHostIsNull() {
 
-        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
-        when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
-        when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
+        String testDateFrom = "2020-01-01";
+        String testDateTo = "2020-01-31";
 
-        String dateFrom = "2020-01-01";
-        String dateTo = "2020-01-02";
-
-        when(mockApiClouderaProperties.getHost()).thenReturn("https://example.com");
+        when(mockApiClouderaProperties.getHost()).thenReturn(null);
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
-        when(mockApiClouderaProperties.getUrl()).thenReturn(url);
+        when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
 
-        assertThrows(IllegalArgumentException.class,
-            ()-> storageCapacity.findFreeStorage(dateFrom, dateTo));
+        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
+        when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
+        when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
 
+        assertThrows(IllegalArgumentException.class, () -> storageCapacity.findFreeStorage(testDateFrom, testDateTo));
+    }
+
+    @Test
+    void shouldReturnIllegalArgumentExceptionWhenOnePropertiesPortIsNull() {
+
+        String testDateFrom = "2020-01-01";
+        String testDateTo = "2020-01-31";
+
+        when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
+        when(mockApiClouderaProperties.getPort()).thenReturn(null);
+        when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
+
+        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
+        when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
+        when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
+
+        assertThrows(IllegalArgumentException.class, () -> storageCapacity.findFreeStorage(testDateFrom, testDateTo));
+    }
+
+    @Test
+    void shouldReturnIllegalArgumentExceptionWhenOnePropertiesUrlIsNull() {
+
+        String testDateFrom = "2020-01-01";
+        String testDateTo = "2020-01-31";
+
+        when(mockApiClouderaProperties.getHost()).thenReturn("http://localhost");
+        when(mockApiClouderaProperties.getPort()).thenReturn("8080");
+        when(mockApiClouderaProperties.getUrl()).thenReturn(null);
+
+        ClouderaProperties.Storage mockStorage = mock(ClouderaProperties.Storage.class);
+        when(mockClouderaProperties.getStorage()).thenReturn(mockStorage);
+        when(mockStorage.getSelectFreeApi()).thenReturn("select total_capacity_free_across_filesystems");
+
+        assertThrows(IllegalArgumentException.class, () -> storageCapacity.findFreeStorage(testDateFrom, testDateTo));
     }
 
 }
