@@ -83,7 +83,7 @@ class UseCaseSubmissionVolumesITTest {
             .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
             .setCommand(Command.REQUEST.getDescription())
             .setCreationTimestamp(Instant.now())
-            .setItemDate("20240229")
+            .setItemDate("20240315")
             .setFileInfo(FileInfo.newBuilder()
                 .setFileName("")
                 .setFileUrl("").build())
@@ -95,22 +95,22 @@ class UseCaseSubmissionVolumesITTest {
         waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
                 FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240229")
+                    .itemDate("20240315")
                     .itemType(ItemType.SUBMISSION_VOLUMES.getName()).build())).getStateName()
                 .equals(State.SENT_RESPONSE.getName())
             );
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35A_20240229.csv");
+            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35A_20240315.csv");
 
         assertNotNull(path);
 
         String lineHeader = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;MESSAGE_TYPE;SUBMISSION_CHANNEL;NO_MESSAGES_ON_GIVE DATE;DATE";
-        String lineOne = "TRRGS;2024-02-29;EMIR;ACCEPTED;API;1;2024-02-01";
-        String lineTwo = "TRRGS;2024-02-29;EMIR;REJECTED;API;1;2024-02-02";
-        String lineThree = "TRRGS;2024-02-29;EMIR;ACCEPTED;WEB;1;2024-02-11";
-        String lineFour = "TRRGS;2024-02-29;EMIR;ACCEPTED;SFTP;1;2024-02-18";
-        String lineFive = "TRRGS;2024-02-29;EMIR;REJECTED;API;1;2024-02-19";
+        String lineOne = "TRRGS;2024-03-15;EMIR;ACCEPTED;API;1;2024-02-01";
+        String lineTwo = "TRRGS;2024-03-15;EMIR;REJECTED;API;1;2024-02-02";
+        String lineThree = "TRRGS;2024-03-15;EMIR;ACCEPTED;WEB;1;2024-02-11";
+        String lineFour = "TRRGS;2024-03-15;EMIR;ACCEPTED;SFTP;1;2024-02-18";
+        String lineFive = "TRRGS;2024-03-15;EMIR;REJECTED;API;1;2024-02-19";
 
         List<String> allLines = Files.readAllLines(path);
 
@@ -135,7 +135,7 @@ class UseCaseSubmissionVolumesITTest {
                 .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240129")
+                .setItemDate("20240115")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -144,7 +144,7 @@ class UseCaseSubmissionVolumesITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240129")
+                    .itemDate("20240115")
                     .itemType(ItemType.SUBMISSION_VOLUMES.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );
@@ -155,7 +155,7 @@ class UseCaseSubmissionVolumesITTest {
     @DisplayName("Given a message item from topic, when error from service then validate state is error")
     void item_35_state_error() {
 
-        doThrow(new RuntimeException("error")).when(recordStatusService).findRecordStatus(any());
+        doThrow(new RuntimeException("error")).when(recordStatusService).findRecordStatus(any(), any());
 
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
             ItemCommand
@@ -164,7 +164,7 @@ class UseCaseSubmissionVolumesITTest {
                 .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240129")
+                .setItemDate("20240115")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -173,7 +173,7 @@ class UseCaseSubmissionVolumesITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240129")
+                    .itemDate("20240115")
                     .itemType(ItemType.SUBMISSION_VOLUMES.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );

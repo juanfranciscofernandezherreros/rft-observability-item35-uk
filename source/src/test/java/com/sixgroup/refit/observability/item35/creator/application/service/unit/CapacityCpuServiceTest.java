@@ -35,7 +35,7 @@ class CapacityCpuServiceTest {
             new Capacity("2024-01-02", "0.9", "0.3", "0.6", "CPU")
         );
         when(capacityCpuRepository.findByCapacityCpu(any(), any())).thenReturn(mockCapacityList);
-        List<Capacity> result = capacityCpuService.findByCapacityCpu("20240101");
+        List<Capacity> result = capacityCpuService.findByCapacityCpu("20240101", "20240201");
 
         assertEquals(2, result.size());
         Capacity capacity1 = result.get(0);
@@ -55,7 +55,7 @@ class CapacityCpuServiceTest {
     @Test
     void findByCapacityCpu_WithEmptyResult_ShouldReturnEmptyList() {
         when(capacityCpuRepository.findByCapacityCpu(any(), any())).thenReturn(null);
-        List<Capacity> result = capacityCpuService.findByCapacityCpu("20240101");
+        List<Capacity> result = capacityCpuService.findByCapacityCpu("20240101", "20240201");
         assertNotNull(result);
         assertTrue(result.isEmpty());
 

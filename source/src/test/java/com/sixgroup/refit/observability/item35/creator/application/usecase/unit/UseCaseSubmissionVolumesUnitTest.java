@@ -44,18 +44,18 @@ class UseCaseSubmissionVolumesUnitTest {
     void testManageFileSubmissionVolumes_Success() throws Exception {
         List<RecordStatus> recordStatusList = new ArrayList<>();
         recordStatusList.add(new RecordStatus("2024-01-01", "test", "web", 10));
-        when(recordStatusService.findRecordStatus(any())).thenReturn(recordStatusList);
+        when(recordStatusService.findRecordStatus(any(), any())).thenReturn(recordStatusList);
         File mockedFile = new File("test_file.csv");
         when(writeFileSubmissionVolumesService.writeFile(anyList(), any())).thenReturn(mockedFile);
         File resultFile = useCaseSubmissionVolumes.execute(ItemCommandMock.builderItemCommand(), mockHeaders);
         assertNotNull(resultFile);
-        verify(stateService, times(1)).nextStep((StateRequest) any());
+        verify(stateService, times(2)).nextStep((StateRequest) any());
         verify(producerItemService, times(1)).send(any(), any());
     }
 
     @Test
     void testManageFileSubmissionVolumes_NoRecordStatusFound() {
-        when(recordStatusService.findRecordStatus(any())).thenReturn(new ArrayList<>());
+        when(recordStatusService.findRecordStatus(any(), any())).thenReturn(new ArrayList<>());
         File resultFile = useCaseSubmissionVolumes.execute(ItemCommandMock.builderItemCommand(), mockHeaders);
         assertNull(resultFile);
         verify(stateService, times(1)).setError(any());
@@ -67,7 +67,7 @@ class UseCaseSubmissionVolumesUnitTest {
     void testManageFileSubmissionVolumes_throw_IOException() throws IOException {
         List<RecordStatus> recordStatusList = new ArrayList<>();
         recordStatusList.add(new RecordStatus("test", "test", "test", 10));
-        when(recordStatusService.findRecordStatus(any())).thenReturn(recordStatusList);
+        when(recordStatusService.findRecordStatus(any(), any())).thenReturn(recordStatusList);
         when(writeFileSubmissionVolumesService.writeFile(any(), any())).thenThrow(IOException.class);
         File resultFile = useCaseSubmissionVolumes.execute(ItemCommandMock.builderItemCommand(), mockHeaders);
         assertNull(resultFile);

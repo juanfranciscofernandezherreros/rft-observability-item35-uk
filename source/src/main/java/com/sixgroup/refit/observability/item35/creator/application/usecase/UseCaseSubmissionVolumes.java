@@ -10,6 +10,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,17 +36,22 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
     private final ItemLog iLog = new ItemLog();
 
     @Override
-    public File execute(ItemCommandDTO itemCommandDTO, Headers headers) {
+    public File execute(ItemCommandDTO itemCommand, Headers headers) {
 
         log.debug("Generating submission volumes file ...");
         File file = null;
         try {
-            final List<RecordStatus> recordStatusList = recordStatusService.findRecordStatus(itemCommandDTO.getItemDate());
+            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
+
+            final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemCommand.getItemDate());
+            final String dateTo = DateUtils.lastDayOfPreviousMonth(itemCommand.getItemDate());
+
+            final List<RecordStatus> recordStatusList = recordStatusService.findRecordStatus(dateFrom, dateTo);
             if (CollectionUtils.isEmpty(recordStatusList)) {
                 log.error("No data found in submission volumes, skipping report generation");
                 stateService.setError(
                     StateRequest.builder()
-                        .fileName(FileUtils.getFileName(itemCommandDTO))
+                        .fileName(FileUtils.getFileName(itemCommand))
                         .itemType(ITEM35)
                         .errorDescription("No record status found, skipping file generation")
                         .build());
@@ -53,19 +59,19 @@ public class UseCaseSubmissionVolumes implements ItemTypeStrategy {
             }
 
             stateService.nextStep(
-                StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
-            iLog.info(itemCommandDTO, SAVING_INFORMATION);
+                StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
+            iLog.info(itemCommand, SAVING_INFORMATION);
 
-            file = writeFileSubmissionVolumes.writeFile(recordStatusList, itemCommandDTO);
+            file = writeFileSubmissionVolumes.writeFile(recordStatusList, itemCommand);
             log.debug("Generated submission volumes file with name {}, path {}", file.getName(), file.getAbsolutePath());
-            itemCommandDTO.setFileName(file.getName());
-            itemCommandDTO.setFileUrl(file.getAbsolutePath());
-            producerItemService.send(itemCommandDTO, headers);
+            itemCommand.setFileName(file.getName());
+            itemCommand.setFileUrl(file.getAbsolutePath());
+            producerItemService.send(itemCommand, headers);
         } catch (Exception e) {
             log.error("Error to generate file submission volumes: {}", e.getMessage(), e);
             stateService.setError(
                 StateRequest.builder()
-                    .fileName(FileUtils.getFileName(itemCommandDTO))
+                    .fileName(FileUtils.getFileName(itemCommand))
                     .itemType(ITEM35)
                     .errorDescription("Error to generate file submission volumes: " + e.getMessage())
                     .build());

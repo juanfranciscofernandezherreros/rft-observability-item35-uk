@@ -54,16 +54,16 @@ class UseCaseComputeCapacityUnitTest {
         ItemCommandDTO itemCommandDTO = ItemCommandMock.builderItemCommandComputeCapacity();
         List<Capacity> capacitiesCpu = CapacityMock.builderListCapacityCpu();
         List<Capacity> capacitiesRam = CapacityMock.builderListCapacityRam();
-        when(capacityCpuService.findByCapacityCpu(anyString())).thenReturn(capacitiesCpu);
-        when(capacityRamService.findByCapacityRam(anyString())).thenReturn(capacitiesRam);
+        when(capacityCpuService.findByCapacityCpu(anyString(), anyString())).thenReturn(capacitiesCpu);
+        when(capacityRamService.findByCapacityRam(anyString(), anyString())).thenReturn(capacitiesRam);
         File mockFile = mock(File.class);
         when(writeFileComputeCapacity.writeFile(anyList(), any(ItemCommandDTO.class))).thenReturn(mockFile);
         useCaseComputeCapacity.execute(itemCommandDTO, mockHeaders);
-        verify(capacityCpuService, times(1)).findByCapacityCpu(anyString());
-        verify(capacityRamService, times(1)).findByCapacityRam(anyString());
+        verify(capacityCpuService, times(1)).findByCapacityCpu(anyString(), anyString());
+        verify(capacityRamService, times(1)).findByCapacityRam(anyString(), anyString());
         verify(writeFileComputeCapacity, times(1)).writeFile(anyList(), any(ItemCommandDTO.class));
         verify(producerItemService, times(1)).send(any(ItemCommandDTO.class), any());
-        verify(stateService, times(1)).nextStep(any(StateRequest.class));
+        verify(stateService, times(2)).nextStep(any(StateRequest.class));
     }
 
     @Test
@@ -72,11 +72,11 @@ class UseCaseComputeCapacityUnitTest {
         ItemCommandDTO itemCommandDTO = ItemCommandMock.builderItemCommandComputeCapacity();
         List<Capacity> capacitiesCpu = List.of();
         List<Capacity> capacitiesRam = CapacityMock.builderListCapacityRam();
-        when(capacityCpuService.findByCapacityCpu(anyString())).thenReturn(capacitiesCpu);
-        when(capacityRamService.findByCapacityRam(anyString())).thenReturn(capacitiesRam);
+        when(capacityCpuService.findByCapacityCpu(anyString(), anyString())).thenReturn(capacitiesCpu);
+        when(capacityRamService.findByCapacityRam(anyString(), anyString())).thenReturn(capacitiesRam);
         useCaseComputeCapacity.execute(itemCommandDTO, mockHeaders);
-        verify(capacityCpuService, times(1)).findByCapacityCpu(anyString());
-        verify(capacityRamService, times(1)).findByCapacityRam(anyString());
+        verify(capacityCpuService, times(1)).findByCapacityCpu(anyString(), anyString());
+        verify(capacityRamService, times(1)).findByCapacityRam(anyString(), anyString());
         verify(writeFileComputeCapacity, times(0)).writeFile(anyList(), any(ItemCommandDTO.class));
         verify(producerItemService, times(0)).send(any(ItemCommandDTO.class), any());
         verify(stateService, times(1)).setError(any(StateRequest.class));

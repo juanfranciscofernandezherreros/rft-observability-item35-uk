@@ -17,15 +17,21 @@ public final class DateUtils {
     private DateUtils() {
     }
 
-    public static String firstDayOfMonth(final String itemDate) {
+    public static String firstDayOfPreviousMonth(final String itemDate) {
         final LocalDate date = LocalDate.parse(itemDate, DATE_FORMAT_YYYYMMDD);
-        final LocalDate initialDate = date.with(TemporalAdjusters.firstDayOfMonth());
+        final LocalDate initialDate = date.minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
         return initialDate.format(DATE_FORMAT_YYYY_MM_DD);
     }
 
-    public static String lastDayOfMonth(final String itemDate) {
+    public static String firstDayOfCurrentMonth(final String itemDate) {
         final LocalDate date = LocalDate.parse(itemDate, DATE_FORMAT_YYYYMMDD);
-        final LocalDate lastDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+        final LocalDate dateFirstDayOfCurrentMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+        return dateFirstDayOfCurrentMonth.format(DATE_FORMAT_YYYY_MM_DD);
+    }
+
+    public static String lastDayOfPreviousMonth(final String itemDate) {
+        final LocalDate date = LocalDate.parse(itemDate, DATE_FORMAT_YYYYMMDD);
+        final LocalDate lastDayOfMonth = date.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
         return lastDayOfMonth.format(DATE_FORMAT_YYYY_MM_DD);
     }
 

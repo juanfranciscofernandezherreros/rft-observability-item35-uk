@@ -43,7 +43,7 @@ class ParticipantServiceTest {
     void findParticipants_repository_return_empty_list() {
         when(reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(anyString(), anyString())).thenReturn(new ArrayList<>());
 
-        final List<ReportGenerationDto> response = participantService.findParticipants("2024-02-01", "2024-03-01", "20240229");
+        final List<ReportGenerationDto> response = participantService.findParticipants("2024-02-01", "2024-03-01", "20240215");
 
         assertTrue(response.isEmpty());
         verify(reportingFileAdapterRepository, times(1)).findParticipantsByDayAccountAndFileType(anyString(), anyString());
@@ -92,7 +92,7 @@ class ParticipantServiceTest {
         when(slaInfoRepository.getSlaInfo(PARTICIPANT_ENTITY, reportType1, reportSessionDate1, initReportDate1, endReportDate1)).thenReturn(Optional.of(slaInfo1));
         when(slaInfoRepository.getSlaInfo(PARTICIPANT_ENTITY, reportType2, reportSessionDate2, initReportDate2, endReportDate2)).thenReturn(Optional.of(slaInfo2));
 
-        final List<ReportGenerationDto> response = participantService.findParticipants("2024-02-01", "2024-03-01", "20240229");
+        final List<ReportGenerationDto> response = participantService.findParticipants("2024-02-01", "2024-03-01", "20240215");
 
         assertFalse(response.isEmpty());
         assertEquals(2, response.size());

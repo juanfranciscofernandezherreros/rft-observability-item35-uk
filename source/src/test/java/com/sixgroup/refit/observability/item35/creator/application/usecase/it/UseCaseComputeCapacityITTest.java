@@ -89,7 +89,7 @@ class UseCaseComputeCapacityITTest {
                 .setItemType(ItemType.COMPUTE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240229")
+                .setItemDate("20240315")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -98,21 +98,21 @@ class UseCaseComputeCapacityITTest {
         waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
                 FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240229")
+                    .itemDate("20240315")
                     .itemType(ItemType.COMPUTE_CAPACITY.getName()).build())).getStateName()
                 .equals(State.SENT_RESPONSE.getName()));
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35D_20240229.csv");
+            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35D_20240315.csv");
 
         assertNotNull(path);
 
         String lineHeader = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;NAME;DESCRIPTION;CPU/RAM;DATE;MIN_USAGE;" +
             "AVG_USAGE;MAX_USAGE;INCIDENT_RELATED;TR_INCIDENT_ID";
-        String lineOne = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-01;0.0050;0.0210;0.2570;NO;NO";
-        String lineTwo = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-01;0.2200;0.2236;0.2317;NO;NO";
-        String penultimateLine = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-31;0.0030;0.0354;0.4440;NO;NO";
-        String lastLine = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-31;0.1275;0.1989;0.2524;NO;NO";
+        String lineOne = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-01;0.0050;0.0210;0.2570;NO;NO";
+        String lineTwo = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-01;0.2200;0.2236;0.2317;NO;NO";
+        String penultimateLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-31;0.0030;0.0354;0.4440;NO;NO";
+        String lastLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-31;0.1275;0.1989;0.2524;NO;NO";
 
         List<String> allLines = Files.readAllLines(path);
 
@@ -129,8 +129,8 @@ class UseCaseComputeCapacityITTest {
     @Test
     @DisplayName("Given a message item from topic, when service return empty list validate state is error with no exist record")
     void item_35_then_state_error_not_exist_records() {
-        doReturn(List.of()).when(capacityCpuService).findByCapacityCpu(any());
-        doReturn(List.of()).when(capacityRamService).findByCapacityRam(any());
+        doReturn(List.of()).when(capacityCpuService).findByCapacityCpu(any(), any());
+        doReturn(List.of()).when(capacityRamService).findByCapacityRam(any(), any());
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
             ItemCommand
                 .newBuilder()
@@ -138,7 +138,7 @@ class UseCaseComputeCapacityITTest {
                 .setItemType(ItemType.COMPUTE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240229")
+                .setItemDate("20240215")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -147,7 +147,7 @@ class UseCaseComputeCapacityITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240229")
+                    .itemDate("20240215")
                     .itemType(ItemType.COMPUTE_CAPACITY.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );
@@ -158,7 +158,7 @@ class UseCaseComputeCapacityITTest {
     @DisplayName("Given a message item from topic, when error from service cpu then validate state is error")
     void item_35_state_error_cpu() {
 
-        doThrow(new RuntimeException("error")).when(capacityCpuService).findByCapacityCpu(any());
+        doThrow(new RuntimeException("error")).when(capacityCpuService).findByCapacityCpu(any(), any());
 
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
             ItemCommand
@@ -167,7 +167,7 @@ class UseCaseComputeCapacityITTest {
                 .setItemType(ItemType.COMPUTE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240229")
+                .setItemDate("20240215")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -176,7 +176,7 @@ class UseCaseComputeCapacityITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240229")
+                    .itemDate("20240215")
                     .itemType(ItemType.COMPUTE_CAPACITY.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );
@@ -186,7 +186,7 @@ class UseCaseComputeCapacityITTest {
     @DisplayName("Given a message item from topic, when error from service cpu then validate state is error")
     void item_35_state_error_ram() {
 
-        doThrow(new RuntimeException("error")).when(capacityRamService).findByCapacityRam(any());
+        doThrow(new RuntimeException("error")).when(capacityRamService).findByCapacityRam(any(), any());
 
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
             ItemCommand
@@ -195,7 +195,7 @@ class UseCaseComputeCapacityITTest {
                 .setItemType(ItemType.COMPUTE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240229")
+                .setItemDate("20240215")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -204,7 +204,7 @@ class UseCaseComputeCapacityITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240229")
+                    .itemDate("20240215")
                     .itemType(ItemType.COMPUTE_CAPACITY.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );

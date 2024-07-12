@@ -84,7 +84,7 @@ class UseCaseReportGenerationITTest {
                 .setItemType(ItemType.REPORT_GENERATION.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240229")
+                .setItemDate("20240315")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -93,22 +93,22 @@ class UseCaseReportGenerationITTest {
         waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
                 FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240229")
+                    .itemDate("20240315")
                     .itemType(ItemType.REPORT_GENERATION.getName()).build())).getStateName()
                 .equals(State.SENT_RESPONSE.getName()));
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35B_20240229.csv");
+            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35B_20240315.csv");
 
         assertNotNull(path);
 
         String lineHeader = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;REPORT_NAME;REPORT_TYPE;REPORT_GENERATION_TIME;" +
             "REPORT_COMPLETION_TIME;REPORT_PUBLICATION_TIME;DATE;SLA;DIFFERENCE;TR_INCIDENT_ID";
 
-        String lineOne = "TRRGS;2024-02-29;EMIR;\"TAR030\";PARTICIPANT;1900-01-01T00:00:00Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T06:00:00Z;;";
-        String lineTwo = "TRRGS;2024-02-29;EMIR;\"eudri2frb000-TAR030 TRACE\";ESMA;1900-01-01T05:12:55Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T12:00:00Z;;";
-        String penultimateLine = "TRRGS;2024-02-29;EMIR;\"eudrif3q0000-TSR107 Portal XML\";ESMA;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
-        String lastLine = "TRRGS;2024-02-29;EMIR;\"trdrif3q0000-TD107\";TR;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
+        String lineOne = "TRRGS;2024-03-15;EMIR;\"TAR030\";PARTICIPANT;1900-01-01T00:00:00Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T06:00:00Z;;";
+        String lineTwo = "TRRGS;2024-03-15;EMIR;\"eudri2frb000-TAR030 TRACE\";ESMA;1900-01-01T05:12:55Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T12:00:00Z;;";
+        String penultimateLine = "TRRGS;2024-03-15;EMIR;\"eudrif3q0000-TSR107 Portal XML\";ESMA;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
+        String lastLine = "TRRGS;2024-03-15;EMIR;\"trdrif3q0000-TD107\";TR;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
 
         List<String> allLines = Files.readAllLines(path);
 
@@ -132,7 +132,7 @@ class UseCaseReportGenerationITTest {
                 .setItemType(ItemType.REPORT_GENERATION.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240129")
+                .setItemDate("20240115")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -141,7 +141,7 @@ class UseCaseReportGenerationITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240129")
+                    .itemDate("20240115")
                     .itemType(ItemType.REPORT_GENERATION.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );
@@ -161,7 +161,7 @@ class UseCaseReportGenerationITTest {
                 .setItemType(ItemType.REPORT_GENERATION.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240129")
+                .setItemDate("20240115")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -170,7 +170,7 @@ class UseCaseReportGenerationITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240129")
+                    .itemDate("20240115")
                     .itemType(ItemType.REPORT_GENERATION.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );
