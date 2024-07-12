@@ -34,7 +34,7 @@ class CapacityRamServiceTest {
     @Test
     void testFindByCapacityRam() {
         when(capacityRamRepository.findByCapacityRam(anyString(), anyString())).thenReturn(builderListCapacityRam());
-        List<Capacity> result = capacityRamService.findByCapacityRam("20240101");
+        List<Capacity> result = capacityRamService.findByCapacityRam("2024-01-01", "2024-02-01");
         verify(capacityRamRepository).findByCapacityRam(eq("2024-01-01"), eq("2024-02-01"));
         assertNotNull(result);
 

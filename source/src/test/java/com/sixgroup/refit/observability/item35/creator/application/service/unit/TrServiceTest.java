@@ -43,7 +43,7 @@ class TrServiceTest {
     void findTrs_repository_return_empty_list() {
         when(reportingFileAdapterRepository.findTrByDayAccountAndFileType(anyString(), anyString())).thenReturn(new ArrayList<>());
 
-        final List<ReportGenerationDto> response = trService.findTr("2024-02-01", "2024-03-01", "20240229");
+        final List<ReportGenerationDto> response = trService.findTr("2024-02-01", "2024-03-01", "20240215");
 
         assertTrue(response.isEmpty());
         verify(reportingFileAdapterRepository, times(1)).findTrByDayAccountAndFileType(anyString(), anyString());
@@ -90,7 +90,7 @@ class TrServiceTest {
         when(slaInfoRepository.getSlaInfo(TR_ENTITY, reportType1, reportSessionDate1, creationDate1)).thenReturn(Optional.of(slaInfo1));
         when(slaInfoRepository.getSlaInfo(TR_ENTITY, reportType2, reportSessionDate2, creationDate2)).thenReturn(Optional.of(slaInfo2));
 
-        final List<ReportGenerationDto> response = trService.findTr("2024-02-01", "2024-03-01", "20240229");
+        final List<ReportGenerationDto> response = trService.findTr("2024-02-01", "2024-03-01", "20240215");
 
         assertFalse(response.isEmpty());
         assertEquals(2, response.size());

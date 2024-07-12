@@ -41,34 +41,36 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
     private final ItemLog iLog = new ItemLog();
 
     @Override
-    public File execute(ItemCommandDTO itemCommandDTO, Headers headers) {
+    public File execute(ItemCommandDTO itemCommand, Headers headers) {
         log.debug("Generating storage capacity file ...");
         File file;
         try {
-            final String firstDayOfMonth = DateUtils.firstDayOfMonth(itemCommandDTO.getItemDate());
-            final String firstDayOfNextMonth = DateUtils.firstDayOfNextMonth(itemCommandDTO.getItemDate());
+            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
 
-            final List<Storage> totalCapacityList = storageService.getTotalCapacity(firstDayOfMonth, firstDayOfNextMonth);
-            final List<Storage> totalFreeCapacityList = storageService.getTotalFreeCapacity(firstDayOfMonth, firstDayOfNextMonth);
+            final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemCommand.getItemDate());
+            final String dateTo = DateUtils.firstDayOfCurrentMonth(itemCommand.getItemDate());
+
+            final List<Storage> totalCapacityList = storageService.getTotalCapacity(dateFrom, dateTo);
+            final List<Storage> totalFreeCapacityList = storageService.getTotalFreeCapacity(dateFrom, dateTo);
 
             if (CollectionUtils.isEmpty(totalCapacityList) || CollectionUtils.isEmpty(totalFreeCapacityList)) {
                 log.error("No data found in storage capacity, skipping report generation");
                 stateService.setError(
                     StateRequest.builder()
-                        .fileName(FileUtils.getFileName(itemCommandDTO))
+                        .fileName(FileUtils.getFileName(itemCommand))
                         .itemType(ITEM35)
                         .errorDescription("No record status found, skipping file generation")
                         .build());
                 return null;
             }
 
-            final List<StorageCapacityDto> storageCapacityFinalList = calculateFinalList(itemCommandDTO.getItemDate(),
+            final List<StorageCapacityDto> storageCapacityFinalList = calculateFinalList(itemCommand.getItemDate(),
                 totalCapacityList, totalFreeCapacityList);
             if (CollectionUtils.isEmpty(storageCapacityFinalList)) {
                 log.error("Not exist any match between 'total free capacity data' and 'total capacity data'");
                 stateService.setError(
                     StateRequest.builder()
-                        .fileName(FileUtils.getFileName(itemCommandDTO))
+                        .fileName(FileUtils.getFileName(itemCommand))
                         .itemType(ITEM35)
                         .errorDescription("Not exist any match between 'total free capacity data' and 'total capacity data'")
                         .build());
@@ -76,19 +78,19 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             }
 
             stateService.nextStep(
-                StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
-            iLog.info(itemCommandDTO, SAVING_INFORMATION);
+                StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
+            iLog.info(itemCommand, SAVING_INFORMATION);
 
-            file = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommandDTO);
+            file = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommand);
             log.debug("Generated storage capacity file");
-            itemCommandDTO.setFileUrl(file.toString());
-            itemCommandDTO.setFileName(file.getName());
-            producerItemService.send(itemCommandDTO, headers);
+            itemCommand.setFileUrl(file.toString());
+            itemCommand.setFileName(file.getName());
+            producerItemService.send(itemCommand, headers);
         } catch (Exception e) {
             log.error("Error to generate file storage capacity: {}", e.getMessage(), e);
             stateService.setError(
                 StateRequest.builder()
-                    .fileName(FileUtils.getFileName(itemCommandDTO))
+                    .fileName(FileUtils.getFileName(itemCommand))
                     .itemType(ITEM35)
                     .errorDescription("Error to generate file storage capacity: " + e.getMessage())
                     .build());

@@ -85,7 +85,7 @@ class UseCaseStorageCapacityITTest {
                 .setItemType(ItemType.STORAGE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240229")
+                .setItemDate("20240315")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -94,22 +94,22 @@ class UseCaseStorageCapacityITTest {
         waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
                 FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240229")
+                    .itemDate("20240315")
                     .itemType(ItemType.STORAGE_CAPACITY.getName()).build())).getStateName()
                 .equals(State.SENT_RESPONSE.getName()));
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35C_20240229.csv");
+            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35C_20240315.csv");
 
         assertNotNull(path);
 
         String lineHeader = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;DATA_CENTER_LOCATION;DATABASE_SERVER_OR_PLATFORM;" +
             "DATE;CAPACITY;USED_CAPACITY;AVAILABLE_CAPACITY;UTILIZATION;INCIDENT_RELATED;TR_INCIDENT_ID";
 
-        String lineOne = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;2024-03-01;13.3012;1.1997;12.1015;0.0902;NO;";
-        String lineTwo = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;2024-03-02;13.3014;1.1839;12.1175;0.089;NO;";
-        String penultimateLine = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;2024-03-31;19.3927;1.5534;17.8393;0.0801;NO;";
-        String lastLine = "TRRGS;2024-02-29;EMIR;Cloudera;Cloudera data warehouse;2024-04-01;19.393;1.6335;17.7595;0.0842;NO;";
+        String lineOne = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;2024-03-01;13.3012;1.1997;12.1015;0.0902;NO;";
+        String lineTwo = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;2024-03-02;13.3014;1.1839;12.1175;0.089;NO;";
+        String penultimateLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;2024-03-31;19.3927;1.5534;17.8393;0.0801;NO;";
+        String lastLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;2024-04-01;19.393;1.6335;17.7595;0.0842;NO;";
 
         List<String> allLines = Files.readAllLines(path);
 
@@ -134,7 +134,7 @@ class UseCaseStorageCapacityITTest {
                 .setItemType(ItemType.STORAGE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240129")
+                .setItemDate("20240115")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -143,7 +143,7 @@ class UseCaseStorageCapacityITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240129")
+                    .itemDate("20240115")
                     .itemType(ItemType.STORAGE_CAPACITY.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );
@@ -163,7 +163,7 @@ class UseCaseStorageCapacityITTest {
                 .setItemType(ItemType.STORAGE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240229")
+                .setItemDate("20240215")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -172,7 +172,7 @@ class UseCaseStorageCapacityITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240229")
+                    .itemDate("20240215")
                     .itemType(ItemType.STORAGE_CAPACITY.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );
@@ -191,7 +191,7 @@ class UseCaseStorageCapacityITTest {
                 .setItemType(ItemType.STORAGE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240229")
+                .setItemDate("20240215")
                 .setFileInfo(FileInfo.newBuilder()
                     .setFileName("")
                     .setFileUrl("").build())
@@ -200,7 +200,7 @@ class UseCaseStorageCapacityITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
                 findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240229")
+                    .itemDate("20240215")
                     .itemType(ItemType.STORAGE_CAPACITY.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
             );

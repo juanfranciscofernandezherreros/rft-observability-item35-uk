@@ -1,13 +1,10 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.consumer;
 
-import com.sixgroup.refit.observability.item.state.application.StateService;
-import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.consumer.RftKafkaConsumerTracing;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
@@ -20,16 +17,12 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class KafkaConsumerItem {
 
     private final RftKafkaConsumerTracing kafkaConsumerTracing;
-    private final StateService stateService;
-
     private final Map<ItemType, ItemTypeStrategy> itemType;
 
     @KafkaListener(topics = "${component-config.topics.observability-item-topic}", groupId = "${component-config.topics.observability-item-consumer-group-id}")
@@ -40,15 +33,11 @@ public class KafkaConsumerItem {
 
             kafkaConsumerTracing.initTrace(item.headers());
             final ItemCommandDTO itemCommand = ItemCommandDTO.generateItemCommandDTO(item.value());
+            log.info("Item35 request itemCommand: {}", itemCommand);
             if (!isRequestTypeAccepted(item.value().getItemType())) {
                 throw new IllegalArgumentException("'type' " + item.value().getItemType()
                     + " cannot be null or blank, and must be any of accepted values");
             }
-
-            stateService.nextStep(
-                StateRequest.builder().fileName(FileUtils.getFileName(itemCommand))
-                    .itemType(ITEM35).build());
-            log.debug("Consumed message to generate file: {}", item.value().getItemType());
             final ItemTypeStrategy itemTypeStrategy = itemType.get(ItemType.getItemTypeFromName(item.value().getItemType()));
             itemTypeStrategy.execute(itemCommand, item.headers());
             log.debug("Generated file item35: {}", item.value().getItemType());

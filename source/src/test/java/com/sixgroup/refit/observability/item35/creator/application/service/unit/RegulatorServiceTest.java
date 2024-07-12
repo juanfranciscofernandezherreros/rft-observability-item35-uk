@@ -49,7 +49,7 @@ class RegulatorServiceTest {
     void findRegulators_repository_return_empty_list() {
         ReflectionTestUtils.setField(regulatorService, "blockSize", 1);
         when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString())).thenReturn(new ArrayList<>());
-        final List<ReportGenerationDto> response = regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240229");
+        final List<ReportGenerationDto> response = regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
         assertTrue(response.isEmpty());
         verify(reportingFileAdapterRepository, times(1)).findRegulatorByDayAccountAndFileType(anyString(), anyString());
 
@@ -102,7 +102,7 @@ class RegulatorServiceTest {
         when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType2, reportSessionDate2, creationDate2)).thenReturn(Optional.of(slaInfo2));
         when(reguIdentityAdapterRepository.findByTraceCode(any())).thenReturn(List.of(ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri2frb000").build()
             , ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri96jn000").build()));
-        final List<ReportGenerationDto> response = regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240229");
+        final List<ReportGenerationDto> response = regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
 
         assertFalse(response.isEmpty());
         assertEquals(2, response.size());

@@ -42,21 +42,18 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
     private final ItemLog iLog = new ItemLog();
 
     @Override
-    public File execute(final ItemCommandDTO itemCommandDTO, final Headers headers) {
+    public File execute(final ItemCommandDTO itemCommand, final Headers headers) {
         log.debug("Generating Report Generation file ...");
         File file = null;
         try {
-            final String firstDayOfMonth = DateUtils.firstDayOfMonth(itemCommandDTO.getItemDate());
-            final String firstDayOfNextMonth = DateUtils.firstDayOfNextMonth(itemCommandDTO.getItemDate());
+            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
 
-            final List<ReportGenerationDto> participants = participantService.findParticipants(firstDayOfMonth,
-                firstDayOfNextMonth, itemCommandDTO.getItemDate());
+            final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemCommand.getItemDate());
+            final String dateTo = DateUtils.firstDayOfCurrentMonth(itemCommand.getItemDate());
 
-            final List<ReportGenerationDto> regulators = regulatorService.findRegulator(firstDayOfMonth,
-                firstDayOfNextMonth, itemCommandDTO.getItemDate());
-
-            final List<ReportGenerationDto> trs = trService.findTr(firstDayOfMonth,
-                firstDayOfNextMonth, itemCommandDTO.getItemDate());
+            final List<ReportGenerationDto> participants = participantService.findParticipants(dateFrom, dateTo, itemCommand.getItemDate());
+            final List<ReportGenerationDto> regulators = regulatorService.findRegulator(dateFrom, dateTo, itemCommand.getItemDate());
+            final List<ReportGenerationDto> trs = trService.findTr(dateFrom, dateTo, itemCommand.getItemDate());
 
             final List<ReportGenerationDto> joinedCollection = Stream.concat(Stream.concat(participants.stream(),
                 regulators.stream()), trs.stream()).toList();
@@ -65,7 +62,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
                 log.error("No data found in report generation, skipping report generation");
                 stateService.setError(
                     StateRequest.builder()
-                        .fileName(FileUtils.getFileName(itemCommandDTO))
+                        .fileName(FileUtils.getFileName(itemCommand))
                         .itemType(ITEM35)
                         .errorDescription("No record status found, skipping file generation")
                         .build());
@@ -73,21 +70,21 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
             }
 
             stateService.nextStep(
-                StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).build());
-            iLog.info(itemCommandDTO, SAVING_INFORMATION);
+                StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
+            iLog.info(itemCommand, SAVING_INFORMATION);
 
             final List<ReportGenerationDto> orderedCollection = CollectionsUtils.getOrderCollectionsByDate(joinedCollection);
 
-            file = writeFileReportGenerationService.writeFile(orderedCollection, itemCommandDTO);
+            file = writeFileReportGenerationService.writeFile(orderedCollection, itemCommand);
             log.debug("Generated report generation file with name {}, path {}", file.getName(), file.getAbsolutePath());
-            itemCommandDTO.setFileName(file.getName());
-            itemCommandDTO.setFileUrl(file.getAbsolutePath());
-            producerItemService.send(itemCommandDTO, headers);
+            itemCommand.setFileName(file.getName());
+            itemCommand.setFileUrl(file.getAbsolutePath());
+            producerItemService.send(itemCommand, headers);
         } catch (Exception e) {
             log.error("Error to generate file report generation: {}", e.getMessage(), e);
             stateService.setError(
                 StateRequest.builder()
-                    .fileName(FileUtils.getFileName(itemCommandDTO))
+                    .fileName(FileUtils.getFileName(itemCommand))
                     .itemType(ITEM35)
                     .errorDescription("Error to generate file report generation: " + e.getMessage())
                     .build());
