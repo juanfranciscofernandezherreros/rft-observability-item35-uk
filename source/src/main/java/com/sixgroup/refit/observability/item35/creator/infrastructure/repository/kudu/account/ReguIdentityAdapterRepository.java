@@ -21,9 +21,7 @@ public class ReguIdentityAdapterRepository implements ReguIdentityRepository {
 
     @Override
     public List<ReguIdentityDTO> findByTraceCode(final List<String> traceCodes) {
-
-        List<ReguIdentityEntity> reguIdentityEntities = reguIdentityKudu.findByTraceCodeIn(traceCodes);
-
+        final List<ReguIdentityEntity> reguIdentityEntities = reguIdentityKudu.findByTraceCodeIn(traceCodes);
         return reguIdentityMapper.entitiesToDomains(reguIdentityEntities);
     }
 }

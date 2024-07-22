@@ -1,8 +1,7 @@
-package com.sixgroup.refit.observability.item35.creator.application.service.unit;
+package com.sixgroup.refit.observability.item35.creator.application.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sixgroup.refit.observability.item35.creator.application.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.*;
@@ -70,7 +69,7 @@ class StorageServiceTest {
         when(storageCapacity.findTotalStorage(anyString(), anyString()))
             .thenReturn(Optional.empty());
 
-        assertThrows(InternalErrorException.class,  ()-> storageService.getTotalCapacity("2024-01-01", "2024-02-01"));
+        assertThrows(InternalErrorException.class, () -> storageService.getTotalCapacity("2024-01-01", "2024-02-01"));
 
         verify(storageCapacity).findTotalStorage(eq("2024-01-01"), eq("2024-02-01"));
     }
@@ -155,7 +154,7 @@ class StorageServiceTest {
         when(storageCapacity.findFreeStorage(anyString(), anyString()))
             .thenReturn(Optional.empty());
 
-        assertThrows(InternalErrorException.class,  ()-> storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01"));
+        assertThrows(InternalErrorException.class, () -> storageService.getTotalFreeCapacity("2024-01-01", "2024-02-01"));
 
         verify(storageCapacity).findFreeStorage(eq("2024-01-01"), eq("2024-02-01"));
 

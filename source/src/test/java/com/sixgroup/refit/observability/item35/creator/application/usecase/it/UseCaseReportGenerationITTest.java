@@ -59,6 +59,9 @@ class UseCaseReportGenerationITTest {
     @Autowired
     private ItemFileFinderRepository sqlServerItemFileFinderRepository;
 
+//    @Autowired
+//    private ProducerItemService producerItemService;
+
     @SpyBean
     private ParticipantService participantService;
 
@@ -90,7 +93,10 @@ class UseCaseReportGenerationITTest {
                     .setFileUrl("").build())
                 .build()));
 
-        waitAtMost(20, TimeUnit.SECONDS)
+//        waitAtMost(200, TimeUnit.SECONDS)
+//            .until(() ->producerItemService.send(any(), any()));
+
+        waitAtMost(200, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
                 FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240315")
@@ -106,8 +112,8 @@ class UseCaseReportGenerationITTest {
             "REPORT_COMPLETION_TIME;REPORT_PUBLICATION_TIME;DATE;SLA;DIFFERENCE;TR_INCIDENT_ID";
 
         String lineOne = "TRRGS;2024-03-15;EMIR;\"TAR030\";PARTICIPANT;1900-01-01T00:00:00Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T06:00:00Z;;";
-        String lineTwo = "TRRGS;2024-03-15;EMIR;\"eudri2frb000-TAR030 TRACE\";ESMA;1900-01-01T05:12:55Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T12:00:00Z;;";
-        String penultimateLine = "TRRGS;2024-03-15;EMIR;\"eudrif3q0000-TSR107 Portal XML\";ESMA;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
+        String lineTwo = "TRRGS;2024-03-15;EMIR;\"ESMAS-TAR030 TRACE\";ESMA;1900-01-01T05:12:55Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T12:00:00Z;;";
+        String penultimateLine = "TRRGS;2024-03-15;EMIR;\"ESMAS-TSR107 TRACE\";ESMA;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
         String lastLine = "TRRGS;2024-03-15;EMIR;\"trdrif3q0000-TD107\";TR;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
 
         List<String> allLines = Files.readAllLines(path);

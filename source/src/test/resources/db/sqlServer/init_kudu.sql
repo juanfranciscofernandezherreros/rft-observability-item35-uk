@@ -23,7 +23,8 @@ CREATE TABLE EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing
 CREATE TABLE EMIR_REFIT_DEV_ACCOUNT_MNG.regu_identity
 (
     tracecode            VARCHAR(255),
-    regulatorid          VARCHAR(255)
+    regulatorid          VARCHAR(255),
+    traceconnectivity    VARCHAR(255)
 );
 
 
@@ -72,11 +73,11 @@ INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,
 INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
     VALUES('TRRGS_DATTSR_ESMAS_R11526-240301_001001-0.zip', 'TD107', '2024-02-05 05:12:55.421', '2024-02-05 08:12:55.421', 'trdrif3q0000');
 
-INSERT INTO EMIR_REFIT_DEV_ACCOUNT_MNG.regu_identity (tracecode,regulatorid) VALUES
-                                                                          ('ESMAS','eudri2frb000'),
-                                                                          ('CAFAA','eudri2frb777'),
-                                                                          ('CAFAA','eudri2frb888'),
-                                                                          ('CAFAA','eudri2frb900'),
-                                                                          ('CAESR','eudri96jn000'),
-                                                                          ('CAFAA','eudrira0004'),
-                                                                          ('CAFAA','eudrm2frb000');
+INSERT INTO EMIR_REFIT_DEV_ACCOUNT_MNG.regu_identity (tracecode,regulatorid, traceconnectivity) VALUES
+                                                                          ('ESMAS','eudri2frb000', 'true'),
+                                                                          ('CAFAA','eudri2frb777', 'false'),
+                                                                          ('CAFAA','eudri2frb888', 'true'),
+                                                                          ('CAFAA','eudri2frb900', 'false'),
+                                                                          ('CAESR','eudri96jn000', 'true'),
+                                                                          ('CAFAA','eudrira0004', 'false'),
+                                                                          ('CAFAA','eudrm2frb000', 'true');
