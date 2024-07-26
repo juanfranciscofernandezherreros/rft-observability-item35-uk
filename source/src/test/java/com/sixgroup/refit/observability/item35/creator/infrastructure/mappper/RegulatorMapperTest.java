@@ -2,6 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.mappper;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
+import com.sixgroup.refit.observability.item35.creator.domain.model.ReguIdentityDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.DataTestUtils;
@@ -84,7 +85,7 @@ class RegulatorMapperTest {
     }
 
     @Test
-    void expected_file_name_regulatorId() {
+    void expected_file_name_trace_account() {
         final String fileName = "TRRGS_DATTAR_CAFAA_R99998-20240220_001001-0.zip";
         final String reportType = "TSR107";
         final LocalDateTime reportSessionDate = DataTestUtils.parseString("2024-02-20 18:55:23");
@@ -106,13 +107,51 @@ class RegulatorMapperTest {
             .generationDuration(Duration.ofMinutes(30))
             .build();
 
-        final RegulatorMapper regulatorMapper = new RegulatorMapper();
-        Map maps = new HashMap<String, String>();
-        maps.put("CAFAA", "eudri2frb777");
-        maps.put("CAESR", "eudri96jn000");
-        final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, maps);
+        final ReguIdentityDTO dto1 = ReguIdentityDTO.builder().traceCode("CAFAA").regulatorId("eudri2frb777").traceConnectivity(false).build();
+        final ReguIdentityDTO dto2 = ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri96jn000").traceConnectivity(false).build();
+        final Map<String, ReguIdentityDTO> traceCodeRegulatorMap = new HashMap();
+        traceCodeRegulatorMap.put("CAFAA", dto1);
+        traceCodeRegulatorMap.put("CAESR", dto2);
 
-        assertEquals("eudri2frb777-TSR107 TRACE", response.getReportName());
+        final RegulatorMapper regulatorMapper = new RegulatorMapper();
+        final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, traceCodeRegulatorMap);
+
+        assertEquals("CAFAA-TSR107 TRACE", response.getReportName());
+    }
+
+    @Test
+    void expected_file_name_trace_connectivity() {
+        final String fileName = "TRRGS_DATTAR_CAFAA_R99998-20240220_001001-0.zip";
+        final String reportType = "TSR107";
+        final LocalDateTime reportSessionDate = DataTestUtils.parseString("2024-02-20 18:55:23");
+        final String accountId = "eudri2frb777";
+        final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
+
+        final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
+        fileTypeProperties.setReportTypeNca("NCA");
+        final ReportConfig reportConfig = new ReportConfig();
+        reportConfig.setName(reportType);
+        reportConfig.setReportName(reportType);
+        fileTypeProperties.getReports().add(reportConfig);
+
+        final RegulatorDTO regulatorDTO = new RegulatorDTO(fileName, reportType, reportSessionDate, accountId, creationDate, "CAFAA");
+
+        final SlaInfo slaInfo = SlaInfo.builder()
+            .meetsSla(Boolean.TRUE)
+            .expectSlaDate(reportSessionDate.plusDays(1).truncatedTo(ChronoUnit.DAYS).plusHours(6))
+            .generationDuration(Duration.ofMinutes(30))
+            .build();
+
+        final ReguIdentityDTO dto1 = ReguIdentityDTO.builder().traceCode("CAFAA").regulatorId("eudri2frb777").traceConnectivity(true).build();
+        final ReguIdentityDTO dto2 = ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri96jn000").traceConnectivity(false).build();
+        final Map<String, ReguIdentityDTO> traceCodeRegulatorMap = new HashMap();
+        traceCodeRegulatorMap.put("CAFAA", dto1);
+        traceCodeRegulatorMap.put("CAESR", dto2);
+
+        final RegulatorMapper regulatorMapper = new RegulatorMapper();
+        final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, traceCodeRegulatorMap);
+
+        assertEquals("CAFAA-TSR107 TRACE", response.getReportName());
     }
 
     @Test
@@ -138,14 +177,49 @@ class RegulatorMapperTest {
             .generationDuration(Duration.ofMinutes(30))
             .build();
 
+        final ReguIdentityDTO dto1 = ReguIdentityDTO.builder().traceCode("CAFAA").regulatorId("eudrira1051").traceConnectivity(false).build();
+        final ReguIdentityDTO dto2 = ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri96jn000").traceConnectivity(false).build();
+        final Map<String, ReguIdentityDTO> traceCodeRegulatorMap = new HashMap();
+        traceCodeRegulatorMap.put("CAFAA", dto1);
+        traceCodeRegulatorMap.put("CAESR", dto2);
+
         final RegulatorMapper regulatorMapper = new RegulatorMapper();
-        Map maps = new HashMap<String, String>();
-        maps.put("CAFAA", "eudri2frb777");
-        maps.put("CAESR", "eudri96jn000");
-        final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, maps);
+        final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, traceCodeRegulatorMap);
 
         assertEquals("eudrira1051-TSR107 Portal XML", response.getReportName());
     }
+
+    @Test
+    void expected_file_name_accountId_when_tracecode_not_exists() {
+        final String fileName = "TRRGS_DATTAR_CAFAA_R99998-20240220_001001-0.zip";
+        final String reportType = "TSR107";
+        final LocalDateTime reportSessionDate = DataTestUtils.parseString("2024-02-20 18:55:23");
+        final String accountId = "eudrira1051";
+        final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
+
+        final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
+        fileTypeProperties.setReportTypeNca("NCA");
+        final ReportConfig reportConfig = new ReportConfig();
+        reportConfig.setName(reportType);
+        reportConfig.setReportName(reportType);
+        fileTypeProperties.getReports().add(reportConfig);
+
+        final RegulatorDTO regulatorDTO = new RegulatorDTO(fileName, reportType, reportSessionDate, accountId, creationDate, "CAFAA");
+
+        final SlaInfo slaInfo = SlaInfo.builder()
+            .meetsSla(Boolean.TRUE)
+            .expectSlaDate(reportSessionDate.plusDays(1).truncatedTo(ChronoUnit.DAYS).plusHours(6))
+            .generationDuration(Duration.ofMinutes(30))
+            .build();
+
+        final Map<String, ReguIdentityDTO> traceCodeRegulatorMap = new HashMap();
+
+        final RegulatorMapper regulatorMapper = new RegulatorMapper();
+        final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, traceCodeRegulatorMap);
+
+        assertEquals("eudrira1051-TSR107 Portal XML", response.getReportName());
+    }
+
 
     @Test
     void findRegulators_ok() {
@@ -170,11 +244,14 @@ class RegulatorMapperTest {
             .generationDuration(Duration.ofMinutes(18 * 60 + 55).plusSeconds(29))
             .build();
 
+        final ReguIdentityDTO dto1 = ReguIdentityDTO.builder().traceCode("CAFAA").regulatorId("eudri2frb777").traceConnectivity(false).build();
+        final ReguIdentityDTO dto2 = ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri96jn000").traceConnectivity(false).build();
+        final Map<String, ReguIdentityDTO> traceCodeRegulatorMap = new HashMap();
+        traceCodeRegulatorMap.put("CAFAA", dto1);
+        traceCodeRegulatorMap.put("CAESR", dto2);
+
         final RegulatorMapper regulatorMapper = new RegulatorMapper();
-        Map maps = new HashMap<String, String>();
-        maps.put("CAFAA", "eudri2frb777");
-        maps.put("CAESR", "eudri96jn000");
-        final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, maps);
+        final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, traceCodeRegulatorMap);
 
         OffsetDateTime originDate = OffsetDateTime
             .of(1900, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
@@ -198,7 +275,7 @@ class RegulatorMapperTest {
 
         ReportGenerationDto expectedValue = new ReportGenerationDto(
             null,
-            "eudri96jn000-TSR107 TRACE",
+            "CAESR-TSR107 TRACE",
             "ESMA",
             reportGenerationTimeString,
             reportCompletionAndPubTime,

@@ -8,8 +8,5 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ReguIdentityMapper {
-
-    ReguIdentityDTO entityToDomain(final ReguIdentityEntity reguIdentityEntity);
-
     List<ReguIdentityDTO> entitiesToDomains(final List<ReguIdentityEntity> reguIdentityEntities);
 }

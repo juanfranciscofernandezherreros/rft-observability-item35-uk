@@ -51,10 +51,24 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
     @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control" +
         ".TrDTO(rfo.fileType, rfo.reportingSessionTimeStamp, rfo.accountId, rfo.creationTimestamp) " +
         "FROM ReportingFileEntity as rfo " +
-        "WHERE (rfo.reportingSessionTimeStamp >= ?1 AND rfo.reportingSessionTimeStamp < ?2) " +
+        "WHERE (rfo.reportingSessionTimeStamp >= :initDate AND rfo.reportingSessionTimeStamp < :endDate) " +
         "AND rfo.accountId LIKE 'tr%' " +
-        "AND rfo.fileType IN (?3) " +
+        "AND rfo.fileType IN (:fileTypes) " +
         "ORDER BY rfo.reportingSessionTimeStamp, rfo.accountId"
     )
-    List<TrDTO> findTrByDayAccountAndFileType(LocalDateTime initDate, LocalDateTime endDate, List<String> fileTypes);
+    List<TrDTO> findTrByDayAccountAndFileTypeOld(LocalDateTime initDate, LocalDateTime endDate, List<String> fileTypes);
+
+    @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control" +
+        ".TrDTO(rfo.fileType, rfo.reportingSessionTimeStamp, rfo.accountId, rfo.creationTimestamp) " +
+        "FROM ReportingFileEntity as rfo " +
+        "WHERE (rfo.reportingSessionTimeStamp >= :initDate AND rfo.reportingSessionTimeStamp < :endDate) " +
+        "AND rfo.accountId LIKE 'tr%' " +
+        "AND rfo.fileType IN (:fileTypes) " +
+        "GROUP BY rfo.accountId, rfo.reportingSessionTimeStamp, rfo.fileType " +
+        "ORDER BY rfo.reportingSessionTimeStamp, rfo.accountId, rfo.fileType"
+    )
+    List<TrDTO> findTrByDayAccountAndFileType(
+        @Param("initDate") LocalDateTime initDate,
+        @Param("endDate") LocalDateTime endDate,
+        @Param("fileTypes") List<String> fileTypes);
 }

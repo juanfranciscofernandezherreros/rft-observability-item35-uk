@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.REGULATOR_ENTITY;
 
@@ -38,13 +37,16 @@ public class RegulatorService {
 
     public List<ReportGenerationDto> findRegulator(final String initDate, final String endDate, final String itemDate) {
         final List<RegulatorDTO> regulations = reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(initDate, endDate);
-        List<String> accountTraces = regulations.stream().map(RegulatorDTO::getAccountTrace).distinct().toList();
-        List<ReguIdentityDTO> definitiveList = fetchAllReguIdentityEntities(accountTraces);
-        if (regulations.isEmpty() || definitiveList.isEmpty()) {
+        final List<String> accountTraces = regulations.stream().map(RegulatorDTO::getAccountTrace).distinct().toList();
+
+        final List<ReguIdentityDTO> reguIdentities = fetchAllReguIdentityEntities(accountTraces);
+        if (regulations.isEmpty() || reguIdentities.isEmpty()) {
             return new ArrayList<>();
         }
-        Map<String, String> traceCodeRegulatorMap = buildRegulatorMap(definitiveList);
-        printTraceCodeRegulatorId(definitiveList);
+
+        final Map<String, ReguIdentityDTO> traceCodeRegulatorMap = buildRegulatorMap(reguIdentities);
+        printTraceCodeRegulatorId(reguIdentities);
+
         final List<ReportGenerationDto> regulatorReportGenerationData = new ArrayList<>();
         regulations.forEach(regulator -> {
             final Optional<SlaInfo> slaInfo = slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
@@ -52,7 +54,7 @@ public class RegulatorService {
                 log.error("Error to find SlaInfo with entity {}, reportName {}, reportSession {}, reportDate {}. Configure properties",
                     REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
             } else {
-                ReportGenerationDto reportGenerationDto = regulatorMapper.toReportGenerationDto(regulator, fileTypeProperties, slaInfo.get(), traceCodeRegulatorMap);
+                final ReportGenerationDto reportGenerationDto = regulatorMapper.toReportGenerationDto(regulator, fileTypeProperties, slaInfo.get(), traceCodeRegulatorMap);
                 reportGenerationDto.setReportingDate(DateUtils.itemDateFormatted(itemDate));
                 regulatorReportGenerationData.add(reportGenerationDto);
             }
@@ -61,28 +63,27 @@ public class RegulatorService {
         return regulatorReportGenerationData;
     }
 
-    private Map<String, String> buildRegulatorMap(List<ReguIdentityDTO> reguIdentityEntities) {
-        return reguIdentityEntities.stream()
-            .collect(Collectors.toMap(
-                ReguIdentityDTO::getTraceCode,
-                ReguIdentityDTO::getRegulatorId,
-                (existingValue, newValue) -> newValue
-            ));
+    private Map<String, ReguIdentityDTO> buildRegulatorMap(final List<ReguIdentityDTO> reguIdentityEntities) {
+        final Map<String, ReguIdentityDTO> map = new HashMap<>();
+        for (ReguIdentityDTO dto : reguIdentityEntities) {
+            map.put(dto.getTraceCode(), dto);
+        }
+        return map;
     }
 
-    private List<ReguIdentityDTO> fetchAllReguIdentityEntities(List<String> accountTraces) {
-        List<ReguIdentityDTO> definitiveList = new ArrayList<>();
-        List<List<String>> partitionedAccountTraces = ListUtils.partition(accountTraces, blockSize);
+    private List<ReguIdentityDTO> fetchAllReguIdentityEntities(final List<String> accountTraces) {
+        final List<ReguIdentityDTO> definitiveList = new ArrayList<>();
+        final List<List<String>> partitionedAccountTraces = ListUtils.partition(accountTraces, blockSize);
 
         partitionedAccountTraces.forEach(partition -> {
-            List<ReguIdentityDTO> reguIdentityEntities = reguIdentityAdapterRepository.findByTraceCode(partition);
+            final List<ReguIdentityDTO> reguIdentityEntities = reguIdentityAdapterRepository.findByTraceCode(partition);
             definitiveList.addAll(reguIdentityEntities);
         });
 
         return definitiveList;
     }
 
-    private void printTraceCodeRegulatorId(List<ReguIdentityDTO> definitiveList) {
+    private void printTraceCodeRegulatorId(final List<ReguIdentityDTO> definitiveList) {
         log.info("{}", new Gson().toJson(definitiveList));
     }
 

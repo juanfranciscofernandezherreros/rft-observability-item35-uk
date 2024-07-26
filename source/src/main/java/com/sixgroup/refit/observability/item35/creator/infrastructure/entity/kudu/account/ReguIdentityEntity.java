@@ -21,4 +21,7 @@ public class ReguIdentityEntity {
 
     @Column(name = "tracecode")
     private String traceCode;
+
+    @Column(name = "traceconnectivity")
+    private String traceConnectivity;
 }
