@@ -6,6 +6,7 @@ import com.sixgroup.refit.observability.item35.creator.configuration.ApiCloudera
 import com.sixgroup.refit.observability.item35.creator.configuration.ClouderaProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.StorageCapacityRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
@@ -33,6 +34,7 @@ public class StorageCapacity implements StorageCapacityRepository {
     private final OkHttpClient okHttpClient;
     private final ApiClouderaProperties apiClouderaProperties;
     private final ClouderaProperties clouderaProperties;
+    private final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public Optional<StorageCapacityResponse> findTotalStorage(String dateFrom, String dateTo) {
         return doClouderaCaller(dateFrom, dateTo, clouderaProperties.getStorage().getSelectTotalApi());
@@ -42,6 +44,7 @@ public class StorageCapacity implements StorageCapacityRepository {
         return doClouderaCaller(dateFrom, dateTo, clouderaProperties.getStorage().getSelectFreeApi());
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private Optional<StorageCapacityResponse> doClouderaCaller(String dateFrom, String dateTo, String query) {
 
         log.debug("Find Storage capacity dateFrom {}, dateTo {} and query {}", dateFrom, dateTo, query);
@@ -76,8 +79,6 @@ public class StorageCapacity implements StorageCapacityRepository {
             .url(urlBuilder.build().toString())
             .method(HttpMethod.GET.name(), null)
             .build();
-        final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-            false);
         okhttp3.Response response = null;
         try {
             response = okHttpClient.newCall(request).execute();
