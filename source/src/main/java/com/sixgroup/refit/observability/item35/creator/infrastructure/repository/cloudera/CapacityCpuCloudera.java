@@ -8,6 +8,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.CapacityCpuRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.CapacityMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
@@ -37,8 +38,10 @@ public class CapacityCpuCloudera implements CapacityCpuRepository {
     private final OkHttpClient okHttpClient;
     private final ApiClouderaProperties apiClouderaProperties;
     private final ClouderaProperties clouderaProperties;
+    private final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Override
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public List<Capacity> findByCapacityCpu(final String dateFrom, final String dateTo) {
 
         log.debug("Find Compute capacity Cpu by dateFrom {} and dateTo {}", dateFrom, dateTo);
@@ -68,19 +71,19 @@ public class CapacityCpuCloudera implements CapacityCpuRepository {
             .url(urlBuilder.build().toString())
             .method(HttpMethod.GET.name(), null)
             .build();
-        final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         okhttp3.Response response = null;
         try {
             response = okHttpClient.newCall(request).execute();
-            if (Objects.isNull(response.body())) {
+            if (null == response.body()) {
+                log.error("Error to call Cloudera Cpu - Message is null, and code: {}", ERROR_CALL_CLOUDERA);
                 return new ArrayList<>();
             }
             if (!response.isSuccessful()) {
                 log.error("Error to call Cloudera with message: {}, and code: {}", response.message(), ERROR_CALL_CLOUDERA);
                 return new ArrayList<>();
             }
-            final StorageCapacityResponse storageCapacityResponseBody = objectMapper.readValue(response.body().string(),
-                StorageCapacityResponse.class);
+            final StorageCapacityResponse storageCapacityResponseBody = objectMapper.readValue(response.body().string(), StorageCapacityResponse.class);
             return CapacityMapper.mapperResponseToListCapacity(storageCapacityResponseBody);
         } catch (IOException e) {
             log.error("Error to call Cloudera CPU with message: {}, code: {}, exception: ",

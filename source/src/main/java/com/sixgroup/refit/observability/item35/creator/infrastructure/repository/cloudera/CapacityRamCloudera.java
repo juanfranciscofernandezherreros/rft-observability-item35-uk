@@ -9,6 +9,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.storage.response.StorageCapacityResponse;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.CapacityRamRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.CapacityMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
@@ -38,8 +39,10 @@ public class CapacityRamCloudera implements CapacityRamRepository {
     private final OkHttpClient okHttpClient;
     private final ApiClouderaProperties apiClouderaProperties;
     private final ClouderaProperties clouderaProperties;
+    private final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Override
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public List<Capacity> findByCapacityRam(final String dateFrom, final String dateTo) {
 
         log.debug("Find Compute capacity Ram by dateFrom {} and dateTo {}", dateFrom, dateTo);
@@ -70,11 +73,11 @@ public class CapacityRamCloudera implements CapacityRamRepository {
             .url(urlBuilder.build().toString())
             .method(HttpMethod.GET.name(), null)
             .build();
-        final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         okhttp3.Response response = null;
         try {
             response = okHttpClient.newCall(request).execute();
             if (Objects.isNull(response.body())) {
+                log.error("Error to call Cloudera Ram - Message is null, and code: {}", ERROR_CALL_CLOUDERA);
                 return new ArrayList<>();
             }
             if (!response.isSuccessful()) {
