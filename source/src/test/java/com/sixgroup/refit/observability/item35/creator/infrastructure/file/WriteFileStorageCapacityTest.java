@@ -1,6 +1,5 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
-import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
@@ -31,11 +30,31 @@ class WriteFileStorageCapacityTest {
     @InjectMocks
     private WriteFileStorageCapacity writeFileStorageCapacity;
     @Mock
-    private StateService stateService;
-    @Mock
     private CsvProperties csvProperties;
     @Mock
     private ReportProperties reportProperties;
+
+    private static ItemCommandDTO getItemCommandDTO() {
+        ItemCommandDTO itemCommandDTO = ItemCommandDTO.builder()
+            .itemDate("20240915")
+            .itemType(ItemType.STORAGE_CAPACITY.getName())
+            .command(Command.REQUEST.getDescription())
+            .build();
+        return itemCommandDTO;
+    }
+
+    private static StorageCapacityDto createStorageCapacity(String reportDay, String date, String timeStamp, float capacity,
+                                                            float usedCapacity, float availableCapacity, float utilization) {
+        StorageCapacityDto storageCapacityDto = new StorageCapacityDto();
+        storageCapacityDto.setReportingDate(reportDay);
+        storageCapacityDto.setDate(date);
+        storageCapacityDto.setTimeStamp(timeStamp);
+        storageCapacityDto.setCapacity(capacity);
+        storageCapacityDto.setUsedCapacity(usedCapacity);
+        storageCapacityDto.setAvailableCapacity(availableCapacity);
+        storageCapacityDto.setUtilization(utilization);
+        return storageCapacityDto;
+    }
 
     @Test
     void writeFile() throws IOException {
@@ -47,16 +66,16 @@ class WriteFileStorageCapacityTest {
 
         Path locationPath = FileSystems.getDefault().getPath("src/test/resources/work-repository-observability/upload/");
 
-        if(!Files.exists(locationPath)) {
+        if (!Files.exists(locationPath)) {
             Files.createDirectories(locationPath);
         }
 
         StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("20240915", "2023/09/01",
-            "2023-09-01T00:00:00.000Z", 16.703632f,0.23867607f, 16.464956f,
+            "2023-09-01T00:00:00.000Z", 16.703632f, 0.23867607f, 16.464956f,
             0.0142888725f);
 
         StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("20240915", "2023/09/02",
-            "2023-09-02T00:00:00.000Z", 16.700466f,0.21350479f, 16.486961f,
+            "2023-09-02T00:00:00.000Z", 16.700466f, 0.21350479f, 16.486961f,
             0.012784361f);
 
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
@@ -79,15 +98,6 @@ class WriteFileStorageCapacityTest {
 
     }
 
-    private static ItemCommandDTO getItemCommandDTO() {
-        ItemCommandDTO itemCommandDTO = ItemCommandDTO.builder()
-            .itemDate("20240915")
-            .itemType(ItemType.STORAGE_CAPACITY.getName())
-            .command(Command.REQUEST.getDescription())
-            .build();
-        return itemCommandDTO;
-    }
-
     private String readFromInputStream(InputStream inputStream) throws IOException {
         StringBuilder resultStringBuilder = new StringBuilder();
         try (BufferedReader br
@@ -98,18 +108,5 @@ class WriteFileStorageCapacityTest {
             }
         }
         return resultStringBuilder.toString();
-    }
-
-    private static StorageCapacityDto createStorageCapacity(String reportDay, String date, String timeStamp, float capacity,
-                                                            float usedCapacity, float availableCapacity, float utilization) {
-        StorageCapacityDto storageCapacityDto = new StorageCapacityDto();
-        storageCapacityDto.setReportingDate(reportDay);
-        storageCapacityDto.setDate(date);
-        storageCapacityDto.setTimeStamp(timeStamp);
-        storageCapacityDto.setCapacity(capacity);
-        storageCapacityDto.setUsedCapacity(usedCapacity);
-        storageCapacityDto.setAvailableCapacity(availableCapacity);
-        storageCapacityDto.setUtilization(utilization);
-        return storageCapacityDto;
     }
 }

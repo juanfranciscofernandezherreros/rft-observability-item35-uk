@@ -63,7 +63,7 @@ class UseCaseComputeCapacityUnitTest {
         verify(capacityRamService, times(1)).findByCapacityRam(anyString(), anyString());
         verify(writeFileComputeCapacity, times(1)).writeFile(anyList(), any(ItemCommandDTO.class));
         verify(producerItemService, times(1)).send(any(ItemCommandDTO.class), any());
-        verify(stateService, times(2)).nextStep(any(StateRequest.class));
+        verify(stateService, times(4)).nextStep(any(StateRequest.class));
     }
 
     @Test

@@ -1,12 +1,8 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.producer;
 
-import com.sixgroup.refit.observability.item.log.ItemLog;
-import com.sixgroup.refit.observability.item.state.application.StateService;
-import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.producer.RftKafkaProducerTracing;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
@@ -21,9 +17,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 
-import static com.sixgroup.refit.observability.item.state.domain.enums.State.SENT_RESPONSE;
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_SENDING_MESSAGE_EFRH_031;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 
 @Slf4j
 @Component
@@ -31,24 +25,15 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 public class KafkaProducerItem implements ProducerItemService {
 
     private final RftKafkaProducerTracing<ItemId, ItemCommand> producerTracing;
-    private final StateService stateService;
-    private final ItemLog iLog = new ItemLog();
 
     @Value("${component-config.topics.observability-item-topic}")
     private String topic;
 
     @Override
     public void send(ItemCommandDTO itemCommandDTO, Headers headers) {
-
-        ItemId itemId = ItemId.newBuilder().setItemId(itemCommandDTO.getItemId()).build();
-        ItemCommand itemCommand = getItemCommandResponse(itemCommandDTO);
+        final ItemId itemId = ItemId.newBuilder().setItemId(itemCommandDTO.getItemId()).build();
+        final ItemCommand itemCommand = getItemCommandResponse(itemCommandDTO);
         var future = producerTracing.createMessage(topic, itemId, itemCommand, headers);
-        stateService.nextStep(
-            StateRequest.builder()
-                .fileName(FileUtils.getFileName(itemCommandDTO))
-                .itemType(ITEM35)
-                .build());
-        iLog.info(itemCommandDTO, SENT_RESPONSE);
         addCallBack(future, itemId, itemCommand);
     }
 

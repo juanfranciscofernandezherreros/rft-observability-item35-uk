@@ -1,8 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.opencsv.CSVWriter;
-import com.sixgroup.refit.observability.item.state.application.StateService;
-import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
@@ -23,16 +21,15 @@ import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.FIELD_INCIDENT_RELATED_FILE;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.FIELD_TR_INCIDENT_ID_RELATED_FILE;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATABASE_SERVER_OR_PLATFORM;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATA_CENTER_LOCATION;
 
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity> {
-
     private final CsvProperties csvProperties;
-    private final StateService stateService;
     private final ReportProperties reportProperties;
 
     @Override
@@ -47,8 +44,6 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
             }
         }
         log.debug("File created and written: " + filePath);
-        stateService.nextStep(
-            StateRequest.builder().fileName(FileUtils.getFileName(itemCommandDTO)).itemType(ITEM35).fileUrl(filePath).build());
         return new File(filePath);
     }
 
