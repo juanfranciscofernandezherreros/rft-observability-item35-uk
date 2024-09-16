@@ -2,6 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase;
 
 import com.sixgroup.refit.observability.item.log.ItemLog;
 import com.sixgroup.refit.observability.item.state.application.StateService;
+import com.sixgroup.refit.observability.item.state.domain.model.ItemReportingDto;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.application.service.CapacityCpuService;
 import com.sixgroup.refit.observability.item35.creator.application.service.CapacityRamService;
@@ -25,7 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static com.sixgroup.refit.observability.item.state.domain.enums.State.SAVING_INFORMATION;
+import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
 
 @Service
@@ -49,6 +50,7 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
         try {
             stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
 
+            //Find information
             final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemCommand.getItemDate());
             final String dateTo = DateUtils.firstDayOfCurrentMonth(itemCommand.getItemDate());
 
@@ -56,38 +58,36 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
             final List<Capacity> capacityRam = capacityRamService.findByCapacityRam(dateFrom, dateTo);
 
             if (CollectionUtils.isEmpty(capacityCpu) || CollectionUtils.isEmpty(capacityRam)) {
+                iLog.info(ItemReportingDto.builder().itemType(ITEM35).build(), ERROR);
                 log.error("No data found in compute capacity, skipping report generation");
-                stateService.setError(
-                    StateRequest.builder()
-                        .fileName(FileUtils.getFileName(itemCommand))
-                        .itemType(ITEM35)
-                        .errorDescription("No record status found, skipping file generation")
-                        .build());
+                stateService.setError(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).errorDescription("No record status found, skipping file generation").build());
                 return null;
             }
 
-            stateService.nextStep(
-                StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
+            //Saving information
+            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
             iLog.info(itemCommand, SAVING_INFORMATION);
 
+            //Saved information
             final List<Capacity> recordsCapacity = new ArrayList<>();
             recordsCapacity.addAll(capacityCpu);
             recordsCapacity.addAll(capacityRam);
             recordsCapacity.sort(Comparator.comparing(Capacity::getDate));
 
             file = writeFileComputeCapacity.writeFile(recordsCapacity, itemCommand);
-            log.debug("Generated compute capacity file with name {}, path {}", file.getName(), file.getAbsolutePath());
+            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).fileUrl(file.getPath()).build());
+            iLog.info(itemCommand, SAVED_INFORMATION);
+
+            //Sent response
             itemCommand.setFileName(file.getName());
             itemCommand.setFileUrl(file.getAbsolutePath());
             producerItemService.send(itemCommand, headers);
+            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
+            iLog.info(itemCommand, SENT_RESPONSE);
         } catch (Exception e) {
+            iLog.info(ItemReportingDto.builder().itemType(ITEM35).build(), ERROR);
             log.error("Error to generate file compute capacity {}", e.getMessage(), e);
-            stateService.setError(
-                StateRequest.builder()
-                    .fileName(FileUtils.getFileName(itemCommand))
-                    .itemType(ITEM35)
-                    .errorDescription("Error to generate file compute capacity: " + e.getMessage())
-                    .build());
+            stateService.setError(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).errorDescription("Error to generate file compute capacity: " + e.getMessage()).build());
         }
         return file;
     }

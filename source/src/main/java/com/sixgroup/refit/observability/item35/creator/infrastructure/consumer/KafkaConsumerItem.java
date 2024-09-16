@@ -1,5 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.consumer;
 
+import com.sixgroup.refit.observability.item.log.ItemLog;
+import com.sixgroup.refit.observability.item.state.domain.model.ItemReportingDto;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import static com.sixgroup.refit.observability.item.state.domain.enums.State.INTERNAL_REQUEST_RECEIVED;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -24,6 +28,7 @@ public class KafkaConsumerItem {
 
     private final RftKafkaConsumerTracing kafkaConsumerTracing;
     private final Map<ItemType, ItemTypeStrategy> itemType;
+    private final ItemLog iLog = new ItemLog();
 
     @KafkaListener(topics = "${component-config.topics.observability-item-topic}", groupId = "${component-config.topics.observability-item-consumer-group-id}")
     public void consume(final ConsumerRecord<ItemId, ItemCommand> item) throws ExecutionException, InterruptedException {
@@ -34,6 +39,8 @@ public class KafkaConsumerItem {
             kafkaConsumerTracing.initTrace(item.headers());
             final ItemCommandDTO itemCommand = ItemCommandDTO.generateItemCommandDTO(item.value());
             log.info("Item35 request itemCommand: {}", itemCommand);
+            iLog.info(ItemReportingDto.builder().itemType(itemCommand.getItemType()).build(), INTERNAL_REQUEST_RECEIVED);
+
             if (!isRequestTypeAccepted(item.value().getItemType())) {
                 throw new IllegalArgumentException("'type' " + item.value().getItemType()
                     + " cannot be null or blank, and must be any of accepted values");

@@ -102,7 +102,7 @@ class UseCaseReportGenerationUnitTest {
         verify(participantService, times(1)).findParticipants(any(), any(), any());
         verify(regulatorService, times(1)).findRegulator(any(), any(), any());
         verify(trService, times(1)).findTr(any(), any(), any());
-        verify(stateService, times(2)).nextStep(any(StateRequest.class));
+        verify(stateService, times(4)).nextStep(any(StateRequest.class));
         verify(producerItemService, times(1)).send(any(), any());
 
         verify(writeFileReportGenerationService).writeFile(reportGenerationDtoListCaptor.capture(),

@@ -97,7 +97,7 @@ class UseCaseStorageCapacityTest {
         assertNotNull(resultFile);
         verify(storageService, times(1)).getTotalCapacity(any(), any());
         verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
-        verify(stateService, times(2)).nextStep(any(StateRequest.class));
+        verify(stateService, times(4)).nextStep(any(StateRequest.class));
         verify(producerItemService, times(1)).send(any(), any());
 
         verify(writeFileSubmissionVolumesService).writeFile(storageCapacityDtoListCaptor.capture(),

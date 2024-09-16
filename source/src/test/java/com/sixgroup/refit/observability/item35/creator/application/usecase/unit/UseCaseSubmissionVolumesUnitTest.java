@@ -49,7 +49,7 @@ class UseCaseSubmissionVolumesUnitTest {
         when(writeFileSubmissionVolumesService.writeFile(anyList(), any())).thenReturn(mockedFile);
         File resultFile = useCaseSubmissionVolumes.execute(ItemCommandMock.builderItemCommand(), mockHeaders);
         assertNotNull(resultFile);
-        verify(stateService, times(2)).nextStep((StateRequest) any());
+        verify(stateService, times(4)).nextStep((StateRequest) any());
         verify(producerItemService, times(1)).send(any(), any());
     }
 
