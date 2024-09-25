@@ -49,6 +49,7 @@ public class CapacityRamCloudera implements CapacityRamRepository {
     }
 
     @Override
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public List<Capacity> findTotalCapacityRam(final String dateFrom, final String dateTo) {
         return getValues(dateFrom, dateTo, clouderaProperties.getRam().getSelectTotalRam());
     }
