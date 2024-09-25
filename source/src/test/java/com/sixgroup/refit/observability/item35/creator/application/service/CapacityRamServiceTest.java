@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.application.mock.CapacityMock.builderListCapacityRam;
+import static com.sixgroup.refit.observability.item35.creator.application.mock.CapacityMock.builderListTotalCapacityRam;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -33,12 +34,13 @@ class CapacityRamServiceTest {
     @Test
     void testFindByCapacityRam() {
         when(capacityRamRepository.findByCapacityRam(anyString(), anyString())).thenReturn(builderListCapacityRam());
+        when(capacityRamRepository.findTotalCapacityRam(anyString(), anyString())).thenReturn(builderListTotalCapacityRam());
         List<Capacity> result = capacityRamService.findByCapacityRam("2024-01-01", "2024-02-01");
         verify(capacityRamRepository).findByCapacityRam(eq("2024-01-01"), eq("2024-02-01"));
         assertNotNull(result);
 
         Assertions.assertEquals(result,
-            List.of(new Capacity("2024-01-01", "0.2317", "0.2200", "0.2236", CapacityConstants.RAM)));
+            List.of(new Capacity("2024-01-01", "0.3794", "0.3603", "0.3662", CapacityConstants.RAM)));
     }
 
 }

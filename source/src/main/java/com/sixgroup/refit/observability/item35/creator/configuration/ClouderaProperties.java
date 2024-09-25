@@ -38,6 +38,8 @@ public class ClouderaProperties {
         @NotNull
         private String selectRam;
         @NotNull
+        private String selectTotalRam;
+        @NotNull
         private String desiredRollup;
     }
 

@@ -17,6 +17,16 @@ public class CapacityMock {
             new Capacity("2024-01-01", "4.0806617088E10", "3.9146037248E10", "3.9659996570596245E10", CapacityConstants.RAM));
     }
 
+    public static List<Capacity> builderListTotalCapacityRam() {
+
+        return List.of(
+            new Capacity("2024-01-01", "1.34283710464E11", "1.34283710464E11", "1.34283710464E11", CapacityConstants.RAM),
+            new Capacity("2024-01-01", "1.3428371456E11", "1.3428371456E11", "1.3428371456E11", CapacityConstants.RAM),
+            new Capacity("2024-01-01", "1.34283710464E11", "1.34283710464E11", "1.34283710464E11", CapacityConstants.RAM),
+            new Capacity("2024-01-01", "1.34283710464E11", "1.34283710464E11", "1.34283710464E11", CapacityConstants.RAM),
+            new Capacity("2024-01-01", "1.34283710464E11", "1.34283710464E11", "1.34283710464E11", CapacityConstants.RAM));
+    }
+
     public static List<Capacity> builderListCapacityCpu() {
 
         return List.of(

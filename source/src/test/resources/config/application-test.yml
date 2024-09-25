@@ -172,6 +172,7 @@ component-config:
     ram:
       enabled: false
       selectRam: select physical_memory_used
+      selectTotalRam: select physical_memory_total
       desiredRollup: DAILY
     storage:
       enabled: false
