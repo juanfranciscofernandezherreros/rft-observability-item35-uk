@@ -83,8 +83,8 @@ class UseCaseStorageCapacityTest {
             0.0143f);
 
         StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("2024-09-15", "2023-09-02",
-            "2023-09-02T00:00:00.000Z", 16.7005f, 0.2135f, 16.4870f,
-            0.0128f);
+            "2023-09-02T00:00:00.000Z", 16.7036f, 0.2166f, 16.4870f,
+            0.013f);
 
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
 
@@ -144,8 +144,8 @@ class UseCaseStorageCapacityTest {
             0.0143f);
 
         StorageCapacityDto storageCapacityDto_2 = createStorageCapacity("2024-09-15", "2023-09-02",
-            "2023-09-02T00:00:00.000Z", 16.7005f, 0.2135f, 16.4870f,
-            0.0128f);
+            "2023-09-02T00:00:00.000Z", 16.7036f, 0.2166f, 16.4870f,
+            0.013f);
 
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
 

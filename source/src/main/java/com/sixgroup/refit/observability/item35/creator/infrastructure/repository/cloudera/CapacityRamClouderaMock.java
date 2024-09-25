@@ -25,10 +25,19 @@ import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalo
 public class CapacityRamClouderaMock implements CapacityRamRepository {
     @Override
     public List<Capacity> findByCapacityRam(String dateFrom, String dateTo) {
+        return getData("json/capacity-ram.json");
+    }
+
+    @Override
+    public List<Capacity> findTotalCapacityRam(final String dateFrom, final String dateTo) {
+        return getData("json/capacity-ram-total.json");
+    }
+
+    private List<Capacity> getData(final String fileUrl) {
         List<Capacity> listCapacityRam = null;
         try {
             StorageCapacityResponse storageCapacityResponse = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .readValue(getClass().getClassLoader().getResourceAsStream("json/capacity-ram.json"), StorageCapacityResponse.class);
+                .readValue(getClass().getClassLoader().getResourceAsStream(fileUrl), StorageCapacityResponse.class);
             listCapacityRam = CapacityMapper.mapperResponseToListCapacity(storageCapacityResponse);
         } catch (IOException e) {
             log.error("Error to call Cloudera Ram Mock with message: {}, and code: {}",

@@ -14,6 +14,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileI
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.MathsUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -25,6 +26,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
@@ -97,14 +99,29 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
     private List<StorageCapacityDto> calculateFinalList(String itemDate, List<Storage> totalCapacityList,
                                                         List<Storage> totalFreeCapacityList) {
-        List<StorageCapacityDto> storageCapacityFinalList = new ArrayList<>();
+        final AtomicReference<BigDecimal> referenceCapacity = new AtomicReference<>(BigDecimal.valueOf(totalCapacityList.get(0).getCapacity()));
+        final AtomicReference<BigDecimal> referenceAvailableCapacity = new AtomicReference<>(BigDecimal.valueOf(totalFreeCapacityList.get(0).getCapacity()));
+
+        final List<StorageCapacityDto> storageCapacityFinalList = new ArrayList<>();
         totalCapacityList.forEach(totalStorage ->
             totalFreeCapacityList.forEach(totalFreeStorage -> {
                 if (totalStorage.getTimeStamp().equals(totalFreeStorage.getTimeStamp())) {
                     final StorageCapacityDto storageCapacityDto = new StorageCapacityDto();
                     storageCapacityDto.setTimeStamp(totalStorage.getTimeStamp());
-                    storageCapacityDto.setCapacity(BigDecimal.valueOf(totalStorage.getCapacity()).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
-                    storageCapacityDto.setAvailableCapacity(BigDecimal.valueOf(totalFreeStorage.getCapacity()).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
+
+                    //Capacity
+                    referenceAvailableCapacity.set(BigDecimal.valueOf(totalFreeStorage.getCapacity()));
+                    if (MathsUtils.isIntoMayorPercent(referenceCapacity.get(), BigDecimal.valueOf(totalStorage.getCapacity()))) {
+                        if (totalFreeStorage.getCapacity().compareTo(totalStorage.getCapacity()) > 0) {
+                            referenceCapacity.set(BigDecimal.valueOf(totalFreeStorage.getCapacity()));
+                            referenceAvailableCapacity.set(BigDecimal.valueOf(totalStorage.getCapacity()));
+                        } else {
+                            referenceCapacity.set(BigDecimal.valueOf(totalStorage.getCapacity()));
+                        }
+                    }
+                    storageCapacityDto.setCapacity(referenceCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
+                    storageCapacityDto.setAvailableCapacity(referenceAvailableCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
+
                     // CALCULATED VALUES
                     float usedCapacity = storageCapacityDto.getCapacity() - storageCapacityDto.getAvailableCapacity();
                     storageCapacityDto.setUsedCapacity(BigDecimal.valueOf(usedCapacity).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());

@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -93,21 +92,26 @@ class CapacityRamClouderaTest {
     @ParameterizedTest
     @NullAndEmptySource
     void shouldReturnIllegalArgumentExceptionWhenHostDateFromIsNullOrBlank(String dateFrom) {
+        final ClouderaProperties.Ram mockRam = mock(ClouderaProperties.Ram.class);
+        when(mockClouderaProperties.getRam()).thenReturn(mockRam);
         assertThrows(IllegalArgumentException.class, () -> capacityRamCloudera.findByCapacityRam(dateFrom, "2020-01-31"));
     }
 
     @ParameterizedTest
     @NullAndEmptySource
     void shouldReturnIllegalArgumentExceptionWhenHostDateToIsNullOrBlank(String dateTo) {
+        final ClouderaProperties.Ram mockRam = mock(ClouderaProperties.Ram.class);
+        when(mockClouderaProperties.getRam()).thenReturn(mockRam);
         assertThrows(IllegalArgumentException.class, () -> capacityRamCloudera.findByCapacityRam("2020-01-31", dateTo));
     }
 
     @Test
     void shouldReturnIllegalArgumentExceptionWhenHostPropertiesIsNull() {
-
         String testDateFrom = "2020-01-01";
         String testDateTo = "2020-01-31";
 
+        final ClouderaProperties.Ram mockRam = mock(ClouderaProperties.Ram.class);
+        when(mockClouderaProperties.getRam()).thenReturn(mockRam);
         when(mockApiClouderaProperties.getHost()).thenReturn(null);
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
@@ -117,10 +121,11 @@ class CapacityRamClouderaTest {
 
     @Test
     void shouldReturnIllegalArgumentExceptionWhenPortPropertiesIsNull() {
-
         String testDateFrom = "2020-01-01";
         String testDateTo = "2020-01-31";
 
+        final ClouderaProperties.Ram mockRam = mock(ClouderaProperties.Ram.class);
+        when(mockClouderaProperties.getRam()).thenReturn(mockRam);
         when(mockApiClouderaProperties.getHost()).thenReturn("https://example.com");
         when(mockApiClouderaProperties.getPort()).thenReturn(null);
         when(mockApiClouderaProperties.getUrl()).thenReturn("/api/test");
@@ -130,10 +135,11 @@ class CapacityRamClouderaTest {
 
     @Test
     void shouldReturnIllegalArgumentExceptionWhenUrlPropertiesIsNull() {
-
         String testDateFrom = "2020-01-01";
         String testDateTo = "2020-01-31";
 
+        final ClouderaProperties.Ram mockRam = mock(ClouderaProperties.Ram.class);
+        when(mockClouderaProperties.getRam()).thenReturn(mockRam);
         when(mockApiClouderaProperties.getHost()).thenReturn("https://example.com");
         when(mockApiClouderaProperties.getPort()).thenReturn("8080");
         when(mockApiClouderaProperties.getUrl()).thenReturn(null);

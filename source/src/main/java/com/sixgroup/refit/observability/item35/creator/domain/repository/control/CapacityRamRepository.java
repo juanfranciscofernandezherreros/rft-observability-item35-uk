@@ -7,4 +7,5 @@ import java.util.List;
 public interface CapacityRamRepository {
 
     List<Capacity> findByCapacityRam(String dateFrom, String dateTo);
+    List<Capacity> findTotalCapacityRam(String dateFrom, String dateTo);
 }

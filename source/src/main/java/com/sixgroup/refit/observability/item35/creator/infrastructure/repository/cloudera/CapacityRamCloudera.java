@@ -44,7 +44,16 @@ public class CapacityRamCloudera implements CapacityRamRepository {
     @Override
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public List<Capacity> findByCapacityRam(final String dateFrom, final String dateTo) {
+        return getValues(dateFrom, dateTo, clouderaProperties.getRam().getSelectRam());
 
+    }
+
+    @Override
+    public List<Capacity> findTotalCapacityRam(final String dateFrom, final String dateTo) {
+        return getValues(dateFrom, dateTo, clouderaProperties.getRam().getSelectTotalRam());
+    }
+
+    private List<Capacity> getValues(final String dateFrom, final String dateTo, final String url) {
         log.debug("Find Compute capacity Ram by dateFrom {} and dateTo {}", dateFrom, dateTo);
 
         if (null == dateFrom) {
@@ -63,7 +72,7 @@ public class CapacityRamCloudera implements CapacityRamRepository {
 
         final HttpUrl.Builder urlBuilder = httpUrl.newBuilder();
 
-        urlBuilder.addQueryParameter(QUERY, clouderaProperties.getRam().getSelectRam());
+        urlBuilder.addQueryParameter(QUERY, url);
         urlBuilder.addQueryParameter(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         urlBuilder.addQueryParameter(DATE_FROM, dateFrom);
         urlBuilder.addQueryParameter(DATE_TO, dateTo);
