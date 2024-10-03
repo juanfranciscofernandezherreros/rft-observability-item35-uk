@@ -22,8 +22,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.NUM_DECIMALS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,6 +36,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UseCaseStorageCapacityTest {
 
+    private final Headers mockHeaders = mock(Headers.class);
     @Captor
     ArgumentCaptor<List<StorageCapacityDto>> storageCapacityDtoListCaptor;
     @Mock
@@ -45,7 +49,6 @@ class UseCaseStorageCapacityTest {
     private UseCaseStorageCapacity useCaseStorageCapacity;
     @Mock
     private StorageService storageService;
-    private final Headers mockHeaders = mock(Headers.class);
 
     private static StorageCapacityDto createStorageCapacity(String reportDay, String date, String timeStamp, float capacity,
                                                             float usedCapacity, float availableCapacity, float utilization) {
@@ -53,10 +56,10 @@ class UseCaseStorageCapacityTest {
         storageCapacityDto.setReportingDate(reportDay);
         storageCapacityDto.setDate(date);
         storageCapacityDto.setTimeStamp(timeStamp);
-        storageCapacityDto.setCapacity(capacity);
-        storageCapacityDto.setUsedCapacity(usedCapacity);
-        storageCapacityDto.setAvailableCapacity(availableCapacity);
-        storageCapacityDto.setUtilization(utilization);
+        storageCapacityDto.setCapacity(new BigDecimal(capacity).setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+        storageCapacityDto.setUsedCapacity(new BigDecimal(usedCapacity).setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+        storageCapacityDto.setAvailableCapacity(new BigDecimal(availableCapacity).setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+        storageCapacityDto.setUtilization(new BigDecimal(utilization).setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
         return storageCapacityDto;
     }
 
@@ -70,12 +73,12 @@ class UseCaseStorageCapacityTest {
 
     @Test
     void execute() throws IOException {
-        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.703632f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
+        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", bigDecimalFromString("16.703632f")),
+            new Storage("2023-09-02T00:00:00.000Z", BigDecimal.valueOf(Float.parseFloat("16.700466f"))));
         when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
 
-        List<Storage> totalFreeCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.464956f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.486961f));
+        List<Storage> totalFreeCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", bigDecimalFromString("16.464956f")),
+            new Storage("2023-09-02T00:00:00.000Z", bigDecimalFromString("16.486961f")));
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
 
         StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("2024-09-15", "2023-09-01",
@@ -118,8 +121,8 @@ class UseCaseStorageCapacityTest {
 
     @Test
     void execute_resource_not_found_total_free_capacity_error() {
-        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.703632f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
+        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", bigDecimalFromString("16.703632f")),
+            new Storage("2023-09-02T00:00:00.000Z", bigDecimalFromString("16.700466")));
         when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(null);
         useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders);
@@ -131,12 +134,12 @@ class UseCaseStorageCapacityTest {
 
     @Test
     void execute_throws_io_exception() throws IOException {
-        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.703632f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.700466f));
+        List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", bigDecimalFromString("16.703632f")),
+            new Storage("2023-09-02T00:00:00.000Z", bigDecimalFromString("16.700466f")));
         when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
 
-        List<Storage> totalFreeCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", 16.464956f),
-            new Storage("2023-09-02T00:00:00.000Z", 16.486961f));
+        List<Storage> totalFreeCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", bigDecimalFromString("16.464956f")),
+            new Storage("2023-09-02T00:00:00.000Z", bigDecimalFromString("16.486961f")));
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
 
         StorageCapacityDto storageCapacityDto_1 = createStorageCapacity("2024-09-15", "2023-09-01",
@@ -165,6 +168,10 @@ class UseCaseStorageCapacityTest {
     @Test
     void getItemType() {
         assertEquals(ItemType.STORAGE_CAPACITY, useCaseStorageCapacity.getItemType());
+    }
+
+    private BigDecimal bigDecimalFromString(final String value) {
+        return BigDecimal.valueOf(Float.parseFloat(value));
     }
 
 }

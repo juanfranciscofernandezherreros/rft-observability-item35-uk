@@ -58,8 +58,8 @@ class StorageServiceTest {
         assertNotNull(storageList);
         assertEquals("2024-01-01T00:00:00.000Z", storageList.get(0).getTimeStamp());
         assertEquals("2024-02-01T00:00:00.000Z", storageList.get(storageList.size() - 1).getTimeStamp());
-        assertEquals(17.1004f, storageList.get(0).getCapacity());
-        assertEquals(17.1903f, storageList.get(storageList.size() - 1).getCapacity());
+        assertEquals(17.1004f, storageList.get(0).getCapacity().floatValue());
+        assertEquals(17.1903f, storageList.get(storageList.size() - 1).getCapacity().floatValue());
         verify(storageCapacity).findTotalStorage(eq("2024-01-01"), eq("2024-02-01"));
     }
 
@@ -142,8 +142,8 @@ class StorageServiceTest {
         assertNotNull(storageList);
         assertEquals("2024-01-01T00:00:00.000Z", storageList.get(0).getTimeStamp());
         assertEquals("2024-02-01T00:00:00.000Z", storageList.get(storageList.size() - 1).getTimeStamp());
-        assertEquals(16.3134f, storageList.get(0).getCapacity());
-        assertEquals(15.9577f, storageList.get(storageList.size() - 1).getCapacity());
+        assertEquals(16.3134f, storageList.get(0).getCapacity().floatValue());
+        assertEquals(15.9577f, storageList.get(storageList.size() - 1).getCapacity().floatValue());
 
         verify(storageCapacity).findFreeStorage(eq("2024-01-01"), eq("2024-02-01"));
     }

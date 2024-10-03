@@ -3,6 +3,7 @@ package com.sixgroup.refit.observability.item35.creator.application.service;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.CapacityCpuRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.MathsUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -42,7 +43,12 @@ public class CapacityCpuService {
             capacityDay.setMax(maxValue.toString());
             capacityDay.setMean(mean.toString());
 
-            capacityCpu.add(new Capacity(capacityDay.getDate(), maxValue.toString(), minValue.toString(), mean.toString(), CapacityConstants.CPU));
+            capacityCpu.add(new Capacity(
+                capacityDay.getDate(),
+                MathsUtils.formatBigDecimalToFourDecimals(maxValue),
+                MathsUtils.formatBigDecimalToFourDecimals(minValue),
+                MathsUtils.formatBigDecimalToFourDecimals(mean),
+                CapacityConstants.CPU));
 
         });
         return capacityCpu;
