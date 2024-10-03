@@ -107,7 +107,7 @@ class UseCaseStorageCapacityITTest {
             "DATE;CAPACITY;USED_CAPACITY;AVAILABLE_CAPACITY;UTILIZATION;INCIDENT_RELATED;TR_INCIDENT_ID";
 
         String lineOne = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;2024-03-01;13.3012;1.1997;12.1015;0.0902;NO;";
-        String lineTwo = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;2024-03-02;13.3012;1.1837;12.1175;0.089;NO;";
+        String lineTwo = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;2024-03-02;13.3012;1.1837;12.1175;0.0890;NO;";
         String penultimateLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;2024-03-31;19.3932;1.5539;17.8393;0.0801;NO;";
         String lastLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;2024-04-01;19.3932;1.6337;17.7595;0.0842;NO;";
 

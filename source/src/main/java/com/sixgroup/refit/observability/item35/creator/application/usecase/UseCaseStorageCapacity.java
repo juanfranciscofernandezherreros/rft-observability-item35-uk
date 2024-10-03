@@ -99,8 +99,8 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
     private List<StorageCapacityDto> calculateFinalList(String itemDate, List<Storage> totalCapacityList,
                                                         List<Storage> totalFreeCapacityList) {
-        final AtomicReference<BigDecimal> referenceCapacity = new AtomicReference<>(BigDecimal.valueOf(totalCapacityList.get(0).getCapacity()));
-        final AtomicReference<BigDecimal> referenceAvailableCapacity = new AtomicReference<>(BigDecimal.valueOf(totalFreeCapacityList.get(0).getCapacity()));
+        final AtomicReference<BigDecimal> referenceCapacity = new AtomicReference<>(totalCapacityList.get(0).getCapacity());
+        final AtomicReference<BigDecimal> referenceAvailableCapacity = new AtomicReference<>(totalFreeCapacityList.get(0).getCapacity());
 
         final List<StorageCapacityDto> storageCapacityFinalList = new ArrayList<>();
         totalCapacityList.forEach(totalStorage ->
@@ -110,23 +110,23 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
                     storageCapacityDto.setTimeStamp(totalStorage.getTimeStamp());
 
                     //Capacity
-                    referenceAvailableCapacity.set(BigDecimal.valueOf(totalFreeStorage.getCapacity()));
-                    if (MathsUtils.isIntoMayorPercent(referenceCapacity.get(), BigDecimal.valueOf(totalStorage.getCapacity()))) {
+                    referenceAvailableCapacity.set(totalFreeStorage.getCapacity());
+                    if (MathsUtils.isIntoMayorPercent(referenceCapacity.get(), totalStorage.getCapacity())) {
                         if (totalFreeStorage.getCapacity().compareTo(totalStorage.getCapacity()) > 0) {
-                            referenceCapacity.set(BigDecimal.valueOf(totalFreeStorage.getCapacity()));
-                            referenceAvailableCapacity.set(BigDecimal.valueOf(totalStorage.getCapacity()));
+                            referenceCapacity.set(totalFreeStorage.getCapacity());
+                            referenceAvailableCapacity.set(totalStorage.getCapacity());
                         } else {
-                            referenceCapacity.set(BigDecimal.valueOf(totalStorage.getCapacity()));
+                            referenceCapacity.set(totalStorage.getCapacity());
                         }
                     }
-                    storageCapacityDto.setCapacity(referenceCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
-                    storageCapacityDto.setAvailableCapacity(referenceAvailableCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
+                    storageCapacityDto.setCapacity(referenceCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+                    storageCapacityDto.setAvailableCapacity(referenceAvailableCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
 
                     // CALCULATED VALUES
-                    float usedCapacity = storageCapacityDto.getCapacity() - storageCapacityDto.getAvailableCapacity();
-                    storageCapacityDto.setUsedCapacity(BigDecimal.valueOf(usedCapacity).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
-                    float utilization = storageCapacityDto.getUsedCapacity() / storageCapacityDto.getCapacity();
-                    storageCapacityDto.setUtilization(BigDecimal.valueOf(utilization).setScale(NUM_DECIMALS, RoundingMode.HALF_UP).floatValue());
+                    final BigDecimal usedCapacity = storageCapacityDto.getCapacity().subtract(storageCapacityDto.getAvailableCapacity());
+                    storageCapacityDto.setUsedCapacity(usedCapacity.setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+                    final BigDecimal utilization = storageCapacityDto.getUsedCapacity().divide(storageCapacityDto.getCapacity(), NUM_DECIMALS, RoundingMode.HALF_UP);
+                    storageCapacityDto.setUtilization(utilization.setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
                     String date = DateUtils.createFileDateFromTimeStamp(storageCapacityDto.getTimeStamp());
                     storageCapacityDto.setDate(date);
 

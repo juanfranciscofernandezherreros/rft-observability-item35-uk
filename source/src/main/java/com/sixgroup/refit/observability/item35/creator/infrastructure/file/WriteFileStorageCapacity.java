@@ -8,6 +8,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandD
 import com.sixgroup.refit.observability.item35.creator.domain.model.StorageCapacityDto;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.shared.csv.CSVCreator;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.MathsUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,10 +55,10 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
             DATA_CENTER_LOCATION,
             DATABASE_SERVER_OR_PLATFORM,
             storageCapacityData.getDate(),
-            String.valueOf(storageCapacityData.getCapacity()),
-            String.valueOf(storageCapacityData.getUsedCapacity()),
-            String.valueOf(storageCapacityData.getAvailableCapacity()),
-            String.valueOf(storageCapacityData.getUtilization()),
+            MathsUtils.formatBigDecimalToFourDecimals(storageCapacityData.getCapacity()),
+            MathsUtils.formatBigDecimalToFourDecimals(storageCapacityData.getUsedCapacity()),
+            MathsUtils.formatBigDecimalToFourDecimals(storageCapacityData.getAvailableCapacity()),
+            MathsUtils.formatBigDecimalToFourDecimals(storageCapacityData.getUtilization()),
             INCIDENT_RELATED,
             TR_INCIDENT_ID
         };

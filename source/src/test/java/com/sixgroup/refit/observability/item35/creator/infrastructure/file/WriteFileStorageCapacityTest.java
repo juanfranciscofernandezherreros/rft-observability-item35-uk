@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,10 +50,10 @@ class WriteFileStorageCapacityTest {
         storageCapacityDto.setReportingDate(reportDay);
         storageCapacityDto.setDate(date);
         storageCapacityDto.setTimeStamp(timeStamp);
-        storageCapacityDto.setCapacity(capacity);
-        storageCapacityDto.setUsedCapacity(usedCapacity);
-        storageCapacityDto.setAvailableCapacity(availableCapacity);
-        storageCapacityDto.setUtilization(utilization);
+        storageCapacityDto.setCapacity(BigDecimal.valueOf(capacity));
+        storageCapacityDto.setUsedCapacity(BigDecimal.valueOf(usedCapacity));
+        storageCapacityDto.setAvailableCapacity(BigDecimal.valueOf(availableCapacity));
+        storageCapacityDto.setUtilization(BigDecimal.valueOf(utilization));
         return storageCapacityDto;
     }
 
@@ -86,10 +87,10 @@ class WriteFileStorageCapacityTest {
         String expectedResult = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;DATA_CENTER_LOCATION;" +
             "DATABASE_SERVER_OR_PLATFORM;DATE;CAPACITY;USED_CAPACITY;AVAILABLE_CAPACITY;UTILIZATION" +
             ";INCIDENT_RELATED;TR_INCIDENT_ID\n" +
-            "TRRGS;20240915;EMIR;Cloudera;Cloudera data warehouse;2023/09/01;16.703632;" +
-            "0.23867607;16.464956;0.0142888725;NO;\n" +
-            "TRRGS;20240915;EMIR;Cloudera;Cloudera data warehouse;2023/09/02;16.700466" +
-            ";0.21350479;16.486961;0.012784361;NO;";
+            "TRRGS;20240915;EMIR;Cloudera;Cloudera data warehouse;2023/09/01;16.7036;" +
+            "0.2387;16.4650;0.0143;NO;\n" +
+            "TRRGS;20240915;EMIR;Cloudera;Cloudera data warehouse;2023/09/02;16.7005" +
+            ";0.2135;16.4870;0.0128;NO;";
 
         InputStream inputStream = new FileInputStream(file);
         String stringFile = readFromInputStream(inputStream);

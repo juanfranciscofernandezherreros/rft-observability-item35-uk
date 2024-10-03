@@ -56,14 +56,14 @@ public class StorageService {
         final List<Storage> storageList = new ArrayList<>();
         storageCapacityResponse.getItems().forEach(items -> {
             if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
-                final List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
+                final List<TimeSeries> filteredTimeSeries = items.getTimeSeries().stream()
                     .filter(timeSeries -> null != timeSeries.getMetadata()
                         && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
                         && timeSeries.getMetadata().getEntityName().equals(clouderaProperties.getStorage().getEntityName()))
                     .toList();
 
-                if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
-                    filteredTimeseries.forEach(timeSeries -> {
+                if (CollectionUtils.isNotEmpty(filteredTimeSeries)) {
+                    filteredTimeSeries.forEach(timeSeries -> {
                         final List<Data> dataList = timeSeries.getData();
                         if (CollectionUtils.isNotEmpty(dataList)) {
                             dataList.forEach(dataItem -> storageList.add(new Storage(dataItem.getTimestamp(), getCapacitiesInTeras(dataItem.getAggregateStatistics().getMean()))));
@@ -79,12 +79,6 @@ public class StorageService {
         return storageList;
     }
 
-    private Float getCapacitiesInTeras(final Float value) {
-        return BigDecimal.valueOf(value)
-            .divide(new BigDecimal("1024").pow(4), NUM_DECIMALS, RoundingMode.HALF_UP)
-            .floatValue();
-    }
-
     private List<Storage> manageClouderaApiTotalCapacityFreeResponseData(final StorageCapacityResponse storageCapacityResponse) {
         if (CollectionUtils.isEmpty(storageCapacityResponse.getItems())) {
             return new ArrayList<>();
@@ -93,13 +87,13 @@ public class StorageService {
         final List<Storage> storageList = new ArrayList<>();
         storageCapacityResponse.getItems().forEach(items -> {
             if (CollectionUtils.isNotEmpty(items.getTimeSeries())) {
-                final List<TimeSeries> filteredTimeseries = items.getTimeSeries().stream()
+                final List<TimeSeries> filteredTimeSeries = items.getTimeSeries().stream()
                     .filter(timeSeries -> null != timeSeries.getMetadata()
                         && StringUtils.isNotBlank(timeSeries.getMetadata().getEntityName())
                         && timeSeries.getMetadata().getEntityName().equals(clouderaProperties.getStorage().getEntityName())).toList();
 
-                if (CollectionUtils.isNotEmpty(filteredTimeseries)) {
-                    filteredTimeseries.forEach(timeSeries -> {
+                if (CollectionUtils.isNotEmpty(filteredTimeSeries)) {
+                    filteredTimeSeries.forEach(timeSeries -> {
                         final List<Data> dataList = timeSeries.getData();
                         if (CollectionUtils.isNotEmpty(dataList)) {
                             dataList.forEach(dataItem -> storageList.add(new Storage(dataItem.getTimestamp(), getCapacitiesInTeras(dataItem.getAggregateStatistics().getMax()))));
@@ -113,6 +107,10 @@ public class StorageService {
             throw new ResourceNotFoundException("Empty list from Cloudera Api 'TotalFreeCapacity' filter");
         }
         return storageList;
+    }
+
+    private BigDecimal getCapacitiesInTeras(final Float value) {
+        return BigDecimal.valueOf(value).divide(new BigDecimal("1024").pow(4), NUM_DECIMALS, RoundingMode.HALF_UP);
     }
 
 }

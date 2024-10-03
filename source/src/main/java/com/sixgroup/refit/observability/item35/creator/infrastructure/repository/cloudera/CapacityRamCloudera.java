@@ -42,18 +42,17 @@ public class CapacityRamCloudera implements CapacityRamRepository {
     private final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Override
-    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public List<Capacity> findByCapacityRam(final String dateFrom, final String dateTo) {
         return getValues(dateFrom, dateTo, clouderaProperties.getRam().getSelectRam());
 
     }
 
     @Override
-    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public List<Capacity> findTotalCapacityRam(final String dateFrom, final String dateTo) {
         return getValues(dateFrom, dateTo, clouderaProperties.getRam().getSelectTotalRam());
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private List<Capacity> getValues(final String dateFrom, final String dateTo, final String url) {
         log.debug("Find Compute capacity Ram by dateFrom {} and dateTo {}", dateFrom, dateTo);
 

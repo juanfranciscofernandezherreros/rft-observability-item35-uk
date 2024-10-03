@@ -2,11 +2,13 @@ package com.sixgroup.refit.observability.item35.creator.shared.utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 public final class MathsUtils {
 
     public static final String PERCENT = "1";
     private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
+    private static final String pattern = "#0.0000";
 
     private MathsUtils() {
     }
@@ -27,6 +29,11 @@ public final class MathsUtils {
             .multiply(ONE_HUNDRED)
             .divide(total, 2, RoundingMode.HALF_UP)
             .divide(ONE_HUNDRED, 4, RoundingMode.HALF_UP);
-        return result.toString();
+        return formatBigDecimalToFourDecimals(result);
+    }
+
+    public static String formatBigDecimalToFourDecimals(final BigDecimal value) {
+        final DecimalFormat myFormatter = new DecimalFormat(pattern);
+        return myFormatter.format(value).replace(",", ".");
     }
 }

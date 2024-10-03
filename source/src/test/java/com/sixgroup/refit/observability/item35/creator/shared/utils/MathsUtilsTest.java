@@ -8,8 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class MathsUtilsTest {
@@ -51,5 +50,16 @@ class MathsUtilsTest {
 
         final Boolean response = MathsUtils.isIntoMayorPercent(initValue, newValue);
         assertFalse(response);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "0.0030, 0.0030", // Q1
+        "0.0080, 0.008" // Q2
+    })
+    void formatBigDecimal(final String expected, final String current) {
+        final BigDecimal currentValue = new BigDecimal(current);
+
+        assertEquals(expected, MathsUtils.formatBigDecimalToFourDecimals(currentValue));
     }
 }
