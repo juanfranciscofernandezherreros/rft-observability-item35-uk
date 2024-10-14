@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 public interface RecordStatusMapper {
 
     @Mapping(target = "noMessagesOnGiveDate", source = "count")
+    @Mapping(target = "reportingDate", source = "reportingDate", dateFormat = "yyyy-MM-dd")
     RecordStatus entityToDomain(RecordStatusDTO recordStatusEntity);
 
 }

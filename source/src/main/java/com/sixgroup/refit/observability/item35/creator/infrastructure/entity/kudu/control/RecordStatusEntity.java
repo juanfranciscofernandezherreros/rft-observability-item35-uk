@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,8 +20,8 @@ public class RecordStatusEntity {
     @Id
     @Column(name = "id")
     private Long id;
-    @Column(name = "receiveddt")
-    private String reportingDate;
+    @Column(name = "rptgtmstmp")
+    private LocalDateTime reportingDate;
     @Column(name = "status")
     private String messageType;
     @Column(name = "channel")

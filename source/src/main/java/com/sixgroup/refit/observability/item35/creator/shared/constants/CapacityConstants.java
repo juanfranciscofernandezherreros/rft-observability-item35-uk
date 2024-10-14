@@ -5,7 +5,7 @@ public final class CapacityConstants {
     public static final String RAM = "RAM";
     public static final String CPU = "CPU";
     public static final String FIELD_INCIDENT_RELATED_FILE = "NO";
-    public static final String FIELD_TR_INCIDENT_ID_RELATED_FILE = "NO";
+    public static final String FIELD_TR_INCIDENT_ID_RELATED_FILE = "";
     public static final String HEADER_NAME = "NAME";
     public static final String HEADER_DESCRIPTION = "DESCRIPTION";
     public static final String HEADER_CPU_RAM = "CPU/RAM";
