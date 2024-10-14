@@ -103,16 +103,16 @@ class UseCaseComputeCapacityITTest {
                 .equals(State.SENT_RESPONSE.getName()));
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35D_20240315.csv");
+            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM35D_20240315.csv");
 
         assertNotNull(path);
 
         String lineHeader = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;NAME;DESCRIPTION;CPU/RAM;DATE;MIN_USAGE;" +
             "AVG_USAGE;MAX_USAGE;INCIDENT_RELATED;TR_INCIDENT_ID";
-        String lineOne = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-01;0.0050;0.0210;0.2570;NO;NO";
-        String lineTwo = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-01;0.3603;0.3662;0.3794;NO;NO";
-        String penultimateLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-31;0.0030;0.0354;0.4440;NO;NO";
-        String lastLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-31;0.2088;0.3257;0.4134;NO;NO";
+        String lineOne = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-01;0.0050;0.0210;0.2570;NO;";
+        String lineTwo = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-01;0.3603;0.3662;0.3794;NO;";
+        String penultimateLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;CPU;2024-01-31;0.0030;0.0354;0.4440;NO;";
+        String lastLine = "TRRGS;2024-03-15;EMIR;Cloudera;Cloudera data warehouse;RAM;2024-01-31;0.2088;0.3257;0.4134;NO;";
 
         List<String> allLines = Files.readAllLines(path);
 

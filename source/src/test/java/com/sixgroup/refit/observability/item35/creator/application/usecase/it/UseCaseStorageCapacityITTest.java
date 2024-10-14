@@ -99,7 +99,7 @@ class UseCaseStorageCapacityITTest {
                 .equals(State.SENT_RESPONSE.getName()));
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_IN_ND_ITEM35C_20240315.csv");
+            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM35C_20240315.csv");
 
         assertNotNull(path);
 

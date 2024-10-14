@@ -12,7 +12,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 
 @Slf4j
 public enum ItemType {
-    SUBMISSION_VOLUMES("submissionVolumes", "TRRGS_EMIR_PR_IN_ND_ITEM35A_",
+    SUBMISSION_VOLUMES("submissionVolumes", "TRRGS_EMIR_PR_FU_ND_ITEM35A_",
         new String[]{
             HEADER_TR_CODE,
             HEADER_REPORTING_DATE,
@@ -23,7 +23,7 @@ public enum ItemType {
             HEADER_DATE
         }),
 
-    COMPUTE_CAPACITY("computeCapacity", "TRRGS_EMIR_PR_IN_ND_ITEM35D_",
+    COMPUTE_CAPACITY("computeCapacity", "TRRGS_EMIR_PR_FU_ND_ITEM35D_",
         new String[]{
             HEADER_TR_CODE,
             HEADER_REPORTING_DATE,
@@ -38,7 +38,7 @@ public enum ItemType {
             HEADER_INCIDENT_RELATED,
             HEADER_TR_INCIDENT_ID
         }),
-    STORAGE_CAPACITY("storageCapacity", "TRRGS_EMIR_PR_IN_ND_ITEM35C_",
+    STORAGE_CAPACITY("storageCapacity", "TRRGS_EMIR_PR_FU_ND_ITEM35C_",
         new String[]{
             HEADER_TR_CODE,
             HEADER_REPORTING_DATE,
@@ -53,7 +53,7 @@ public enum ItemType {
             HEADER_INCIDENT_RELATED,
             HEADER_TR_INCIDENT_ID
         }),
-    REPORT_GENERATION("reportGeneration", "TRRGS_EMIR_PR_IN_ND_ITEM35B_",
+    REPORT_GENERATION("reportGeneration", "TRRGS_EMIR_PR_FU_ND_ITEM35B_",
         new String[]{
             HEADER_TR_CODE,
             HEADER_REPORTING_DATE,

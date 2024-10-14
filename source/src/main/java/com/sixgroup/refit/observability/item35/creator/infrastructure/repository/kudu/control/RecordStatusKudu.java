@@ -6,18 +6,19 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kud
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
 
 public interface RecordStatusKudu extends JpaRepository<RecordStatusEntity, Long> {
 
-    @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RecordStatusDTO(rs.reportingDate , rs.messageType , rs.submissionChannel,COUNT(1)) " +
+    @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RecordStatusDTO(MIN(rs.reportingDate), rs.messageType, rs.submissionChannel, COUNT(1)) " +
         "FROM RecordStatusEntity as rs  " +
         "WHERE rs.submissionChannel IN ('" + SFTP + "', '" + API + "', '" + WEB + "') " +
         "AND rs.messageType IN ('ACPT','RJCT') " +
-        "AND rs.reportingDate >= ?1 AND rs.reportingDate <= ?2 " +
-        "GROUP BY rs.reportingDate, rs.messageType, rs.submissionChannel " +
-        "ORDER BY rs.reportingDate")
-    List<RecordStatusDTO> findByRecordStatus(String fromDate, String toDate);
+        "AND rs.reportingDate >= ?1 AND rs.reportingDate < ?2 " +
+        "GROUP BY YEAR(rs.reportingDate), MONTH(rs.reportingDate), DAY(rs.reportingDate), rs.messageType, rs.submissionChannel " +
+        "ORDER BY YEAR(rs.reportingDate), MONTH(rs.reportingDate), DAY(rs.reportingDate)")
+    List<RecordStatusDTO> findByRecordStatus(LocalDateTime fromDate, LocalDateTime toDate);
 }

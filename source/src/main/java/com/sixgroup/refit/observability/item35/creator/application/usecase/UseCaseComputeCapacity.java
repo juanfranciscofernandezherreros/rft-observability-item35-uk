@@ -24,7 +24,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
@@ -42,7 +41,7 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
     private final ItemLog iLog = new ItemLog();
 
     @Override
-    public File execute(final ItemCommandDTO itemCommand, final Headers headers) throws ExecutionException, InterruptedException {
+    public File execute(final ItemCommandDTO itemCommand, final Headers headers) {
 
         log.debug("Generating compute capacity file ...");
         File file = null;

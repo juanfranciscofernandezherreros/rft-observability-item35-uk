@@ -5,11 +5,10 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandD
 import org.apache.kafka.common.header.Headers;
 
 import java.io.File;
-import java.util.concurrent.ExecutionException;
 
 public interface ItemTypeStrategy {
 
-    File execute(ItemCommandDTO itemCommandDTO, Headers headers) throws ExecutionException, InterruptedException;
+    File execute(ItemCommandDTO itemCommandDTO, Headers headers);
 
     ItemType getItemType();
 }

@@ -17,7 +17,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.INTERNAL_REQUEST_RECEIVED;
 
@@ -29,9 +29,10 @@ public class KafkaConsumerItem {
     private final RftKafkaConsumerTracing kafkaConsumerTracing;
     private final Map<ItemType, ItemTypeStrategy> itemType;
     private final ItemLog iLog = new ItemLog();
+    private final Executor executor;
 
     @KafkaListener(topics = "${component-config.topics.observability-item-topic}", groupId = "${component-config.topics.observability-item-consumer-group-id}")
-    public void consume(final ConsumerRecord<ItemId, ItemCommand> item) throws ExecutionException, InterruptedException {
+    public void consume(final ConsumerRecord<ItemId, ItemCommand> item) {
         log.debug("Consume message: {}", item);
         if (Constants.ITEM35.equals(item.key().getItemId())
             && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
@@ -46,8 +47,7 @@ public class KafkaConsumerItem {
                     + " cannot be null or blank, and must be any of accepted values");
             }
             final ItemTypeStrategy itemTypeStrategy = itemType.get(ItemType.getItemTypeFromName(item.value().getItemType()));
-            itemTypeStrategy.execute(itemCommand, item.headers());
-            log.debug("Generated file item35: {}", item.value().getItemType());
+            executor.execute(() -> itemTypeStrategy.execute(itemCommand, item.headers()));
         }
     }
 
