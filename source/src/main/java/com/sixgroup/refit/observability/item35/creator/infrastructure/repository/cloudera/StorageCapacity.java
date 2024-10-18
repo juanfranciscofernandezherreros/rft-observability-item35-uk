@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.ErrorCatalog.ERROR_CALL_CLOUDERA;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.*;
 
 @Repository
 @RequiredArgsConstructor

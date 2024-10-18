@@ -8,7 +8,7 @@ import com.sixgroup.refit.observability.item35.creator.application.service.Parti
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
-import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
+import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
@@ -80,10 +80,10 @@ class UseCaseReportGenerationITTest {
     @Test
     @DisplayName("Given a message item35 with itemType ReportGeneration from topic, validate create and save file")
     void when_send_item_request_item_35_create_and_save_file_repot_generation() throws IOException {
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
             ItemCommand
                 .newBuilder()
-                .setItemId(Constants.ITEM35)
+                .setItemId(AppConstants.ITEM35)
                 .setItemType(ItemType.REPORT_GENERATION.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
@@ -97,7 +97,7 @@ class UseCaseReportGenerationITTest {
 //            .until(() ->producerItemService.send(any(), any()));
 
         waitAtMost(200, TimeUnit.SECONDS)
-            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
+            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35,
                 FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240315")
                     .itemType(ItemType.REPORT_GENERATION.getName()).build())).getStateName()
@@ -112,9 +112,9 @@ class UseCaseReportGenerationITTest {
             "REPORT_COMPLETION_TIME;REPORT_PUBLICATION_TIME;DATE;SLA;DIFFERENCE;TR_INCIDENT_ID";
 
         String lineOne = "TRRGS;2024-03-15;EMIR;\"TAR030\";PARTICIPANT;1900-01-01T00:00:00Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T06:00:00Z;;";
-        String lineTwo = "TRRGS;2024-03-15;EMIR;\"ESMAS-TAR030 TRACE\";ESMA;1900-01-01T05:12:55Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T12:00:00Z;;";
+        String lineTwo = "TRRGS;2024-03-15;EMIR;\"ESMAS-TAR030 TRACE\";ESMA;1900-01-01T04:12:55Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T12:00:00Z;;";
         String penultimateLine = "TRRGS;2024-03-15;EMIR;\"ESMAS-TSR107 TRACE\";ESMA;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
-        String lastLine = "TRRGS;2024-03-15;EMIR;\"trdrif3q0000-TD107\";TR;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
+        String lastLine = "TRRGS;2024-03-15;EMIR;\"NATIONAL BANK OF ROMANIA-TSR109 Portal XML\";NCA;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
 
         List<String> allLines = Files.readAllLines(path);
 
@@ -124,17 +124,17 @@ class UseCaseReportGenerationITTest {
         assertEquals(penultimateLine, allLines.get(allLines.size() - 2));
         assertEquals(lastLine, allLines.get(allLines.size() -1 ));
 
-        assertEquals(13, allLines.size());
+        assertEquals(19, allLines.size());
 
     }
 
     @Test
     @DisplayName("Given a message item from topic, when service return empty list validate state is error with no exist record")
     void item_35_then_state_error_not_exist_records() {
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
             ItemCommand
                 .newBuilder()
-                .setItemId(Constants.ITEM35)
+                .setItemId(AppConstants.ITEM35)
                 .setItemType(ItemType.REPORT_GENERATION.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
@@ -146,7 +146,7 @@ class UseCaseReportGenerationITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
+                findByItemTypeAndFileName(AppConstants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240115")
                     .itemType(ItemType.REPORT_GENERATION.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
@@ -160,10 +160,10 @@ class UseCaseReportGenerationITTest {
 
         doThrow(new RuntimeException("error")).when(participantService).findParticipants(any(), any(), any());
 
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
             ItemCommand
                 .newBuilder()
-                .setItemId(Constants.ITEM35)
+                .setItemId(AppConstants.ITEM35)
                 .setItemType(ItemType.REPORT_GENERATION.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
@@ -175,7 +175,7 @@ class UseCaseReportGenerationITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
+                findByItemTypeAndFileName(AppConstants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240115")
                     .itemType(ItemType.REPORT_GENERATION.getName())
                     .build())).getStateName().equals(State.ERROR.getName())

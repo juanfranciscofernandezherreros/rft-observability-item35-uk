@@ -1,11 +1,15 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
+import com.sixgroup.refit.observability.item35.creator.domain.config.TranslationData;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReguIdentityDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.reportstate.ReportEodProcessStateRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.sqlserver.ReportEoDDTO;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.account.ReguIdentityAdapterRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.DataTestUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.sla.SlaInfoRepository;
@@ -24,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.REGULATOR_ENTITY;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.REGULATOR_ENTITY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -40,9 +44,12 @@ class RegulatorServiceTest {
     private RegulatorFileTypeProperties fileTypeProperties;
     @Mock
     private SlaInfoRepository slaInfoRepository;
-
     @Mock
     private ReguIdentityAdapterRepository reguIdentityAdapterRepository;
+    @Mock
+    private ReportProperties reportProperties;
+    @Mock
+    private ReportEodProcessStateRepository reportEodProcessStateRepository;
 
     @Test
     void findRegulators_repository_return_empty_list() {
@@ -96,11 +103,19 @@ class RegulatorServiceTest {
         fileTypeProperties.getReports().add(reportConfig1);
         fileTypeProperties.getReports().add(reportConfig2);
 
+        final ReportProperties.Translation accounts = new ReportProperties.Translation();
+        final TranslationData translationData = new TranslationData();
+        translationData.setName("eudrp0uu0000");
+        translationData.setValue("EIOPA");
+        accounts.getAccounts().add(translationData);
+
         when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString())).thenReturn(List.of(regulator1, regulator2));
         when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType1, reportSessionDate1, creationDate1)).thenReturn(Optional.of(slaInfo1));
         when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType2, reportSessionDate2, creationDate2)).thenReturn(Optional.of(slaInfo2));
         when(reguIdentityAdapterRepository.findByTraceCode(any())).thenReturn(List.of(ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri2frb000").build()
             , ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri96jn000").build()));
+        when(reportProperties.getTranslation()).thenReturn(accounts);
+
         final List<ReportGenerationDto> response = regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
 
         assertFalse(response.isEmpty());
@@ -108,5 +123,80 @@ class RegulatorServiceTest {
 
         verify(reportingFileAdapterRepository,
             times(1)).findRegulatorByDayAccountAndFileType(anyString(), anyString());
+    }
+
+    @Test
+    void findRegulators_ok_withEodInit() {
+        ReflectionTestUtils.setField(regulatorService, "blockSize", 1);
+        final String fileName1 = "TRRGS_DATTSR_ESMAS_R15923-20240220_001001-0.zip";
+        final String reportType1 = "TAR108";
+        final LocalDateTime reportSessionDate1 = DataTestUtils.parseString("2024-02-20 18:55:23");
+        final String accountId1 = "eudritrace";
+        final LocalDateTime creationDate1 = DataTestUtils.parseString("2024-02-20 18:55:29");
+
+        final RegulatorDTO regulator1 = new RegulatorDTO(fileName1, reportType1, reportSessionDate1, accountId1, creationDate1, "CAESR");
+
+        final SlaInfo slaInfo1 = SlaInfo.builder()
+            .meetsSla(Boolean.TRUE)
+            .expectSlaDate(reportSessionDate1.plusDays(1).truncatedTo(ChronoUnit.DAYS).plusHours(6))
+            .generationDuration(Duration.ofMinutes(30))
+            .build();
+
+        fileTypeProperties.setReportTypeEsma("ESMA");
+        final ReportConfig reportConfig1 = new ReportConfig("TAR108", "TAR108", "MRAR000");
+
+        final ReportProperties.Translation accounts = new ReportProperties.Translation();
+        final TranslationData translationData = new TranslationData();
+        translationData.setName("eudrp0uu0000");
+        translationData.setValue("EIOPA");
+        accounts.getAccounts().add(translationData);
+
+        final ReportEoDDTO reportEo1 = new ReportEoDDTO("MRAR000", DataTestUtils.parseString("2024-02-20 02:00:00"), "2024-02-20");
+
+        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString())).thenReturn(List.of(regulator1));
+        when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType1, reportSessionDate1, reportEo1.getStartedDate(), creationDate1)).thenReturn(Optional.of(slaInfo1));
+        when(reguIdentityAdapterRepository.findByTraceCode(any())).thenReturn(List.of(ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri2frb000").build()
+            , ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri96jn000").build()));
+        when(reportProperties.getTranslation()).thenReturn(accounts);
+        when(reportEodProcessStateRepository.find(anyString(), anyString())).thenReturn(List.of(reportEo1));
+        when(fileTypeProperties.getReports()).thenReturn(List.of(reportConfig1));
+
+        final List<ReportGenerationDto> response = regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
+
+        assertFalse(response.isEmpty());
+        assertEquals(1, response.size());
+
+        verify(reportingFileAdapterRepository,
+            times(1)).findRegulatorByDayAccountAndFileType(anyString(), anyString());
+        verify(reportEodProcessStateRepository, times(1)).find(anyString(), anyString());
+    }
+
+    @Test
+    void findReportEod_shouldReturnDataWhenReportExists() {
+        final ReportEoDDTO reportEo1 = new ReportEoDDTO("MRAR000", DataTestUtils.parseString("2024-09-01 02:00:00"), "2024-09-01");
+        final ReportEoDDTO reportEo2 = new ReportEoDDTO("TRTS000", DataTestUtils.parseString("2024-09-01 02:01:00"), "2024-09-01");
+        final List<ReportEoDDTO> reportEoDDTOS = List.of(reportEo1, reportEo2);
+
+        final ReportConfig reportConfig1 = new ReportConfig("TAR108", "TAR108", "MRAR000");
+        final ReportConfig reportConfig2 = new ReportConfig("TSR107", "TSR107", "TRTS000");
+        final List<ReportConfig> reportConfigList = List.of(reportConfig1, reportConfig2);
+
+        final String fileType1 = "TAR108";
+        final LocalDateTime reportingSession1 = DataTestUtils.parseString("2024-09-01 02:55:11");
+        final Optional<ReportEoDDTO> response1 = regulatorService.findReportEod(reportEoDDTOS, reportConfigList, fileType1, reportingSession1);
+        assertTrue(response1.isPresent());
+
+        final String fileType2 = "TSR107";
+        final LocalDateTime reportingSession2 = DataTestUtils.parseString("2024-09-02 02:00:00");
+        final Optional<ReportEoDDTO> response2 = regulatorService.findReportEod(reportEoDDTOS, reportConfigList, fileType2, reportingSession2);
+        assertTrue(response2.isEmpty());
+
+        final Optional<ReportEoDDTO> response3 = regulatorService.findReportEod(new ArrayList<>(), reportConfigList, fileType1, reportingSession1);
+        assertTrue(response3.isEmpty());
+
+        final String fileType3 = "TAR030";
+        final Optional<ReportEoDDTO> response4 = regulatorService.findReportEod(reportEoDDTOS, reportConfigList, fileType3, reportingSession1);
+        assertTrue(response4.isEmpty());
+
     }
 }

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.PARTICIPANT_ENTITY;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.PARTICIPANT_ENTITY;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -41,11 +41,13 @@ class ParticipantServiceTest {
     @Test
     void findParticipants_repository_return_empty_list() {
         when(reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(anyString(), anyString())).thenReturn(new ArrayList<>());
+        when(reportingFileAdapterRepository.findParticipantsRecoFileType(anyString(), anyString())).thenReturn(new ArrayList<>());
 
         final List<ReportGenerationDto> response = participantService.findParticipants("2024-02-01", "2024-03-01", "20240215");
 
         assertTrue(response.isEmpty());
         verify(reportingFileAdapterRepository, times(1)).findParticipantsByDayAccountAndFileType(anyString(), anyString());
+        verify(reportingFileAdapterRepository, times(1)).findParticipantsRecoFileType(anyString(), anyString());
 
     }
 
@@ -61,8 +63,14 @@ class ParticipantServiceTest {
         final LocalDateTime initReportDate2 = DataTestUtils.parseString("2024-02-20 18:55:23");
         final LocalDateTime endReportDate2 = DataTestUtils.parseString("2024-02-20 18:55:29");
 
+        final String reportTypeReco1 = "REC091";
+        final LocalDateTime reportSessionDateReco1 = DataTestUtils.parseString("2024-02-20 18:55:23");
+        final LocalDateTime initReportDateReco1 = DataTestUtils.parseString("2024-02-20 18:55:23");
+        final LocalDateTime endReportDateReco1 = DataTestUtils.parseString("2024-02-20 18:55:29");
+
         final ParticipantDTO participant1 = new ParticipantDTO(reportType1, reportSessionDate1, initReportDate1, endReportDate1);
         final ParticipantDTO participant2 = new ParticipantDTO(reportType2, reportSessionDate2, initReportDate2, endReportDate2);
+        final ParticipantDTO participantReco1 = new ParticipantDTO(reportTypeReco1, reportSessionDateReco1, initReportDateReco1, endReportDateReco1);
 
         final SlaInfo slaInfo1 = SlaInfo.builder()
             .meetsSla(Boolean.TRUE)
@@ -88,6 +96,7 @@ class ParticipantServiceTest {
         fileTypeProperties.getReports().add(reportConfig2);
 
         when(reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(anyString(), anyString())).thenReturn(List.of(participant1, participant2));
+        when(reportingFileAdapterRepository.findParticipantsRecoFileType(anyString(), anyString())).thenReturn(List.of(participantReco1));
         when(slaInfoRepository.getSlaInfo(PARTICIPANT_ENTITY, reportType1, reportSessionDate1, initReportDate1, endReportDate1)).thenReturn(Optional.of(slaInfo1));
         when(slaInfoRepository.getSlaInfo(PARTICIPANT_ENTITY, reportType2, reportSessionDate2, initReportDate2, endReportDate2)).thenReturn(Optional.of(slaInfo2));
 
@@ -98,6 +107,8 @@ class ParticipantServiceTest {
 
         verify(reportingFileAdapterRepository, times(1))
             .findParticipantsByDayAccountAndFileType(anyString(), anyString());
+        verify(reportingFileAdapterRepository, times(1))
+            .findParticipantsRecoFileType(anyString(), anyString());
 
     }
 

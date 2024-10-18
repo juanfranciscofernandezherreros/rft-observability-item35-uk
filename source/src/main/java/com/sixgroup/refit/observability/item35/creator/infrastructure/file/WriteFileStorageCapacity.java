@@ -18,7 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.*;
 
 @Service
 @RequiredArgsConstructor

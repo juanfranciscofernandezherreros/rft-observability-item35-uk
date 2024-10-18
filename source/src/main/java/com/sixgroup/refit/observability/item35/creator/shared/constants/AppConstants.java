@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.shared.constants;
 
-public final class Constants {
+public final class AppConstants {
 
     public static final String HEADER_TR_CODE = "TR_CODE";
     public static final String HEADER_REPORTING_DATE = "REPORTING_DATE";
@@ -49,6 +49,6 @@ public final class Constants {
     public static final String TRACE = " TRACE";
     public static final String PORTAL_XML = " Portal XML";
 
-    private Constants() {
+    private AppConstants() {
     }
 }

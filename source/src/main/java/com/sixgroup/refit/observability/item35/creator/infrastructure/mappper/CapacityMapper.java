@@ -13,8 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_YYYY_MM_DD;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.DATE_FORMAT_YYYY_MM_DD;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS;
 
 public final class CapacityMapper {
 

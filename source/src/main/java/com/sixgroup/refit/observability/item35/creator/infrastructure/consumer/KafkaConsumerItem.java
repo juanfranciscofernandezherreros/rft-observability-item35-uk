@@ -6,7 +6,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
-import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
+import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
 import com.sixgroup.refit.observability.modules.log.kafka.infrastructure.consumer.RftKafkaConsumerTracing;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
@@ -34,7 +34,7 @@ public class KafkaConsumerItem {
     @KafkaListener(topics = "${component-config.topics.observability-item-topic}", groupId = "${component-config.topics.observability-item-consumer-group-id}")
     public void consume(final ConsumerRecord<ItemId, ItemCommand> item) {
         log.debug("Consume message: {}", item);
-        if (Constants.ITEM35.equals(item.key().getItemId())
+        if (AppConstants.ITEM35.equals(item.key().getItemId())
             && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
 
             kafkaConsumerTracing.initTrace(item.headers());

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.*;
 
 public interface RecordStatusKudu extends JpaRepository<RecordStatusEntity, Long> {
 

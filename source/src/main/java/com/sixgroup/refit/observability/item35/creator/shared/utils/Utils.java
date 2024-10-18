@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.NUM_DECIMALS;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.NUM_DECIMALS;
 
 @Slf4j
 public final class Utils {

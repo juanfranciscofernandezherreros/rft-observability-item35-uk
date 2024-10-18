@@ -20,7 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATE_FORMAT_YYYY_MM_DD;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.DATE_FORMAT_YYYY_MM_DD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)

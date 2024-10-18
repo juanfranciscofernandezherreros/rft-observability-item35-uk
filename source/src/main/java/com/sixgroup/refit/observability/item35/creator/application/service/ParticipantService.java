@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.PARTICIPANT_ENTITY;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.PARTICIPANT_ENTITY;
 
 @Slf4j
 @Service
@@ -31,12 +31,18 @@ public class ParticipantService {
     public List<ReportGenerationDto> findParticipants(final String initDate, final String endDate, final String itemDate) {
         final List<ParticipantDTO> participants =
             reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(initDate, endDate);
-        if (participants.isEmpty()) {
+        final List<ParticipantDTO> participantsReco =
+            reportingFileAdapterRepository.findParticipantsRecoFileType(initDate, endDate);
+
+        final List<ParticipantDTO> totalParticipants = new ArrayList<>();
+        totalParticipants.addAll(participants);
+        totalParticipants.addAll(participantsReco);
+        if (totalParticipants.isEmpty()) {
             return new ArrayList<>();
         }
 
         final List<ReportGenerationDto> participantReportGenerationData = new ArrayList<>();
-        participants.forEach(participant -> {
+        totalParticipants.forEach(participant -> {
             final Optional<SlaInfo> slaInfo =
                 slaInfoRepository.getSlaInfo(PARTICIPANT_ENTITY, participant.getFileType(), participant.getReportingSession(), participant.getInitDate(), participant.getEndDate());
             if (slaInfo.isEmpty()) {

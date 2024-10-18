@@ -2,10 +2,15 @@ package com.sixgroup.refit.observability.item35.creator.application.service;
 
 import com.google.gson.Gson;
 import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
+import com.sixgroup.refit.observability.item35.creator.domain.config.TranslationData;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReguIdentityDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
+import com.sixgroup.refit.observability.item35.creator.domain.repository.reportstate.ReportEodProcessStateRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.sqlserver.ReportEoDDTO;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.RegulatorMapper;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.account.ReguIdentityAdapterRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.sla.SlaInfoRepository;
@@ -17,9 +22,10 @@ import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.REGULATOR_ENTITY;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.REGULATOR_ENTITY;
 
 @Slf4j
 @Service
@@ -28,9 +34,11 @@ public class RegulatorService {
 
     private final ReportingFileAdapterRepository reportingFileAdapterRepository;
     private final RegulatorFileTypeProperties fileTypeProperties;
+    private final ReportProperties reportProperties;
     private final SlaInfoRepository slaInfoRepository;
     private final RegulatorMapper regulatorMapper = new RegulatorMapper();
     private final ReguIdentityAdapterRepository reguIdentityAdapterRepository;
+    private final ReportEodProcessStateRepository reportEodProcessStateRepository;
 
     @Value("${component-config.kududb-account.blockSize}")
     private int blockSize;
@@ -47,9 +55,18 @@ public class RegulatorService {
         final Map<String, ReguIdentityDTO> traceCodeRegulatorMap = buildRegulatorMap(reguIdentities);
         printTraceCodeRegulatorId(reguIdentities);
 
+        //Find start report type
+        final List<ReportEoDDTO> reportsEoD = reportEodProcessStateRepository.find(initDate, endDate);
+
         final List<ReportGenerationDto> regulatorReportGenerationData = new ArrayList<>();
         regulations.forEach(regulator -> {
-            final Optional<SlaInfo> slaInfo = slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
+            Optional<SlaInfo> slaInfo;
+            final Optional<ReportEoDDTO> reportEoDFound = findReportEod(reportsEoD, fileTypeProperties.getReports(), regulator.getFileType(), regulator.getReportingSession());
+            if (reportEoDFound.isPresent()) {
+                slaInfo = slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), reportEoDFound.get().getStartedDate(), regulator.getCreationDate());
+            } else {
+                slaInfo = slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
+            }
             if (slaInfo.isEmpty()) {
                 log.error("Error to find SlaInfo with entity {}, reportName {}, reportSession {}, reportDate {}. Configure properties",
                     REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
@@ -63,11 +80,37 @@ public class RegulatorService {
         return regulatorReportGenerationData;
     }
 
+    protected Optional<ReportEoDDTO> findReportEod(final List<ReportEoDDTO> reportsEoD,
+                                                   final List<ReportConfig> reports,
+                                                   final String fileType,
+                                                   final LocalDateTime reportingSession) {
+        if (reportsEoD.isEmpty()) {
+            return Optional.empty();
+        }
+
+        final Optional<ReportConfig> reportConfigFound = reports.stream().filter(report -> fileType.equals(report.getReportName())).findFirst();
+        if (reportConfigFound.isEmpty()) {
+            return Optional.empty();
+        }
+        final String reportQueryEodQuery = reportConfigFound.get().getReportQueryEod();
+        final String reportingSessionQuery = DateUtils.localDateTimeToSpainDateFormat(reportingSession);
+
+        return reportsEoD.stream().filter(report -> reportQueryEodQuery.equals(report.getReportType()) && reportingSessionQuery.equals(report.getReportingSession())).findFirst();
+    }
+
     private Map<String, ReguIdentityDTO> buildRegulatorMap(final List<ReguIdentityDTO> reguIdentityEntities) {
         final Map<String, ReguIdentityDTO> map = new HashMap<>();
         for (ReguIdentityDTO dto : reguIdentityEntities) {
             map.put(dto.getTraceCode(), dto);
         }
+
+        //Add translation accounts
+        for (TranslationData account : reportProperties.getTranslation().getAccounts()) {
+            if (!map.containsKey(account.value)) {
+                map.put(account.name, ReguIdentityDTO.builder().regulatorId(account.name).traceCode(account.getValue()).traceConnectivity(false).isTranslatedAccount(true).build());
+            }
+        }
+
         return map;
     }
 

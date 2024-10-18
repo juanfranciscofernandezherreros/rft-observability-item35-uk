@@ -26,7 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.ITEM35;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.ITEM35;
 
 @Service
 @RequiredArgsConstructor

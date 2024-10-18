@@ -19,10 +19,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.DATABASE_SERVER_OR_PLATFORM;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.DATA_CENTER_LOCATION;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.FIELD_INCIDENT_RELATED_FILE;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.FIELD_TR_INCIDENT_ID_RELATED_FILE;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATABASE_SERVER_OR_PLATFORM;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.DATA_CENTER_LOCATION;
 
 
 @Service

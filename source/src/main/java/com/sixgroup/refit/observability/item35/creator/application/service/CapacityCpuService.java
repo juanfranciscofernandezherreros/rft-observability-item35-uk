@@ -14,7 +14,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.NUM_DECIMALS;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.NUM_DECIMALS;
 
 @Service
 @RequiredArgsConstructor
