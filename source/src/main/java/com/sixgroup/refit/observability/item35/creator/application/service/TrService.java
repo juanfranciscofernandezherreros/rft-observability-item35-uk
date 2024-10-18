@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.TR_ENTITY;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.TR_ENTITY;
 
 @Slf4j
 @Service

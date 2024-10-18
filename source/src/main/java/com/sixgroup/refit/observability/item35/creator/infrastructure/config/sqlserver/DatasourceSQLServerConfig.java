@@ -1,7 +1,7 @@
-
 package com.sixgroup.refit.observability.item35.creator.infrastructure.config.sqlserver;
 
 import com.sixgroup.refit.observability.item.state.infrastructure.entity.ItemReportingEntity;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.sqlserver.ReportEoDProcessStateEntity;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,7 +25,8 @@ import static com.sixgroup.refit.observability.item35.creator.infrastructure.con
 @EnableJpaRepositories(
     entityManagerFactoryRef = "sqlserver-em",
     transactionManagerRef = "sqlserver-trm",
-    basePackages = {"com.sixgroup.refit.observability.item.state.infrastructure.repository.sqlserver"}
+    basePackages = {"com.sixgroup.refit.observability.item.state.infrastructure.repository.sqlserver",
+        "com.sixgroup.refit.observability.item35.creator.infrastructure.repository.sqlserver"}
 )
 @EnableTransactionManagement
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ public class DatasourceSQLServerConfig {
         objectObjectHashMap.put(HIBERNATE_DDL_AUTO, properties.getDdlAuto());
         return builder
             .dataSource(dataSource)
-            .packages(ItemReportingEntity.class)
+            .packages(ItemReportingEntity.class, ReportEoDProcessStateEntity.class)
             .persistenceUnit(properties.getPersistenceUnit())
             .properties(objectObjectHashMap)
             .build();

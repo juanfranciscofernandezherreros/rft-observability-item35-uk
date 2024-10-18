@@ -17,4 +17,5 @@ public class ReguIdentityDTO {
     @Expose
     private String regulatorId;
     private Boolean traceConnectivity;
+    private boolean isTranslatedAccount;
 }

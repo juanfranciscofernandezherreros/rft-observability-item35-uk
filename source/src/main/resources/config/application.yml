@@ -16,6 +16,25 @@ spring:
         "schema.registry.url": "http://localhost:8081"
 
 component-config:
+  trCode: TRRGS
+  regulationReference: EMIR
+  translation:
+    accounts:
+      - name: eudrp0uu0000
+        value: EIOPA
+      - name: eudrp4dc3000
+        value: COVIP
+      - name: eudrp4ea0000
+        value: CAFME
+      - name: eudrp5cb4000
+        value: SVERIGES RIKSBANK
+      - name: eudrp0pbp000
+        value: NATIONAL BANK OF ROMANIA
+    reports:
+      - name: I091
+        value: REC091
+      - name: S091
+        value: REC091
   participant:
     reportType: PARTICIPANT
     reports:
@@ -30,27 +49,44 @@ component-config:
       - name: RJ092
         reportName: RJ092
       - name: RJCT000
-        reportName: RJCT000
+        reportName: RJC092
       - name: WARN000
-        reportName: WARN000
+        reportName: WRN106
+      - name: IMDT092
+        reportName: IMDT092
+      - name: REC091
+        reportName: REC091
+    reports_custom:
+      - name: REC091
+        reportName: REC091
   regulator:
     reportTypeEsma: ESMA
     reportTypeNca: NCA
     reports:
       - name: TAR030
         reportName: TAR030
+        report_query_eod: TRAR000
       - name: TAR108
         reportName: TAR108
+        report_query_eod: MRAR000
       - name: TSR107
         reportName: TSR107
+        report_query_eod: TRTS000
       - name: TSR109
         reportName: TSR109
+        report_query_eod: MRTS000
       - name: RJ092
         reportName: RJ092
+        report_query_eod: RJ092
       - name: RJCT000
-        reportName: RJCT000
+        reportName: RJC092
+        report_query_eod: RJCT000
       - name: WARN000
-        reportName: WARN000
+        reportName: WRN106
+        report_query_eod: WARN000
+      - name: REC091
+        reportName: REC091
+        report_query_eod: RECO000
   tr:
     reportType: TR
     reportTypeQuery:
@@ -84,6 +120,15 @@ component-config:
         - name: RJCT000
           sla-init: yyyy-MM-ddT00:00:00Z
           sla-end: yyyy-MM-ddT06:00:00Z
+        - name: WARN000
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: IMDT092
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
+        - name: REC091
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT06:00:00Z
       authority:
         - name: TAR030
           sla-init: yyyy-MM-ddT00:00:00Z
@@ -103,6 +148,12 @@ component-config:
         - name: RJCT000
           sla-init: yyyy-MM-ddT00:00:00Z
           sla-end: yyyy-MM-ddT12:00:00Z
+        - name: WARN000
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: REC091
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
       tr:
         - name: RL078
           sla-init: yyyy-MM-ddT00:00:00Z
@@ -110,6 +161,34 @@ component-config:
         - name: TD107
           sla-init: yyyy-MM-ddT00:00:00Z
           sla-end: yyyy-MM-ddT12:00:00Z
+
+  csv:
+    output_path: "work-repository-observability/upload/item35/"
+  topics:
+    observability-item-topic: rft.dev.observability.item.private.v1
+    observability-item-consumer-group-id: rft.dev.rft-observability-item35-creator
+  kududb-control:
+    schema: EMIR_REFIT_DEV_CONTROL_REFIT
+  kududb-account:
+    schema: EMIR_REFIT_DEV_ACCOUNT_MNG
+    blockSize: 50
+  cloudera:
+    knox-auth: true
+    cpu:
+      enabled: false
+      selectCpu: select cpu_percent_across_hosts where category=CLUSTER
+      desiredRollup: DAILY
+    ram:
+      enabled: false
+      selectRam: select physical_memory_used
+      selectTotalRam: select physical_memory_total
+      desiredRollup: DAILY
+    storage:
+      enabled: false
+      selectTotalApi: select total_capacity_across_filesystems
+      selectFreeApi: select total_capacity_free_across_filesystems
+      desiredRollup: DAILY
+      entityName: dm-rftemir-light-qa
 
 logging:
   level:

@@ -8,6 +8,7 @@ CREATE SEQUENCE  if not exists dbo.item_reporting_seq
 CREATE SEQUENCE  if not exists dbo.item_reporting_state_seq
     start with 1
     increment by 1;
+DROP TABLE IF EXISTS report_eod_process_state;
 
 CREATE TABLE IF NOT EXISTS item_reporting(
     id int not null primary key,
@@ -43,3 +44,15 @@ INSERT INTO dbo.item_reporting (id, item_type, file_name, file_url, file_creatio
 INSERT INTO dbo.item_reporting (id, item_type, file_name, file_url, file_creation_date, file_update_date, state_name, state_update_date) VALUES (-4001, 'item35','TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv', null, '2024-02-22', '2024-02-23', 'sent_request', '2024-02-23');
 INSERT INTO dbo.item_reporting (id, item_type, file_name, file_url, file_creation_date, file_update_date, state_name, state_update_date) VALUES (-4002, 'item35','TRRGS_EMIR_PR_FU_ND_ITEM35D_20240315.csv', null, '2024-03-22', '2024-03-23', 'sent_request', '2024-03-23');
 
+
+DROP TABLE IF EXISTS report_eod_process_state;
+CREATE TABLE if not exists report_eod_process_state
+(
+    report_type       varchar(50) not null,
+    reporting_session varchar(50) not null,
+    target_type       varchar(50) not null,
+    query_id          varchar(50) not null,
+    started_date     datetime
+    );
+
+INSERT INTO report_eod_process_state(report_type, reporting_session, target_type, query_id, started_date) VALUES ('TRAR000', '2024-02-02', 'AUTHORITY', 'empty', '2024-02-02 01:00:00.000')

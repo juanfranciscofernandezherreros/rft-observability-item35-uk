@@ -26,6 +26,28 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
                                                                  @Param("endTime") LocalDateTime endTime,
                                                                  @Param("fileTypes") List<String> fileTypes);
 
+    @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control" +
+        ".ParticipantDTO(" +
+        "   SUBSTRING(rfo.outgoingFileName, " +
+        "       LOCATE('_', rfo.outgoingFileName,  1) + 1, " +
+        "       LOCATE('_', rfo.outgoingFileName, LOCATE('_', rfo.outgoingFileName) + 1) " +
+        "       - LOCATE('_', rfo.outgoingFileName) - 1), " +
+        "MIN(rfo.reportingSessionTimeStamp), MIN(rfo.creationTimestamp), MAX(rfo.creationTimestamp)) " +
+        "FROM ReportingFileEntity as rfo " +
+        "WHERE rfo.reportingSessionTimeStamp >= :startTime AND rfo.reportingSessionTimeStamp < :endTime " +
+        "AND rfo.accountId LIKE 'eudb%' " +
+        "AND rfo.fileType IN (:fileTypes) " +
+        "GROUP BY YEAR(rfo.reportingSessionTimeStamp), MONTH(rfo.reportingSessionTimeStamp), DAY(rfo.reportingSessionTimeStamp), " +
+        "SUBSTRING(rfo.outgoingFileName, " +
+        "   LOCATE('_', rfo.outgoingFileName,  1) + 1, " +
+        "   LOCATE('_', rfo.outgoingFileName, LOCATE('_', rfo.outgoingFileName) + 1) " +
+        "   - LOCATE('_', rfo.outgoingFileName) - 1) " +
+        "ORDER BY MIN(rfo.reportingSessionTimeStamp)"
+    )
+    List<ParticipantDTO> findParticipantsRecoFileType(@Param("startTime") LocalDateTime startTime,
+                                                                 @Param("endTime") LocalDateTime endTime,
+                                                                 @Param("fileTypes") List<String> fileTypes);
+
     @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO(" +
         "rfo.outgoingFileName, " +
         "rfo.fileType, " +

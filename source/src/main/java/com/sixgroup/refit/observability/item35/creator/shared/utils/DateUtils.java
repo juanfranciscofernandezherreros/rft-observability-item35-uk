@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.shared.utils;
 
-import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
+import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
@@ -10,9 +10,9 @@ import java.time.temporal.TemporalAdjusters;
 
 @Slf4j
 public final class DateUtils {
-    private static final DateTimeFormatter DATE_FORMAT_YYYYMMDD = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYYMMDD);
-    private static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYY_MM_DD);
-    private static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH_MM_SS = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+    private static final DateTimeFormatter DATE_FORMAT_YYYYMMDD = DateTimeFormatter.ofPattern(AppConstants.DATE_FORMAT_YYYYMMDD);
+    private static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD = DateTimeFormatter.ofPattern(AppConstants.DATE_FORMAT_YYYY_MM_DD);
+    private static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH_MM_SS = DateTimeFormatter.ofPattern(AppConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
 
     private DateUtils() {
     }
@@ -58,4 +58,8 @@ public final class DateUtils {
         return localDateTime.format(DATE_FORMAT_YYYY_MM_DD);
     }
 
+    public static String localDateToString(final LocalDate localDate){
+        return localDate.format(DATE_FORMAT_YYYY_MM_DD);
+
+    }
 }

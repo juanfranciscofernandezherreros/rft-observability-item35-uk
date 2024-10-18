@@ -8,7 +8,7 @@ import com.sixgroup.refit.observability.item35.creator.application.service.Stora
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
-import com.sixgroup.refit.observability.item35.creator.shared.constants.Constants;
+import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
@@ -78,10 +78,10 @@ class UseCaseStorageCapacityITTest {
     @Test
     @DisplayName("Given a message item35 with itemType StorageCapacity from topic, validate create and save file")
     void when_send_item_request_item_35_create_and_save_file_storage_capacity() throws IOException {
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
             ItemCommand
                 .newBuilder()
-                .setItemId(Constants.ITEM35)
+                .setItemId(AppConstants.ITEM35)
                 .setItemType(ItemType.STORAGE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
@@ -92,7 +92,7 @@ class UseCaseStorageCapacityITTest {
                 .build()));
 
         waitAtMost(20, TimeUnit.SECONDS)
-            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(Constants.ITEM35,
+            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35,
                 FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240315")
                     .itemType(ItemType.STORAGE_CAPACITY.getName()).build())).getStateName()
@@ -127,10 +127,10 @@ class UseCaseStorageCapacityITTest {
     void item_35_then_state_error_not_exist_records() {
         doReturn(List.of()).when(storageService).getTotalCapacity(any(), any());
         doReturn(List.of()).when(storageService).getTotalFreeCapacity(any(), any());
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
             ItemCommand
                 .newBuilder()
-                .setItemId(Constants.ITEM35)
+                .setItemId(AppConstants.ITEM35)
                 .setItemType(ItemType.STORAGE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
@@ -142,7 +142,7 @@ class UseCaseStorageCapacityITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
+                findByItemTypeAndFileName(AppConstants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240115")
                     .itemType(ItemType.STORAGE_CAPACITY.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
@@ -156,10 +156,10 @@ class UseCaseStorageCapacityITTest {
 
         doThrow(new RuntimeException("error")).when(storageService).getTotalCapacity(any(), any());
 
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
             ItemCommand
                 .newBuilder()
-                .setItemId(Constants.ITEM35)
+                .setItemId(AppConstants.ITEM35)
                 .setItemType(ItemType.STORAGE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
@@ -171,7 +171,7 @@ class UseCaseStorageCapacityITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
+                findByItemTypeAndFileName(AppConstants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240215")
                     .itemType(ItemType.STORAGE_CAPACITY.getName())
                     .build())).getStateName().equals(State.ERROR.getName())
@@ -184,10 +184,10 @@ class UseCaseStorageCapacityITTest {
 
         doThrow(new RuntimeException("error")).when(storageService).getTotalFreeCapacity(any(), any());
 
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(Constants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
             ItemCommand
                 .newBuilder()
-                .setItemId(Constants.ITEM35)
+                .setItemId(AppConstants.ITEM35)
                 .setItemType(ItemType.STORAGE_CAPACITY.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
@@ -199,7 +199,7 @@ class UseCaseStorageCapacityITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(Constants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
+                findByItemTypeAndFileName(AppConstants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
                     .itemDate("20240215")
                     .itemType(ItemType.STORAGE_CAPACITY.getName())
                     .build())).getStateName().equals(State.ERROR.getName())

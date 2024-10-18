@@ -9,6 +9,8 @@ import java.util.List;
 public interface ReportingFileAdapterRepository {
     List<ParticipantDTO> findParticipantsByDayAccountAndFileType(String initDate, String endDate);
 
+    List<ParticipantDTO> findParticipantsRecoFileType(String initDate, String endDate);
+
     List<RegulatorDTO> findRegulatorByDayAccountAndFileType(String initDate, String endDate);
 
     List<TrDTO> findTrByDayAccountAndFileType(String initDate, String endDate);

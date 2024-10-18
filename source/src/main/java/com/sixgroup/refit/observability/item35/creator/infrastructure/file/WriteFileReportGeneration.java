@@ -17,7 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.TR_INCIDENT_ID;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.TR_INCIDENT_ID;
 
 @Service
 @RequiredArgsConstructor

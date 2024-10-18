@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.*;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.*;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.Constants.*;
 
 @Slf4j
 public enum ItemType {
