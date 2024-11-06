@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.ParticipantDTO;
@@ -24,7 +24,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.A
 public class ParticipantService {
 
     private final ReportingFileAdapterRepository reportingFileAdapterRepository;
-    private final ParticipantFileTypeProperties fileTypeProperties;
+    private final ParticipantProperties fileTypeProperties;
     private final SlaInfoRepository slaInfoRepository;
     private final ParticipantMapper participantMapper = new ParticipantMapper();
 

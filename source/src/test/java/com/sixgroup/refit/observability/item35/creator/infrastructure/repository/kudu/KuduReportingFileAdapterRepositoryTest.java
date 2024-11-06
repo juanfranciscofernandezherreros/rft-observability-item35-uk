@@ -1,8 +1,8 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantFileTypeProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.TrProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.ParticipantDTO;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO;
@@ -29,11 +29,11 @@ class KuduReportingFileAdapterRepositoryTest {
     @Mock
     private ReportingFileKudu reportingFileKudu;
     @Mock
-    private ParticipantFileTypeProperties participantFileTypeProperties;
+    private ParticipantProperties participantProperties;
     @Mock
-    private RegulatorFileTypeProperties regulatorFileTypeProperties;
+    private RegulatorProperties regulatorProperties;
     @Mock
-    private TrFileTypeProperties trFileTypeProperties;
+    private TrProperties trProperties;
 
     @Test
     void findParticipantsByDayAndFileType() {
@@ -45,13 +45,13 @@ class KuduReportingFileAdapterRepositoryTest {
         reportConfig2.setReportName("TAR108");
 
         doReturn(List.of(new ParticipantDTO())).when(reportingFileKudu)
-            .findParticipantsByDayAccountAndFileType(any(), any(), anyList());
+            .findParticipantsByDayAccountAndFileType(any(), any(), anyList(), any());
 
-        when(participantFileTypeProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
+        when(participantProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
 
         kuduReportingFileAdapterRepository.findParticipantsByDayAccountAndFileType("2024-02-01", "2024-03-01");
 
-        verify(reportingFileKudu, times(1)).findParticipantsByDayAccountAndFileType(any(), any(), anyList());
+        verify(reportingFileKudu, times(1)).findParticipantsByDayAccountAndFileType(any(), any(), anyList(), any());
 
     }
 
@@ -65,13 +65,13 @@ class KuduReportingFileAdapterRepositoryTest {
         reportConfig2.setReportName("TAR108");
 
         doReturn(List.of(new RegulatorDTO())).when(reportingFileKudu)
-            .findRegulatorByDayAccountAndFileType(any(), any(), anyList());
+            .findRegulatorByDayAccountAndFileType(any(), any(), anyList(), any());
 
-        when(regulatorFileTypeProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
+        when(regulatorProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
 
         kuduReportingFileAdapterRepository.findRegulatorByDayAccountAndFileType("2024-02-01", "2024-03-01");
 
-        verify(reportingFileKudu, times(1)).findRegulatorByDayAccountAndFileType(any(), any(), anyList());
+        verify(reportingFileKudu, times(1)).findRegulatorByDayAccountAndFileType(any(), any(), anyList(), any());
     }
 
     @Test
@@ -84,13 +84,13 @@ class KuduReportingFileAdapterRepositoryTest {
         reportConfig2.setReportName("RL078");
 
         doReturn(List.of(new TrDTO())).when(reportingFileKudu)
-            .findTrByDayAccountAndFileType(any(), any(), any());
+            .findTrByDayAccountAndFileType(any(), any(), any(), any());
 
-        when(trFileTypeProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
+        when(trProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
 
         kuduReportingFileAdapterRepository.findTrByDayAccountAndFileType("2024-02-01", "2024-03-01");
 
-        verify(reportingFileKudu, times(1)).findTrByDayAccountAndFileType(any(), any(), any());
+        verify(reportingFileKudu, times(1)).findTrByDayAccountAndFileType(any(), any(), any(), any());
     }
 
 }

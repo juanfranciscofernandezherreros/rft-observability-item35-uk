@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.config.TranslationData;
@@ -41,7 +41,7 @@ class RegulatorServiceTest {
     @Mock
     private ReportingFileAdapterRepository reportingFileAdapterRepository;
     @Mock
-    private RegulatorFileTypeProperties fileTypeProperties;
+    private RegulatorProperties fileTypeProperties;
     @Mock
     private SlaInfoRepository slaInfoRepository;
     @Mock

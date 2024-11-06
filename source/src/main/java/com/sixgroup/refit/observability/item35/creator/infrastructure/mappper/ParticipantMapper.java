@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.mappper;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.ParticipantDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ParticipantMapper {
 
     public ReportGenerationDto toReportGenerationDto(final ParticipantDTO participant,
-                                                     final ParticipantFileTypeProperties fileTypeProperties,
+                                                     final ParticipantProperties fileTypeProperties,
                                                      final SlaInfo slaInfo) {
         final ReportGenerationDto reportGenerationDto = new ReportGenerationDto();
         reportGenerationDto.setReportName(getReportName(participant.getFileType(), fileTypeProperties));
@@ -28,7 +28,7 @@ public class ParticipantMapper {
         return reportGenerationDto;
     }
 
-    private String getReportName(final String fileType, final ParticipantFileTypeProperties fileTypeProperties) {
+    private String getReportName(final String fileType, final ParticipantProperties fileTypeProperties) {
         return ReportUtils.getReportName(fileTypeProperties.getReports(), fileType);
     }
 }

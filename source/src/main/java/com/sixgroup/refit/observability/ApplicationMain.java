@@ -11,8 +11,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication
 @EnableConfigurationProperties({CsvProperties.class, DatasourceMssqlProperties.class, DatasourceKuduProperties.class,
-    ApiClouderaProperties.class, ClouderaProperties.class, ParticipantFileTypeProperties.class, RegulatorFileTypeProperties.class,
-    TrFileTypeProperties.class, ReportProperties.class, SlaProperties.class})
+    ApiClouderaProperties.class, ClouderaProperties.class, ParticipantProperties.class, RegulatorProperties.class,
+    TrProperties.class, ReportProperties.class, SlaProperties.class})
 public class ApplicationMain {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationMain.class, args);

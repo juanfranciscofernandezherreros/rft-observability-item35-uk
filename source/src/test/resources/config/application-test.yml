@@ -76,6 +76,7 @@ component-config:
       - name: S091
         value: REC091
   participant:
+    accountId: 'eudb%'
     reportType: PARTICIPANT
     reports:
       - name: TAR030
@@ -100,6 +101,7 @@ component-config:
       - name: REC091
         reportName: REC091
   regulator:
+    accountId: 'eudr%'
     reportTypeEsma: ESMA
     reportTypeNca: NCA
     reports:
@@ -128,6 +130,7 @@ component-config:
         reportName: REC091
         report_query_eod: RECO000
   tr:
+    accountId: 'tr%'
     reportType: TR
     reportTypeQuery:
       - RL078

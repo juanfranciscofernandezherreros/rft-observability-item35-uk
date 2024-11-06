@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@ConfigurationProperties("component-config.participant")
-public class ParticipantFileTypeProperties {
+@ConfigurationProperties("component-config.tr")
+public class TrProperties {
 
+    private String accountId;
     private String reportType;
     private List<ReportConfig> reports = new ArrayList<>();
-    private List<ReportConfig> reportsCustom = new ArrayList<>();
 }

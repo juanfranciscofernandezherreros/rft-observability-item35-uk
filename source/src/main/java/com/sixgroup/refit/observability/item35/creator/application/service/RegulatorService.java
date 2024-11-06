@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
 import com.google.gson.Gson;
-import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.config.TranslationData;
@@ -33,7 +33,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.A
 public class RegulatorService {
 
     private final ReportingFileAdapterRepository reportingFileAdapterRepository;
-    private final RegulatorFileTypeProperties fileTypeProperties;
+    private final RegulatorProperties fileTypeProperties;
     private final ReportProperties reportProperties;
     private final SlaInfoRepository slaInfoRepository;
     private final RegulatorMapper regulatorMapper = new RegulatorMapper();

@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.mappper;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.TrProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.TrDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TrMapper {
     public ReportGenerationDto toReportGenerationDto(final TrDTO trDTO,
-                                                     final TrFileTypeProperties fileTypeProperties,
+                                                     final TrProperties fileTypeProperties,
                                                      final SlaInfo slaInfo) {
         final ReportGenerationDto reportGenerationDto = new ReportGenerationDto();
         reportGenerationDto.setReportName(getReportName(trDTO.getAccountId(), trDTO.getFileType(), fileTypeProperties));
@@ -27,7 +27,7 @@ public class TrMapper {
         return reportGenerationDto;
     }
 
-    private String getReportName(final String accountId, final String fileType, final TrFileTypeProperties fileTypeProperties) {
+    private String getReportName(final String accountId, final String fileType, final TrProperties fileTypeProperties) {
         return accountId + "-" + ReportUtils.getReportName(fileTypeProperties.getReports(), fileType);
     }
 }
