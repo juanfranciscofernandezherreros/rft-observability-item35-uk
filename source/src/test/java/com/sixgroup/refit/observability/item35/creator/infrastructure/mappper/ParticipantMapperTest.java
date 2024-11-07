@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.mappper;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.ParticipantDTO;
@@ -30,7 +30,7 @@ class ParticipantMapperTest {
         final LocalDateTime initReportDate = DataTestUtils.parseString("2024-02-20 18:25:29");
         final LocalDateTime endReportDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final ParticipantFileTypeProperties fileTypeProperties = new ParticipantFileTypeProperties();
+        final ParticipantProperties fileTypeProperties = new ParticipantProperties();
         fileTypeProperties.setReportType("participant");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);

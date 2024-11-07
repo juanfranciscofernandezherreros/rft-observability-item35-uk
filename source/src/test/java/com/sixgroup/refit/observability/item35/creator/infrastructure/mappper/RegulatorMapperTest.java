@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.mappper;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReguIdentityDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
@@ -34,7 +34,7 @@ class RegulatorMapperTest {
         final String accountId = "eudritrace";
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
+        final RegulatorProperties fileTypeProperties = new RegulatorProperties();
         fileTypeProperties.setReportTypeEsma("ESMA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
@@ -63,7 +63,7 @@ class RegulatorMapperTest {
         final String accountId = "eudritrace";
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
+        final RegulatorProperties fileTypeProperties = new RegulatorProperties();
         fileTypeProperties.setReportTypeNca("NCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
@@ -92,7 +92,7 @@ class RegulatorMapperTest {
         final String accountId = "eudritrace";
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
+        final RegulatorProperties fileTypeProperties = new RegulatorProperties();
         fileTypeProperties.setReportTypeNca("NCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
@@ -127,7 +127,7 @@ class RegulatorMapperTest {
         final String accountId = "eudri2frb777";
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
+        final RegulatorProperties fileTypeProperties = new RegulatorProperties();
         fileTypeProperties.setReportTypeNca("NCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
@@ -162,7 +162,7 @@ class RegulatorMapperTest {
         final String accountId = "eudrira1051";
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
+        final RegulatorProperties fileTypeProperties = new RegulatorProperties();
         fileTypeProperties.setReportTypeNca("NCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
@@ -197,7 +197,7 @@ class RegulatorMapperTest {
         final String accountId = "eudrira1051";
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
+        final RegulatorProperties fileTypeProperties = new RegulatorProperties();
         fileTypeProperties.setReportTypeNca("NCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
@@ -229,7 +229,7 @@ class RegulatorMapperTest {
         final String accountId = "eudritrace";
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final RegulatorFileTypeProperties fileTypeProperties = new RegulatorFileTypeProperties();
+        final RegulatorProperties fileTypeProperties = new RegulatorProperties();
         fileTypeProperties.setReportTypeEsma("ESMA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);

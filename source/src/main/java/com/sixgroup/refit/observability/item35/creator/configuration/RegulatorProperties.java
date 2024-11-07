@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@ConfigurationProperties("component-config.tr")
-public class TrFileTypeProperties {
+@ConfigurationProperties("component-config.regulator")
+public class RegulatorProperties {
 
-    private String reportType;
+    private String accountId;
+    private String reportTypeEsma;
+    private String reportTypeNca;
     private List<ReportConfig> reports = new ArrayList<>();
 }

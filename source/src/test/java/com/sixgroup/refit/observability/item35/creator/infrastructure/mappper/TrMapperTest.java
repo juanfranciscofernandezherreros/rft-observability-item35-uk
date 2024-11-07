@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.mappper;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.TrProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.TrDTO;
@@ -30,7 +30,7 @@ class TrMapperTest {
         final String accountId = "trkdp";
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-22 14:08:55");
 
-        final TrFileTypeProperties fileTypeProperties = new TrFileTypeProperties();
+        final TrProperties fileTypeProperties = new TrProperties();
         fileTypeProperties.setReportType("TR");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);

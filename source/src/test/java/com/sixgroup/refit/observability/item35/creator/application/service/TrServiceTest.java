@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.TrProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
@@ -34,7 +34,7 @@ class TrServiceTest {
     @Mock
     private ReportingFileAdapterRepository reportingFileAdapterRepository;
     @Mock
-    private TrFileTypeProperties fileTypeProperties;
+    private TrProperties fileTypeProperties;
     @Mock
     private SlaInfoRepository slaInfoRepository;
 

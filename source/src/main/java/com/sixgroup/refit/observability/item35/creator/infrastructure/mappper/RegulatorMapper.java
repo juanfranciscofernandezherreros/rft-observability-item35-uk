@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.mappper;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReguIdentityDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO;
@@ -19,7 +19,7 @@ public class RegulatorMapper {
 
 
     public ReportGenerationDto toReportGenerationDto(final RegulatorDTO regulator,
-                                                     final RegulatorFileTypeProperties fileTypeProperties,
+                                                     final RegulatorProperties fileTypeProperties,
                                                      final SlaInfo slaInfo,
                                                      final Map<String, ReguIdentityDTO> traceCodeRegulatorMap) {
         final ReportGenerationDto reportGenerationDto = new ReportGenerationDto();
@@ -38,7 +38,7 @@ public class RegulatorMapper {
 
     private String getReportName(final String accountId,
                                  final String fileType,
-                                 final RegulatorFileTypeProperties fileTypeProperties,
+                                 final RegulatorProperties fileTypeProperties,
                                  final String accountTrace,
                                  final Map<String, ReguIdentityDTO> traceCodeRegulatorMap) {
 
@@ -63,7 +63,7 @@ public class RegulatorMapper {
     }
 
     private String getReportType(final String fileName,
-                                 final RegulatorFileTypeProperties fileTypeProperties) {
+                                 final RegulatorProperties fileTypeProperties) {
         return fileName.contains("ESMA") ? fileTypeProperties.getReportTypeEsma() : fileTypeProperties.getReportTypeNca();
     }
 }

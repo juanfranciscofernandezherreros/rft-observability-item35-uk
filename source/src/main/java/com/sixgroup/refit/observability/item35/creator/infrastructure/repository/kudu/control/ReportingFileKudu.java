@@ -17,14 +17,15 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
         ".ParticipantDTO(rfo.fileType, MIN(rfo.reportingSessionTimeStamp), MIN(rfo.creationTimestamp), MAX(rfo.creationTimestamp)) " +
         "FROM ReportingFileEntity as rfo " +
         "WHERE rfo.reportingSessionTimeStamp >= :startTime AND rfo.reportingSessionTimeStamp < :endTime " +
-        "AND rfo.accountId LIKE 'eudb%' " +
+        "AND UPPER(rfo.accountId) LIKE UPPER(CONCAT(:accountId, '%')) " +
         "AND rfo.fileType IN (:fileTypes) " +
         "GROUP BY YEAR(rfo.reportingSessionTimeStamp), MONTH(rfo.reportingSessionTimeStamp), DAY(rfo.reportingSessionTimeStamp), rfo.fileType " +
         "ORDER BY MIN(rfo.reportingSessionTimeStamp)"
     )
     List<ParticipantDTO> findParticipantsByDayAccountAndFileType(@Param("startTime") LocalDateTime startTime,
                                                                  @Param("endTime") LocalDateTime endTime,
-                                                                 @Param("fileTypes") List<String> fileTypes);
+                                                                 @Param("fileTypes") List<String> fileTypes,
+                                                                 @Param("accountId") String accountId);
 
     @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control" +
         ".ParticipantDTO(" +
@@ -35,7 +36,7 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
         "MIN(rfo.reportingSessionTimeStamp), MIN(rfo.creationTimestamp), MAX(rfo.creationTimestamp)) " +
         "FROM ReportingFileEntity as rfo " +
         "WHERE rfo.reportingSessionTimeStamp >= :startTime AND rfo.reportingSessionTimeStamp < :endTime " +
-        "AND rfo.accountId LIKE 'eudb%' " +
+        "AND UPPER(rfo.accountId) LIKE UPPER(CONCAT(:accountId, '%')) " +
         "AND rfo.fileType IN (:fileTypes) " +
         "GROUP BY YEAR(rfo.reportingSessionTimeStamp), MONTH(rfo.reportingSessionTimeStamp), DAY(rfo.reportingSessionTimeStamp), " +
         "SUBSTRING(rfo.outgoingFileName, " +
@@ -45,8 +46,9 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
         "ORDER BY MIN(rfo.reportingSessionTimeStamp)"
     )
     List<ParticipantDTO> findParticipantsRecoFileType(@Param("startTime") LocalDateTime startTime,
-                                                                 @Param("endTime") LocalDateTime endTime,
-                                                                 @Param("fileTypes") List<String> fileTypes);
+                                                      @Param("endTime") LocalDateTime endTime,
+                                                      @Param("fileTypes") List<String> fileTypes,
+                                                      @Param("accountId") String accountId);
 
     @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO(" +
         "rfo.outgoingFileName, " +
@@ -62,19 +64,19 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
         "FROM ReportingFileEntity rfo " +
         "WHERE rfo.reportingSessionTimeStamp >= :startDate " +
         "AND rfo.reportingSessionTimeStamp < :endDate " +
-        "AND rfo.accountId LIKE 'eudr%' " +
+        "AND UPPER(rfo.accountId) LIKE UPPER(CONCAT(:accountId, '%')) " +
         "AND rfo.fileType IN :fileTypes " +
         "ORDER BY rfo.reportingSessionTimeStamp, rfo.accountId")
-    List<RegulatorDTO> findRegulatorByDayAccountAndFileType(
-        @Param("startDate") LocalDateTime startDate,
-        @Param("endDate") LocalDateTime endDate,
-        @Param("fileTypes") List<String> fileTypes);
+    List<RegulatorDTO> findRegulatorByDayAccountAndFileType(@Param("startDate") LocalDateTime startDate,
+                                                            @Param("endDate") LocalDateTime endDate,
+                                                            @Param("fileTypes") List<String> fileTypes,
+                                                            @Param("accountId") String accountId);
 
     @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control" +
         ".TrDTO(rfo.fileType, rfo.reportingSessionTimeStamp, rfo.accountId, MAX(rfo.creationTimestamp)) " +
         "FROM ReportingFileEntity as rfo " +
         "WHERE (rfo.reportingSessionTimeStamp >= :initDate AND rfo.reportingSessionTimeStamp < :endDate) " +
-        "AND rfo.accountId LIKE 'tr%' " +
+        "AND UPPER(rfo.accountId) LIKE UPPER(CONCAT(:accountId, '%')) " +
         "AND rfo.fileType IN (:fileTypes) " +
         "GROUP BY rfo.fileType, rfo.reportingSessionTimeStamp, rfo.accountId " +
         "ORDER BY rfo.reportingSessionTimeStamp, rfo.accountId, rfo.fileType"
@@ -82,5 +84,6 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
     List<TrDTO> findTrByDayAccountAndFileType(
         @Param("initDate") LocalDateTime initDate,
         @Param("endDate") LocalDateTime endDate,
-        @Param("fileTypes") List<String> fileTypes);
+        @Param("fileTypes") List<String> fileTypes,
+        @Param("accountId") String accountId);
 }

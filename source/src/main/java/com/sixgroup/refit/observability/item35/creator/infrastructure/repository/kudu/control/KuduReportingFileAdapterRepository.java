@@ -1,9 +1,9 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.control;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantFileTypeProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorProperties;
 import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.TrProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.config.TranslationData;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
@@ -28,37 +28,39 @@ import java.util.Optional;
 public class KuduReportingFileAdapterRepository implements ReportingFileAdapterRepository {
 
     private final ReportingFileKudu reportingFileKudu;
-    private final ParticipantFileTypeProperties participantFileTypeProperties;
-    private final RegulatorFileTypeProperties regulatorFileTypeProperties;
-    private final TrFileTypeProperties trFileTypeProperties;
+    private final ParticipantProperties participantProperties;
+    private final RegulatorProperties regulatorProperties;
+    private final TrProperties trProperties;
     private final ReportProperties reportProperties;
 
     public List<ParticipantDTO> findParticipantsByDayAccountAndFileType(final String initDate, final String endDate) {
         log.debug("Find Participants by day and fileType");
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-        final List<ReportConfig> reports = participantFileTypeProperties.getReports();
-        final List<String> reportsCustom = participantFileTypeProperties.getReportsCustom().stream().map(ReportConfig::getName).toList();
+        final List<ReportConfig> reports = participantProperties.getReports();
+        final List<String> reportsCustom = participantProperties.getReportsCustom().stream().map(ReportConfig::getName).toList();
         final List<ReportConfig> reportsQuery = reports.stream().filter(report -> !reportsCustom.contains(report.getName())).toList();
         if (reportsQuery.isEmpty()) {
             return new ArrayList<>();
         }
-        return reportingFileKudu.
-            findParticipantsByDayAccountAndFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(reportsQuery));
+        return reportingFileKudu.findParticipantsByDayAccountAndFileType(startDate, finalDate,
+            ReportUtils.getReportsTypeQuery(reportsQuery),
+            participantProperties.getAccountId());
     }
 
     public List<ParticipantDTO> findParticipantsRecoFileType(final String initDate, final String endDate) {
         log.debug("Find Participants reco by day and fileType");
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-        final List<ReportConfig> reports = participantFileTypeProperties.getReports();
-        final List<String> reportsCustom = participantFileTypeProperties.getReportsCustom().stream().map(ReportConfig::getName).toList();
+        final List<ReportConfig> reports = participantProperties.getReports();
+        final List<String> reportsCustom = participantProperties.getReportsCustom().stream().map(ReportConfig::getName).toList();
         final List<ReportConfig> reportsQuery = reports.stream().filter(report -> reportsCustom.contains(report.getName())).toList();
         if (reportsQuery.isEmpty()) {
             return new ArrayList<>();
         }
-        final List<ParticipantDTO> participantsFound = reportingFileKudu.
-            findParticipantsRecoFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(reportsQuery));
+        final List<ParticipantDTO> participantsFound = reportingFileKudu.findParticipantsRecoFileType(startDate, finalDate,
+            ReportUtils.getReportsTypeQuery(reportsQuery),
+            participantProperties.getAccountId());
         if (participantsFound.isEmpty()) {
             return new ArrayList<>();
         }
@@ -74,7 +76,9 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
         return reportingFileKudu.
-            findRegulatorByDayAccountAndFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(regulatorFileTypeProperties.getReports()));
+            findRegulatorByDayAccountAndFileType(startDate, finalDate,
+                ReportUtils.getReportsTypeQuery(regulatorProperties.getReports()),
+                regulatorProperties.getAccountId());
     }
 
     public List<TrDTO> findTrByDayAccountAndFileType(final String initDate, final String endDate) {
@@ -82,7 +86,9 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
         return reportingFileKudu
-            .findTrByDayAccountAndFileType(startDate, finalDate, ReportUtils.getReportsTypeQuery(trFileTypeProperties.getReports()));
+            .findTrByDayAccountAndFileType(startDate, finalDate,
+                ReportUtils.getReportsTypeQuery(trProperties.getReports()),
+                trProperties.getAccountId());
     }
 
 }

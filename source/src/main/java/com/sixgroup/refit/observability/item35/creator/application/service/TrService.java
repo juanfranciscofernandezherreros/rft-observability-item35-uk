@@ -1,6 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.TrFileTypeProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.TrProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.TrDTO;
@@ -24,7 +24,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.A
 public class TrService {
 
     private final ReportingFileAdapterRepository reportingFileAdapterRepository;
-    private final TrFileTypeProperties fileTypeProperties;
+    private final TrProperties fileTypeProperties;
     private final SlaInfoRepository slaInfoRepository;
     private final TrMapper trMapper = new TrMapper();
 
