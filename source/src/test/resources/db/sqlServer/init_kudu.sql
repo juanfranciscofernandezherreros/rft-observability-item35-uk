@@ -6,7 +6,7 @@ CREATE SCHEMA EMIR_REFIT_DEV_ACCOUNT_MNG;
 
 CREATE TABLE EMIR_REFIT_DEV_CONTROL_REFIT.record_status
 (
-    rptgtmstmp            TIMESTAMP,
+    receiveddt            VARCHAR(255),
     status                VARCHAR(255),
     channel               VARCHAR(255)
 );
@@ -27,14 +27,13 @@ CREATE TABLE EMIR_REFIT_DEV_ACCOUNT_MNG.regu_identity
     traceconnectivity    VARCHAR(255)
 );
 
-
-INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(rptgtmstmp,status,channel)VALUES('2024-02-18 00:00:00.000', 'ACPT', 'sftp');
-INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(rptgtmstmp,status,channel)VALUES('2023-02-28 00:01:00.000', 'ACPT', 'web');
-INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(rptgtmstmp,status,channel)VALUES('2024-02-02 02:00:00.000', 'RJCT', 'api');
-INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(rptgtmstmp,status,channel)VALUES('2024-02-01 00:03:00.000', 'ACPT', 'api');
-INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(rptgtmstmp,status,channel)VALUES('2024-02-19 04:00:00.000', 'RJCT', 'api');
-INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(rptgtmstmp,status,channel)VALUES('2024-03-18 00:05:00.000', 'RJCT', 'sftp');
-INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(rptgtmstmp,status,channel)VALUES('2024-02-11 06:00:00.000', 'ACPT', 'web');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(receiveddt,status,channel)VALUES('2024-02-18', 'ACPT', 'sftp');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(receiveddt,status,channel)VALUES('2023-02-28', 'ACPT', 'web');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(receiveddt,status,channel)VALUES('2024-02-02', 'RJCT', 'api');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(receiveddt,status,channel)VALUES('2024-02-01', 'ACPT', 'api');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(receiveddt,status,channel)VALUES('2024-02-19', 'RJCT', 'api');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(receiveddt,status,channel)VALUES('2024-03-18', 'RJCT', 'sftp');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.record_status(receiveddt,status,channel)VALUES('2024-02-11', 'ACPT', 'web');
 
 INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
     VALUES('eudbia0o5000_S030_20240404091131_TAR_0001.xml', 'TAR030', '2024-02-02 05:12:55.421', '2024-02-02 05:12:55.421', 'eudbif3q0000');
