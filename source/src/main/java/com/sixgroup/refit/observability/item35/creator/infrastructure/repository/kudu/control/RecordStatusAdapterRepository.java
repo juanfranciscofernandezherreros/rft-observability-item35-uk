@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +22,9 @@ public class RecordStatusAdapterRepository implements RecordStatusRepository {
     private final RecordStatusMapper recordStatusMapper;
 
     @Override
-    public List<RecordStatus> findByRecordStatus(String dateFrom, String dateTo) {
+    public List<RecordStatus> findByRecordStatus(final String dateFrom, final String dateTo) {
         log.debug("Find Record status by dateFrom and dateTo");
-        final LocalDateTime startDate = LocalDate.parse(dateFrom).atStartOfDay();
-        final LocalDateTime finalDate = LocalDate.parse(dateTo).plusDays(1).atStartOfDay();
-        final List<RecordStatusDTO> dataFound = recordStatusKudu.findByRecordStatus(startDate, finalDate);
+        final List<RecordStatusDTO> dataFound = recordStatusKudu.findByRecordStatus(dateFrom, dateTo);
         if (null == dataFound || dataFound.isEmpty()) {
             return new ArrayList<>();
         }
