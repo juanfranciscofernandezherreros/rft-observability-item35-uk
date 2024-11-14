@@ -124,7 +124,7 @@ class UseCaseReportGenerationITTest {
         assertEquals(penultimateLine, allLines.get(allLines.size() - 2));
         assertEquals(lastLine, allLines.get(allLines.size() -1 ));
 
-        assertEquals(19, allLines.size());
+        assertEquals(20, allLines.size());
 
     }
 
