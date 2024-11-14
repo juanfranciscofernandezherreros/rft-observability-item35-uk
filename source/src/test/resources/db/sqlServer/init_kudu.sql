@@ -63,6 +63,8 @@ INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,
 INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
     VALUES('TRRGS_DATTAR_ESMAS_R99996-240301_001001-0.zip', 'TAR030', '2024-02-02 05:12:55.421', '2024-02-02 05:12:55.421', 'eudritrace');
 INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
+    VALUES('TRRGS_DATREC_eudrp4ea0000_SR0002G-240715_001001-0.zip', 'TAR030', '2024-02-03 05:12:50.421', '2024-02-03 05:12:50.421', 'eudrp4ea0000');
+INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
     VALUES('TRRGS_DATTAR_ESMAS_R99996-240301_001001-0.zip', 'TAR030', '2024-02-03 05:12:50.421', '2024-02-03 05:12:50.421', 'eudrif3q0000');
 INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
     VALUES('TRRGS_DATTAR_EUDRIRA1051_R60003-240301_001001-0.zip', 'RJCT000', '2024-02-03 05:12:55.421', '2024-02-04 13:12:55.421', 'eudrif3q0000');
@@ -90,7 +92,7 @@ INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,
 INSERT INTO EMIR_REFIT_DEV_CONTROL_REFIT.reports_file_outgoing(outgoingfilename,filetype,reportingsessiontimestamp,creationtimestamp,accountid)
     VALUES('TRRGS_DATTAR_ESMAS_R99996-240301_001001-0.zip', 'RL078', '2024-02-04 05:12:55.421', '2024-02-04 07:12:55.421', 'trdrif3q0000');
 
-INSERT INTO EMIR_REFIT_DEV_ACCOUNT_MNG.regu_identity (tracecode,regulatorid, traceconnectivity) VALUES
+INSERT INTO EMIR_REFIT_DEV_ACCOUNT_MNG.regu_identity (tracecode, regulatorid, traceconnectivity) VALUES
                                                                           ('ESMAS','eudri2frb000', 'true'),
                                                                           ('CAFAA','eudri2frb777', 'false'),
                                                                           ('CAFAA','eudri2frb888', 'true'),

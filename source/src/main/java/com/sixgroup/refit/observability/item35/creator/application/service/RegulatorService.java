@@ -100,14 +100,15 @@ public class RegulatorService {
 
     private Map<String, ReguIdentityDTO> buildRegulatorMap(final List<ReguIdentityDTO> reguIdentityEntities) {
         final Map<String, ReguIdentityDTO> map = new HashMap<>();
-        for (ReguIdentityDTO dto : reguIdentityEntities) {
-            map.put(dto.getTraceCode(), dto);
-        }
 
         //Add translation accounts
         for (TranslationData account : reportProperties.getTranslation().getAccounts()) {
-            if (!map.containsKey(account.value)) {
-                map.put(account.name, ReguIdentityDTO.builder().regulatorId(account.name).traceCode(account.getValue()).traceConnectivity(false).isTranslatedAccount(true).build());
+            map.put(account.name, ReguIdentityDTO.builder().regulatorId(account.name).traceCode(account.getValue()).traceConnectivity(false).isTranslatedAccount(true).build());
+        }
+
+        for (ReguIdentityDTO dto : reguIdentityEntities) {
+            if (!map.containsKey(dto.getTraceCode())) {
+                map.put(dto.getTraceCode(), dto);
             }
         }
 
