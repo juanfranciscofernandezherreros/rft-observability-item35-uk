@@ -6,6 +6,7 @@ import com.sixgroup.refit.observability.item35.creator.application.mock.Capacity
 import com.sixgroup.refit.observability.item35.creator.application.mock.ItemCommandMock;
 import com.sixgroup.refit.observability.item35.creator.application.service.CapacityCpuService;
 import com.sixgroup.refit.observability.item35.creator.application.service.CapacityRamService;
+import com.sixgroup.refit.observability.item35.creator.application.service.FileNameService;
 import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseComputeCapacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -27,57 +28,59 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UseCaseComputeCapacityUnitTest {
 
+    private final Headers mockHeaders = mock(Headers.class);
+    @InjectMocks
+    private UseCaseComputeCapacity useCaseComputeCapacity;
     @Mock
     private CapacityCpuService capacityCpuService;
-
     @Mock
     private CapacityRamService capacityRamService;
-
     @Mock
     private WriteFileItem35Service writeFileComputeCapacity;
-
     @Mock
     private ProducerItemService producerItemService;
-
+    @Mock
+    private FileNameService fileNameService;
     @Mock
     private StateService stateService;
 
-    @InjectMocks
-    private UseCaseComputeCapacity useCaseComputeCapacity;
-
-    private final Headers mockHeaders = mock(Headers.class);
-
-
     @Test
     void testExecuteSuccess() throws Exception {
-
+        final String fileName = "test_file.csv";
         ItemCommandDTO itemCommandDTO = ItemCommandMock.builderItemCommandComputeCapacity();
         List<Capacity> capacitiesCpu = CapacityMock.builderListCapacityCpu();
         List<Capacity> capacitiesRam = CapacityMock.builderListCapacityRam();
+
         when(capacityCpuService.findByCapacityCpu(anyString(), anyString())).thenReturn(capacitiesCpu);
         when(capacityRamService.findByCapacityRam(anyString(), anyString())).thenReturn(capacitiesRam);
         File mockFile = mock(File.class);
-        when(writeFileComputeCapacity.writeFile(anyList(), any(ItemCommandDTO.class))).thenReturn(mockFile);
+        when(writeFileComputeCapacity.writeFile(anyList(), any(ItemCommandDTO.class), any())).thenReturn(mockFile);
+        when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
+
         useCaseComputeCapacity.execute(itemCommandDTO, mockHeaders);
+
         verify(capacityCpuService, times(1)).findByCapacityCpu(anyString(), anyString());
         verify(capacityRamService, times(1)).findByCapacityRam(anyString(), anyString());
-        verify(writeFileComputeCapacity, times(1)).writeFile(anyList(), any(ItemCommandDTO.class));
+        verify(writeFileComputeCapacity, times(1)).writeFile(anyList(), any(ItemCommandDTO.class), any());
         verify(producerItemService, times(1)).send(any(ItemCommandDTO.class), any());
         verify(stateService, times(4)).nextStep(any(StateRequest.class));
     }
 
     @Test
     void testExecuteError() throws Exception {
-
+        final String fileName = "test_file.csv";
         ItemCommandDTO itemCommandDTO = ItemCommandMock.builderItemCommandComputeCapacity();
         List<Capacity> capacitiesCpu = List.of();
         List<Capacity> capacitiesRam = CapacityMock.builderListCapacityRam();
         when(capacityCpuService.findByCapacityCpu(anyString(), anyString())).thenReturn(capacitiesCpu);
         when(capacityRamService.findByCapacityRam(anyString(), anyString())).thenReturn(capacitiesRam);
+        when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
+
         useCaseComputeCapacity.execute(itemCommandDTO, mockHeaders);
+
         verify(capacityCpuService, times(1)).findByCapacityCpu(anyString(), anyString());
         verify(capacityRamService, times(1)).findByCapacityRam(anyString(), anyString());
-        verify(writeFileComputeCapacity, times(0)).writeFile(anyList(), any(ItemCommandDTO.class));
+        verify(writeFileComputeCapacity, times(0)).writeFile(anyList(), any(ItemCommandDTO.class), any());
         verify(producerItemService, times(0)).send(any(ItemCommandDTO.class), any());
         verify(stateService, times(1)).setError(any(StateRequest.class));
     }

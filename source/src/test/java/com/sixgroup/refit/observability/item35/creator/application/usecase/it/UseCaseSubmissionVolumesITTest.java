@@ -7,9 +7,7 @@ import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFin
 import com.sixgroup.refit.observability.item35.creator.application.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
-import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
@@ -50,10 +48,8 @@ import static org.mockito.Mockito.doThrow;
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 class UseCaseSubmissionVolumesITTest {
 
-    private Producer<ItemId, ItemCommand> producer;
-
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
-
+    private Producer<ItemId, ItemCommand> producer;
     @Value("${component-config.topics.observability-item-topic}")
     private String topic;
 
@@ -79,7 +75,7 @@ class UseCaseSubmissionVolumesITTest {
     void when_send_item_request_item_35_create_and_save_file_submission_volumes() throws IOException {
         ItemCommand itemCommand = ItemCommand
             .newBuilder()
-            .setItemId(AppConstants.ITEM35)
+            .setItemId(AppConstants.ITEM35_ID)
             .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
             .setCommand(Command.REQUEST.getDescription())
             .setCreationTimestamp(Instant.now())
@@ -89,14 +85,12 @@ class UseCaseSubmissionVolumesITTest {
                 .setFileUrl("").build())
             .build();
 
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
             itemCommand));
 
         waitAtMost(20, TimeUnit.SECONDS)
-            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35,
-                FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240315")
-                    .itemType(ItemType.SUBMISSION_VOLUMES.getName()).build())).getStateName()
+            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
+                    "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240315.csv").getStateName()
                 .equals(State.SENT_RESPONSE.getName())
             );
 
@@ -128,10 +122,10 @@ class UseCaseSubmissionVolumesITTest {
     @Test
     @DisplayName("Given a message item from topic, when service return empty list validate state is error with no exist record")
     void item_35_then_state_error_not_exist_records() {
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
             ItemCommand
                 .newBuilder()
-                .setItemId(AppConstants.ITEM35)
+                .setItemId(AppConstants.ITEM35_ID)
                 .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
@@ -143,10 +137,7 @@ class UseCaseSubmissionVolumesITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(AppConstants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240115")
-                    .itemType(ItemType.SUBMISSION_VOLUMES.getName())
-                    .build())).getStateName().equals(State.ERROR.getName())
+                findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240115.csv").getStateName().equals(State.ERROR.getName())
             );
 
     }
@@ -157,10 +148,10 @@ class UseCaseSubmissionVolumesITTest {
 
         doThrow(new RuntimeException("error")).when(recordStatusService).findRecordStatus(any(), any());
 
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35).build(),
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
             ItemCommand
                 .newBuilder()
-                .setItemId(AppConstants.ITEM35)
+                .setItemId(AppConstants.ITEM35_ID)
                 .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
@@ -172,10 +163,7 @@ class UseCaseSubmissionVolumesITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(AppConstants.ITEM35, FileUtils.getFileName(ItemCommandDTO.builder()
-                    .itemDate("20240115")
-                    .itemType(ItemType.SUBMISSION_VOLUMES.getName())
-                    .build())).getStateName().equals(State.ERROR.getName())
+                findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240115.csv").getStateName().equals(State.ERROR.getName())
             );
     }
 

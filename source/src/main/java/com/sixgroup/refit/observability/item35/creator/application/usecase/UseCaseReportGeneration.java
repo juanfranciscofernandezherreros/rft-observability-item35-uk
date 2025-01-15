@@ -4,6 +4,7 @@ import com.sixgroup.refit.observability.item.log.ItemLog;
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.ItemReportingDto;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
+import com.sixgroup.refit.observability.item35.creator.application.service.FileNameService;
 import com.sixgroup.refit.observability.item35.creator.application.service.ParticipantService;
 import com.sixgroup.refit.observability.item35.creator.application.service.RegulatorService;
 import com.sixgroup.refit.observability.item35.creator.application.service.TrService;
@@ -15,7 +16,6 @@ import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileI
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.CollectionsUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.ITEM35;
+import static com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType.REPORT_GENERATION;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.ITEM35_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,18 +37,20 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
 
     private final WriteFileItem35Service<ReportGenerationDto> writeFileReportGenerationService;
     private final ProducerItemService producerItemService;
-    private final StateService stateService;
     private final ParticipantService participantService;
     private final RegulatorService regulatorService;
     private final TrService trService;
+    private final FileNameService fileNameService;
+    private final StateService stateService;
     private final ItemLog iLog = new ItemLog();
 
     @Override
     public File execute(final ItemCommandDTO itemCommand, final Headers headers) {
         log.debug("Generating Report Generation file ...");
+        final String fileName = fileNameService.getFileName(REPORT_GENERATION, itemCommand.getItemDate());
         File file = null;
         try {
-            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
 
             //Find information
             final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemCommand.getItemDate());
@@ -61,39 +64,39 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
                 regulators.stream()), trs.stream()).toList();
 
             if (CollectionUtils.isEmpty(joinedCollection)) {
-                iLog.info(ItemReportingDto.builder().itemType(ITEM35).build(), ERROR);
+                iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
                 log.error("No data found in report generation, skipping report generation");
-                stateService.setError(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).errorDescription("No record status found, skipping file generation").build());
+                stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("No record status found, skipping file generation").build());
                 return null;
             }
 
             //Saving information
-            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
             iLog.info(itemCommand, SAVING_INFORMATION);
 
             //Saved information
             final List<ReportGenerationDto> orderedCollection = CollectionsUtils.getOrderCollectionsByDate(joinedCollection);
-            file = writeFileReportGenerationService.writeFile(orderedCollection, itemCommand);
-            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).fileUrl(file.getPath()).build());
+            file = writeFileReportGenerationService.writeFile(orderedCollection, itemCommand, fileName);
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).fileUrl(file.getPath()).build());
             iLog.info(itemCommand, SAVED_INFORMATION);
 
             //Sent response
             itemCommand.setFileName(file.getName());
             itemCommand.setFileUrl(file.getAbsolutePath());
             producerItemService.send(itemCommand, headers);
-            stateService.nextStep(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).build());
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
             iLog.info(itemCommand, SENT_RESPONSE);
         } catch (Exception e) {
-            iLog.info(ItemReportingDto.builder().itemType(ITEM35).build(), ERROR);
+            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
             log.error("Error to generate file report generation: {}", e.getMessage(), e);
-            stateService.setError(StateRequest.builder().fileName(FileUtils.getFileName(itemCommand)).itemType(ITEM35).errorDescription("Error to generate file report generation: " + e.getMessage()).build());
+            stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("Error to generate file report generation: " + e.getMessage()).build());
         }
         return file;
     }
 
     @Override
     public ItemType getItemType() {
-        return ItemType.REPORT_GENERATION;
+        return REPORT_GENERATION;
     }
 
 

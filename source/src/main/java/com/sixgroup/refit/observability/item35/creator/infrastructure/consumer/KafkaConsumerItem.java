@@ -34,7 +34,7 @@ public class KafkaConsumerItem {
     @KafkaListener(topics = "${component-config.topics.observability-item-topic}", groupId = "${component-config.topics.observability-item-consumer-group-id}")
     public void consume(final ConsumerRecord<ItemId, ItemCommand> item) {
         log.debug("Consume message: {}", item);
-        if (AppConstants.ITEM35.equals(item.key().getItemId())
+        if (AppConstants.ITEM35_ID.equals(item.key().getItemId())
             && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
 
             kafkaConsumerTracing.initTrace(item.headers());
@@ -52,6 +52,6 @@ public class KafkaConsumerItem {
     }
 
     private boolean isRequestTypeAccepted(final String requestItemType) {
-        return ItemType.reportsName().contains(requestItemType);
+        return ItemType.reportsItemName().contains(requestItemType);
     }
 }
