@@ -17,14 +17,14 @@ public final class AppConstants {
     public static final String HEADER_NO_MESSAGES_ON_GIVE = "NO_MESSAGES_ON_GIVE DATE";
     public static final String HEADER_DATE = "DATE";
     public static final String DATE_FORMAT_YYYY_MM_DD = "yyyy-MM-dd";
-    public static final String DATE_FORMAT_DD_MM_YYYY = "dd-MM-yyyy";
     public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final String DATE_FORMAT_YYYYMMDD = "yyyyMMdd";
+    public static final String FILE_NAME_PATTERN_YYYYMMDD = "YYYYMMDD";
     public static final String SFTP = "sftp";
     public static final String API = "api";
     public static final String WEB = "web";
-    public static final String ITEM35 = "item35";
+    public static final String ITEM35_ID = "item35";
     public static final String HEADER_DATA_CENTER_LOCATION = "DATA_CENTER_LOCATION";
     public static final String HEADER_DATABASE_SERVER_OR_PLATFORM = "DATABASE_SERVER_OR_PLATFORM";
     public static final String HEADER_CAPACITY = "CAPACITY";

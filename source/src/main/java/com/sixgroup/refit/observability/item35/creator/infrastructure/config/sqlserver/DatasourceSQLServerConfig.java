@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.config.sqlserver;
 
 import com.sixgroup.refit.observability.item.state.infrastructure.entity.ItemReportingEntity;
-import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.sqlserver.ReportEoDProcessStateEntity;
+import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.sqlserver.ReportEoDStateEntity;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,7 +51,7 @@ public class DatasourceSQLServerConfig {
         objectObjectHashMap.put(HIBERNATE_DDL_AUTO, properties.getDdlAuto());
         return builder
             .dataSource(dataSource)
-            .packages(ItemReportingEntity.class, ReportEoDProcessStateEntity.class)
+            .packages(ItemReportingEntity.class, ReportEoDStateEntity.class)
             .persistenceUnit(properties.getPersistenceUnit())
             .properties(objectObjectHashMap)
             .build();

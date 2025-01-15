@@ -2,6 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase.unit
 
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
+import com.sixgroup.refit.observability.item35.creator.application.service.FileNameService;
 import com.sixgroup.refit.observability.item35.creator.application.service.StorageService;
 import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseStorageCapacity;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
@@ -37,6 +38,8 @@ import static org.mockito.Mockito.*;
 class UseCaseStorageCapacityTest {
 
     private final Headers mockHeaders = mock(Headers.class);
+    @InjectMocks
+    private UseCaseStorageCapacity useCaseStorageCapacity;
     @Captor
     ArgumentCaptor<List<StorageCapacityDto>> storageCapacityDtoListCaptor;
     @Mock
@@ -44,11 +47,11 @@ class UseCaseStorageCapacityTest {
     @Mock
     private ProducerItemService producerItemService;
     @Mock
-    private StateService stateService;
-    @InjectMocks
-    private UseCaseStorageCapacity useCaseStorageCapacity;
-    @Mock
     private StorageService storageService;
+    @Mock
+    private FileNameService fileNameService;
+    @Mock
+    private StateService stateService;
 
     private static StorageCapacityDto createStorageCapacity(String reportDay, String date, String timeStamp, float capacity,
                                                             float usedCapacity, float availableCapacity, float utilization) {
@@ -73,6 +76,7 @@ class UseCaseStorageCapacityTest {
 
     @Test
     void execute() throws IOException {
+        final String fileName = "test_file.csv";
         List<Storage> totalCapacityList = List.of(new Storage("2023-09-01T00:00:00.000Z", bigDecimalFromString("16.703632f")),
             new Storage("2023-09-02T00:00:00.000Z", BigDecimal.valueOf(Float.parseFloat("16.700466f"))));
         when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
@@ -91,8 +95,9 @@ class UseCaseStorageCapacityTest {
 
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
 
-        File mockedFile = new File("test_file.csv");
-        when(writeFileSubmissionVolumesService.writeFile(anyList(), any())).thenReturn(mockedFile);
+        File mockedFile = new File(fileName);
+        when(writeFileSubmissionVolumesService.writeFile(anyList(), any(), any())).thenReturn(mockedFile);
+        when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         ItemCommandDTO itemCommandDTO = getItemCommandDTO();
 
@@ -104,7 +109,7 @@ class UseCaseStorageCapacityTest {
         verify(producerItemService, times(1)).send(any(), any());
 
         verify(writeFileSubmissionVolumesService).writeFile(storageCapacityDtoListCaptor.capture(),
-            any());
+            any(), any());
         List<StorageCapacityDto> value = storageCapacityDtoListCaptor.getValue();
         assertEquals(value, storageCapacityDtoList);
     }
@@ -152,7 +157,7 @@ class UseCaseStorageCapacityTest {
 
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
 
-        when(writeFileSubmissionVolumesService.writeFile(anyList(), any())).thenThrow(new IOException("Error"));
+        when(writeFileSubmissionVolumesService.writeFile(anyList(), any(), any())).thenThrow(new IOException("Error"));
         useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders);
         verify(storageService, times(1)).getTotalCapacity(any(), any());
         verify(storageService, times(1)).getTotalFreeCapacity(any(), any());
@@ -160,7 +165,7 @@ class UseCaseStorageCapacityTest {
         verify(producerItemService, times(0)).send(any(), any());
 
         verify(writeFileSubmissionVolumesService).writeFile(storageCapacityDtoListCaptor.capture(),
-            any());
+            any(), any());
         List<StorageCapacityDto> value = storageCapacityDtoListCaptor.getValue();
         assertEquals(value, storageCapacityDtoList);
     }

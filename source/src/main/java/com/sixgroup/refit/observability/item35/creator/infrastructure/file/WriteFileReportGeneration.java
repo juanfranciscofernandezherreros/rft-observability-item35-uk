@@ -27,9 +27,9 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
     private final ReportProperties reportProperties;
 
     @Override
-    public File writeFile(final List<ReportGenerationDto> reportGenerationList, final ItemCommandDTO itemCommandDTO) throws IOException {
+    public File writeFile(final List<ReportGenerationDto> reportGenerationList, final ItemCommandDTO itemCommandDTO, final String fileName) throws IOException {
         log.debug("Creating and writing file");
-        String filePath = csvProperties.getOutputPath() + getFileName(itemCommandDTO.getItemDate());
+        String filePath = csvProperties.getOutputPath() + fileName;
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
@@ -62,10 +62,6 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
             TR_INCIDENT_ID
         };
         csvWriter.writeNext(data);
-    }
-
-    private String getFileName(String itemDate) {
-        return ItemType.REPORT_GENERATION.getNamePattern() + itemDate + ".csv";
     }
 
 }

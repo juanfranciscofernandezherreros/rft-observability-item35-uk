@@ -58,6 +58,10 @@ api:
 component-config:
   trCode: TRRGS
   regulationReference: EMIR
+  submissionVolumesFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35A_YYYYMMDD.csv
+  reportGenerationFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35B_YYYYMMDD.csv
+  storageCapacityFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35C_YYYYMMDD.csv
+  computeCapacityFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35D_YYYYMMDD.csv
   translation:
     accounts:
       - name: eudrp0uu0000

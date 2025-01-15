@@ -10,17 +10,17 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReportEoDProcessStatePK implements Serializable {
+public class ReportEoDStatePK implements Serializable {
 
-    @Column(name="report_type")
+    @Column(name = "report_type")
     private String reportType;
 
-    @Column(name="reporting_session")
+    @Column(name = "reporting_session")
     private String reportingSession;
 
-    @Column(name="target_type")
+    @Column(name = "target_type")
     private String targetType;
 
-    @Column(name = "query_id")
-    private String queryId;
+    @Column(name = "reporting_process")
+    private String reportingProcess;
 }

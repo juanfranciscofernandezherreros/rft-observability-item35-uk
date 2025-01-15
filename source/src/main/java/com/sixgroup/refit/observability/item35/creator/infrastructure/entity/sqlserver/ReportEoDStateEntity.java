@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "report_eod_process_state")
-@IdClass(ReportEoDProcessStatePK.class)
-public class ReportEoDProcessStateEntity {
+@Table(name = "report_eod_state")
+@IdClass(ReportEoDStatePK.class)
+public class ReportEoDStateEntity {
 
     @Id
     @Column(name = "report_type")
@@ -29,8 +29,8 @@ public class ReportEoDProcessStateEntity {
     private String targetType;
 
     @Id
-    @Column(name = "query_id")
-    private String queryId;
+    @Column(name = "reporting_process")
+    private String reportingProcess;
 
     @Column(name = "started_date")
     @CreationTimestamp

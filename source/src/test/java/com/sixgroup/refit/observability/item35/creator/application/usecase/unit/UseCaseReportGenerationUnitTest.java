@@ -2,6 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase.unit
 
 import com.sixgroup.refit.observability.item.state.application.StateService;
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
+import com.sixgroup.refit.observability.item35.creator.application.service.FileNameService;
 import com.sixgroup.refit.observability.item35.creator.application.service.ParticipantService;
 import com.sixgroup.refit.observability.item35.creator.application.service.RegulatorService;
 import com.sixgroup.refit.observability.item35.creator.application.service.TrService;
@@ -34,6 +35,8 @@ import static org.mockito.Mockito.*;
 class UseCaseReportGenerationUnitTest {
 
     private final Headers mockHeaders = mock(Headers.class);
+    @InjectMocks
+    private UseCaseReportGeneration useCaseReportGeneration;
     @Captor
     ArgumentCaptor<List<ReportGenerationDto>> reportGenerationDtoListCaptor;
     @Mock
@@ -41,15 +44,15 @@ class UseCaseReportGenerationUnitTest {
     @Mock
     private ProducerItemService producerItemService;
     @Mock
-    private StateService stateService;
-    @InjectMocks
-    private UseCaseReportGeneration useCaseReportGeneration;
-    @Mock
     private ParticipantService participantService;
     @Mock
     private RegulatorService regulatorService;
     @Mock
     private TrService trService;
+    @Mock
+    private FileNameService fileNameService;
+    @Mock
+    private StateService stateService;
 
     @Test
     void getItemType() {
@@ -58,11 +61,15 @@ class UseCaseReportGenerationUnitTest {
 
     @Test
     void execute_resource_not_found() {
+        final String fileName = "test_file.csv";
+
         when(participantService.findParticipants(any(), any(), any())).thenReturn(Collections.emptyList());
         when(regulatorService.findRegulator(any(), any(), any())).thenReturn(Collections.emptyList());
         when(trService.findTr(any(), any(), any())).thenReturn(Collections.emptyList());
+        when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         final File response = useCaseReportGeneration.execute(getItemCommandDTO(), mockHeaders);
+
         assertNull(response);
         verify(stateService, times(1)).setError(any());
         verify(producerItemService, times(0)).send(any(), any());
@@ -72,6 +79,8 @@ class UseCaseReportGenerationUnitTest {
 
     @Test
     void execute() throws IOException {
+        final String fileName = "test_file.csv";
+
         final ReportGenerationDto reportGenerationParticipant = new ReportGenerationDto("2024-02-29",
             "TAR108", "participant", "1900-01-01T00:00:06Z",
             "2024-02-20T18:55:29Z", "2024-02-20T18:55:29Z", "2024-02-20",
@@ -92,8 +101,9 @@ class UseCaseReportGenerationUnitTest {
 
         when(trService.findTr(any(), any(), any())).thenReturn(List.of(reportGenerationTr));
 
-        final File mockedFile = new File("test_file.csv");
-        when(writeFileReportGenerationService.writeFile(anyList(), any())).thenReturn(mockedFile);
+        final File mockedFile = new File(fileName);
+        when(writeFileReportGenerationService.writeFile(anyList(), any(), any())).thenReturn(mockedFile);
+        when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         final ItemCommandDTO itemCommandDTO = getItemCommandDTO();
 
@@ -106,7 +116,7 @@ class UseCaseReportGenerationUnitTest {
         verify(producerItemService, times(1)).send(any(), any());
 
         verify(writeFileReportGenerationService).writeFile(reportGenerationDtoListCaptor.capture(),
-            any());
+            any(), any());
         List<ReportGenerationDto> value = reportGenerationDtoListCaptor.getValue();
 
         assertEquals(value, List.of(reportGenerationParticipant, reportGenerationRegulator, reportGenerationTr));
@@ -114,6 +124,7 @@ class UseCaseReportGenerationUnitTest {
 
     @Test
     void execute_throws_io_exception() throws IOException {
+        final String fileName = "test_file.csv";
         ReportGenerationDto reportGeneration_participant = new ReportGenerationDto("2024-02-29",
             "TAR108", "participant", "1900-01-01T00:00:06Z",
             "2024-02-20T18:55:29Z", "2024-02-20T18:55:29Z", "20-02-2024",
@@ -134,11 +145,14 @@ class UseCaseReportGenerationUnitTest {
 
         when(trService.findTr(any(), any(), any())).thenReturn(List.of(reportGeneration_tr));
 
-        File mockedFile = new File("test_file.csv");
-        when(writeFileReportGenerationService.writeFile(anyList(), any())).thenReturn(mockedFile);
+        File mockedFile = new File(fileName);
+        when(writeFileReportGenerationService.writeFile(anyList(), any(), any())).thenReturn(mockedFile);
 
-        when(writeFileReportGenerationService.writeFile(anyList(), any())).thenThrow(new IOException("Error"));
+        when(writeFileReportGenerationService.writeFile(anyList(), any(), any())).thenThrow(new IOException("Error"));
+        when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
+
         final File response = useCaseReportGeneration.execute(getItemCommandDTO(), mockHeaders);
+
         assertNull(response);
 
         verify(participantService, times(1)).findParticipants(any(), any(), any());
@@ -147,7 +161,7 @@ class UseCaseReportGenerationUnitTest {
         verify(stateService, times(2)).nextStep(any(StateRequest.class));
 
         verify(writeFileReportGenerationService).writeFile(reportGenerationDtoListCaptor.capture(),
-            any());
+            any(), any());
         List<ReportGenerationDto> value = reportGenerationDtoListCaptor.getValue();
 
         assertEquals(value, List.of(reportGeneration_participant, reportGeneration_regulator, reportGeneration_tr));

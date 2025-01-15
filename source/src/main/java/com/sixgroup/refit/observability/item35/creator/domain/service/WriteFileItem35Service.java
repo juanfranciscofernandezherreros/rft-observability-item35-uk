@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface WriteFileItem35Service<T> {
 
-    File writeFile(List<T> records, ItemCommandDTO itemCommandDTO) throws IOException;
+    File writeFile(List<T> records, ItemCommandDTO itemCommandDTO, String fileName) throws IOException;
 }

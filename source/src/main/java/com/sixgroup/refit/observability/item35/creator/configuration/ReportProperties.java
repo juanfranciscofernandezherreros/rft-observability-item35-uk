@@ -19,6 +19,15 @@ public class ReportProperties {
     @NotNull
     private String regulationReference;
 
+    @NotNull
+    public String submissionVolumesFileNamePattern;
+    @NotNull
+    public String reportGenerationFileNamePattern;
+    @NotNull
+    public String storageCapacityFileNamePattern;
+    @NotNull
+    public String computeCapacityFileNamePattern;
+
     private Translation translation;
 
     @Getter

@@ -12,7 +12,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 
 @Slf4j
 public enum ItemType {
-    SUBMISSION_VOLUMES("submissionVolumes", "TRRGS_EMIR_PR_FU_ND_ITEM35A_",
+    SUBMISSION_VOLUMES("submissionVolumes",
         new String[]{
             HEADER_TR_CODE,
             HEADER_REPORTING_DATE,
@@ -22,23 +22,22 @@ public enum ItemType {
             HEADER_NO_MESSAGES_ON_GIVE,
             HEADER_DATE
         }),
-
-    COMPUTE_CAPACITY("computeCapacity", "TRRGS_EMIR_PR_FU_ND_ITEM35D_",
+    REPORT_GENERATION("reportGeneration",
         new String[]{
             HEADER_TR_CODE,
             HEADER_REPORTING_DATE,
             HEADER_REGULATION_REFERENCE,
-            HEADER_NAME,
-            HEADER_DESCRIPTION,
-            HEADER_CPU_RAM,
+            HEADER_REPORT_NAME,
+            HEADER_REPORT_TYPE,
+            HEADER_REPORT_GENERATION_TIME,
+            HEADER_REPORT_COMPLETION_TIME,
+            HEADER_REPORT_PUBLICATION_TIME,
             HEADER_DATE,
-            HEADER_MIN_USAGE,
-            HEADER_AVG_USAGE,
-            HEADER_MAX_USAGE,
-            HEADER_INCIDENT_RELATED,
+            HEADER_SLA,
+            HEADER_DIFFERENCE,
             HEADER_TR_INCIDENT_ID
         }),
-    STORAGE_CAPACITY("storageCapacity", "TRRGS_EMIR_PR_FU_ND_ITEM35C_",
+    STORAGE_CAPACITY("storageCapacity",
         new String[]{
             HEADER_TR_CODE,
             HEADER_REPORTING_DATE,
@@ -53,47 +52,34 @@ public enum ItemType {
             HEADER_INCIDENT_RELATED,
             HEADER_TR_INCIDENT_ID
         }),
-    REPORT_GENERATION("reportGeneration", "TRRGS_EMIR_PR_FU_ND_ITEM35B_",
+    COMPUTE_CAPACITY("computeCapacity",
         new String[]{
             HEADER_TR_CODE,
             HEADER_REPORTING_DATE,
             HEADER_REGULATION_REFERENCE,
-            HEADER_REPORT_NAME,
-            HEADER_REPORT_TYPE,
-            HEADER_REPORT_GENERATION_TIME,
-            HEADER_REPORT_COMPLETION_TIME,
-            HEADER_REPORT_PUBLICATION_TIME,
+            HEADER_NAME,
+            HEADER_DESCRIPTION,
+            HEADER_CPU_RAM,
             HEADER_DATE,
-            HEADER_SLA,
-            HEADER_DIFFERENCE,
+            HEADER_MIN_USAGE,
+            HEADER_AVG_USAGE,
+            HEADER_MAX_USAGE,
+            HEADER_INCIDENT_RELATED,
             HEADER_TR_INCIDENT_ID
         });
 
     private final String name;
-    private final String namePattern;
     private final String[] headers;
 
-    ItemType(final String name, final String namePattern, String[] headers) {
+    ItemType(final String name, final String[] headers) {
         this.name = name;
-        this.namePattern = namePattern;
         this.headers = headers;
 
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getNamePattern() {
-        return namePattern;
-    }
-
-    public String[] getHeaders() {
-        return headers;
-    }
-
     public static ItemType getItemTypeFromName(final String name) {
-        final Optional<ItemType> itemTypeFound = Arrays.stream(ItemType.values()).filter(itemType -> name.equals(itemType.getName())).findFirst();
+        final Optional<ItemType> itemTypeFound = Arrays.stream(ItemType.values())
+            .filter(itemType -> name.equals(itemType.getName())).findFirst();
         if (itemTypeFound.isEmpty()) {
             log.error("Error to find itemType by name {}", name);
             throw new InternalErrorException("Error to find itemType by name " + name);
@@ -101,8 +87,16 @@ public enum ItemType {
         return itemTypeFound.get();
     }
 
-    public static List<String> reportsName() {
-        return List.of(SUBMISSION_VOLUMES.getName(), COMPUTE_CAPACITY.getName(), STORAGE_CAPACITY.getName(), REPORT_GENERATION.getName());
+    public static List<String> reportsItemName() {
+        return Arrays.stream(ItemType.values()).map(ItemType::getName).toList();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String[] getHeaders() {
+        return headers;
     }
 
 }

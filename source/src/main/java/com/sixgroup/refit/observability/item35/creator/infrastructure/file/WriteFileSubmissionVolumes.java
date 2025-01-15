@@ -10,7 +10,6 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.shared.csv.CSVCreator;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,9 +27,9 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
     private final ReportProperties reportProperties;
 
     @Override
-    public File writeFile(final List<RecordStatus> recordStatus, final ItemCommandDTO itemCommandDTO) throws IOException {
+    public File writeFile(final List<RecordStatus> recordStatus, final ItemCommandDTO itemCommandDTO, final String fileName) throws IOException {
         log.debug("Creating and writing file");
-        final String filePath = csvProperties.getOutputPath() + FileUtils.getFileName(itemCommandDTO);
+        final String filePath = csvProperties.getOutputPath() + fileName;
         try (FileWriter writer = new FileWriter(filePath);
              CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
