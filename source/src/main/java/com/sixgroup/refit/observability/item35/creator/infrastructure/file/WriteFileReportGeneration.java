@@ -2,7 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
@@ -24,7 +24,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.A
 @Slf4j
 public class WriteFileReportGeneration implements WriteFileItem35Service<ReportGenerationDto> {
     private final CsvProperties csvProperties;
-    private final ReportProperties reportProperties;
+    private final ReportItemProperties reportProperties;
 
     @Override
     public File writeFile(final List<ReportGenerationDto> reportGenerationList, final ItemCommandDTO itemCommandDTO, final String fileName) throws IOException {
@@ -42,7 +42,8 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
     }
 
     private void writeHeader(final CSVWriter csvWriter) {
-        csvWriter.writeNext(ItemType.REPORT_GENERATION.getHeaders());
+        String[] headers = ItemType.REPORT_GENERATION.getHeadersWithIncidentId(reportProperties.getIncidentIdHeader());
+        csvWriter.writeNext(headers);
     }
 
 

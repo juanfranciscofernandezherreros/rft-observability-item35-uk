@@ -11,11 +11,9 @@ import com.sixgroup.refit.observability.modules.validate.domain.data.SlaInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.PARTICIPANT_ENTITY;
 
 @Slf4j
@@ -29,11 +27,8 @@ public class ParticipantService {
     private final ParticipantMapper participantMapper = new ParticipantMapper();
 
     public List<ReportGenerationDto> findParticipants(final String initDate, final String endDate, final String itemDate) {
-        final List<ParticipantDTO> participants =
-            reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(initDate, endDate);
-        final List<ParticipantDTO> participantsReco =
-            reportingFileAdapterRepository.findParticipantsRecoFileType(initDate, endDate);
-
+        final List<ParticipantDTO> participants = reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(initDate, endDate);
+        final List<ParticipantDTO> participantsReco = reportingFileAdapterRepository.findParticipantsRecoFileType(initDate, endDate);
         final List<ParticipantDTO> totalParticipants = new ArrayList<>();
         totalParticipants.addAll(participants);
         totalParticipants.addAll(participantsReco);

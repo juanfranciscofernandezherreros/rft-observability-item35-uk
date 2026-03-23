@@ -99,4 +99,17 @@ public enum ItemType {
         return headers;
     }
 
+    /**
+     * Returns a copy of the headers array with the last element replaced by
+     * the given {@code incidentIdHeader} (either {@code TR_INCIDENT_ID} or {@code SLA_BREACH_ID}).
+     * Used only for item types that have an incident/breach id column (REPORT_GENERATION,
+     * STORAGE_CAPACITY, COMPUTE_CAPACITY). For SUBMISSION_VOLUMES the standard
+     * {@link #getHeaders()} should be used instead.
+     */
+    public String[] getHeadersWithIncidentId(final String incidentIdHeader) {
+        String[] copy = Arrays.copyOf(headers, headers.length);
+        copy[copy.length - 1] = incidentIdHeader;
+        return copy;
+    }
+
 }

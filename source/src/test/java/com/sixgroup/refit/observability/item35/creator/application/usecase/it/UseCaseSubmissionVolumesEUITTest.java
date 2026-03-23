@@ -4,7 +4,7 @@ package com.sixgroup.refit.observability.item35.creator.application.usecase.it;
 import com.sixgroup.refit.observability.ApplicationMain;
 import com.sixgroup.refit.observability.item.state.domain.enums.State;
 import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
-import com.sixgroup.refit.observability.item35.creator.application.service.ParticipantService;
+import com.sixgroup.refit.observability.item35.creator.application.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
@@ -42,11 +42,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 
+
 @SpringBootTest(classes = {ApplicationMain.class})
-@ActiveProfiles({"test", "test-uk"})
+@ActiveProfiles({"test", "test-eu"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
-class UseCaseReportGenerationITTest {
+class UseCaseSubmissionVolumesEUITTest {
 
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
     private Producer<ItemId, ItemCommand> producer;
@@ -57,10 +58,10 @@ class UseCaseReportGenerationITTest {
     private ItemFileFinderRepository sqlServerItemFileFinderRepository;
 
     @SpyBean
-    private ParticipantService participantService;
+    private RecordStatusService recordStatusService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         // Configurar el productor
         Properties producerProps = new Properties();
         producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
@@ -68,63 +69,67 @@ class UseCaseReportGenerationITTest {
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
         producerProps.put("schema.registry.url", "mock://not-used");
         producer = new KafkaProducer<>(producerProps);
-
     }
 
     @Test
-    @DisplayName("Given a message item35 with itemType ReportGeneration from topic, validate create and save file")
-    void when_send_item_request_item_35_create_and_save_file_repot_generation() throws IOException {
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
-            ItemCommand
-                .newBuilder()
-                .setItemId(AppConstants.ITEM35_ID)
-                .setItemType(ItemType.REPORT_GENERATION.getName())
-                .setCommand(Command.REQUEST.getDescription())
-                .setCreationTimestamp(Instant.now())
-                .setItemDate("20240315")
-                .setFileInfo(FileInfo.newBuilder()
-                    .setFileName("")
-                    .setFileUrl("").build())
-                .build()));
+    @DisplayName("[EU] Given a message item35 with itemType SubmissionVolumes from topic, validate CSV is created with SLA_BREACH_ID column")
+    void when_send_item_request_item_35_create_and_save_file_submission_volumes() throws IOException {
+        ItemCommand itemCommand = ItemCommand
+            .newBuilder()
+            .setItemId(AppConstants.ITEM35_ID)
+            .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
+            .setCommand(Command.REQUEST.getDescription())
+            .setCreationTimestamp(Instant.now())
+            .setItemDate("20240315")
+            .setFileInfo(FileInfo.newBuilder()
+                .setFileName("")
+                .setFileUrl("").build())
+            .build();
 
-        waitAtMost(200, TimeUnit.SECONDS)
-            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
-                    "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240315.csv").getStateName()
-                .equals(State.SENT_RESPONSE.getName()));
+        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
+            itemCommand));
+        producer.flush();
+
+        waitAtMost(60, TimeUnit.SECONDS)
+            .until(() -> {
+                var r = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
+                    "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240315.csv");
+                return r != null && State.SENT_RESPONSE.getName().equals(r.getStateName());
+            });
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM35B_20240315.csv");
+            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM35A_20240315.csv");
 
         assertNotNull(path);
 
-        String lineHeader = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;REPORT_NAME;REPORT_TYPE;REPORT_GENERATION_TIME;" +
-            "REPORT_COMPLETION_TIME;REPORT_PUBLICATION_TIME;DATE;SLA;DIFFERENCE;TR_INCIDENT_ID";
-
-        String lineOne = "TRRGS;2024-03-15;EMIR;\"TAR030\";PARTICIPANT;1900-01-01T00:00:00Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T06:00:00Z;;";
-        String lineTwo = "TRRGS;2024-03-15;EMIR;\"ESMAS-TAR030 TRACE\";ESMA;1900-01-01T04:12:55Z;2024-02-02T05:12:55Z;;2024-02-02;2024-02-03T12:00:00Z;;";
-        String penultimateLine = "TRRGS;2024-03-15;EMIR;\"ESMAS-TSR107 TRACE\";ESMA;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
-        String lastLine = "TRRGS;2024-03-15;EMIR;\"NATIONAL BANK OF ROMANIA-TSR109 Portal XML\";FCA;1900-01-01T08:12:55Z;2024-02-05T08:12:55Z;;2024-02-05;2024-02-06T12:00:00Z;;";
+        String lineHeader = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;MESSAGE_TYPE;SUBMISSION_CHANNEL;NO_MESSAGES_ON_GIVE DATE;DATE";
+        String lineOne = "TRRGS;2024-03-15;EMIR;ACCEPTED;API;1;2024-02-01";
+        String lineTwo = "TRRGS;2024-03-15;EMIR;REJECTED;API;1;2024-02-02";
+        String lineThree = "TRRGS;2024-03-15;EMIR;ACCEPTED;WEB;1;2024-02-11";
+        String lineFour = "TRRGS;2024-03-15;EMIR;ACCEPTED;SFTP;1;2024-02-18";
+        String lineFive = "TRRGS;2024-03-15;EMIR;REJECTED;API;1;2024-02-19";
 
         List<String> allLines = Files.readAllLines(path);
 
         assertEquals(lineHeader, allLines.get(0));
         assertEquals(lineOne, allLines.get(1));
         assertEquals(lineTwo, allLines.get(2));
-        assertEquals(penultimateLine, allLines.get(allLines.size() - 2));
-        assertEquals(lastLine, allLines.get(allLines.size() - 1));
+        assertEquals(lineThree, allLines.get(3));
+        assertEquals(lineFour, allLines.get(4));
+        assertEquals(lineFive, allLines.get(5));
 
-        assertEquals(19, allLines.size());
+        assertEquals(6, allLines.size());
 
     }
 
     @Test
-    @DisplayName("Given a message item from topic, when service return empty list validate state is error with no exist record")
+    @DisplayName("[EU] Given a message item35 from topic, when service return empty list validate state is error")
     void item_35_then_state_error_not_exist_records() {
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
             ItemCommand
                 .newBuilder()
                 .setItemId(AppConstants.ITEM35_ID)
-                .setItemType(ItemType.REPORT_GENERATION.getName())
+                .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
                 .setItemDate("20240115")
@@ -136,23 +141,23 @@ class UseCaseReportGenerationITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
 
     }
 
     @Test
-    @DisplayName("Given a message item from topic, when error from service then validate state is error")
+    @DisplayName("[EU] Given a message item35 from topic, when error from service then validate state is error")
     void item_35_state_error() {
 
-        doThrow(new RuntimeException("error")).when(participantService).findParticipants(any(), any(), any());
+        doThrow(new RuntimeException("error")).when(recordStatusService).findRecordStatus(any(), any());
 
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
             ItemCommand
                 .newBuilder()
                 .setItemId(AppConstants.ITEM35_ID)
-                .setItemType(ItemType.REPORT_GENERATION.getName())
+                .setItemType(ItemType.SUBMISSION_VOLUMES.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
                 .setItemDate("20240115")
@@ -164,11 +169,9 @@ class UseCaseReportGenerationITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
     }
 
-
 }
-

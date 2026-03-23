@@ -97,7 +97,7 @@ public class CapacityRamCloudera implements CapacityRamRepository {
                 StorageCapacityResponse.class);
             return CapacityMapper.mapperResponseToListCapacity(storageCapacityResponseBody);
         } catch (IOException e) {
-            log.error("Error to call Cloudera Ram with message: {}, code: {}, exception: ",
+            log.error("Error to call Cloudera Ram with message: {}, code: {}",
                 e.getMessage(), ERROR_CALL_CLOUDERA, e);
             return new ArrayList<>();
         } finally {

@@ -2,7 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.StorageCapacityDto;
@@ -24,8 +24,9 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.A
 @RequiredArgsConstructor
 @Slf4j
 public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageCapacityDto> {
+
     private final CsvProperties csvProperties;
-    private final ReportProperties reportProperties;
+    private final ReportItemProperties reportItemProperties;
 
     @Override
     public File writeFile(final List<StorageCapacityDto> storageCapacityDtoList, final ItemCommandDTO itemCommandDTO, final String fileName) throws IOException {
@@ -43,15 +44,16 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
     }
 
     private void writeHeader(final CSVWriter csvWriter) {
-        csvWriter.writeNext(ItemType.STORAGE_CAPACITY.getHeaders());
+        String[] headers = ItemType.STORAGE_CAPACITY.getHeadersWithIncidentId(reportItemProperties.getIncidentIdHeader());
+        csvWriter.writeNext(headers);
     }
 
 
     private void writeRecord(final CSVWriter csvWriter, final StorageCapacityDto storageCapacityData) {
         String[] data = {
-            reportProperties.getTrCode(),
+            reportItemProperties.getTrCode(),
             storageCapacityData.getReportingDate(),
-            reportProperties.getRegulationReference(),
+            reportItemProperties.getRegulationReference(),
             DATA_CENTER_LOCATION,
             DATABASE_SERVER_OR_PLATFORM,
             storageCapacityData.getDate(),

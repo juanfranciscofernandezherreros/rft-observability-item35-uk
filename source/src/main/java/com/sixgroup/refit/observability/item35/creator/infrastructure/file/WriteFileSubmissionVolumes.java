@@ -2,7 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Status;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -24,7 +24,7 @@ import java.util.List;
 @Slf4j
 public class WriteFileSubmissionVolumes implements WriteFileItem35Service<RecordStatus> {
     private final CsvProperties csvProperties;
-    private final ReportProperties reportProperties;
+    private final ReportItemProperties reportProperties;
 
     @Override
     public File writeFile(final List<RecordStatus> recordStatus, final ItemCommandDTO itemCommandDTO, final String fileName) throws IOException {

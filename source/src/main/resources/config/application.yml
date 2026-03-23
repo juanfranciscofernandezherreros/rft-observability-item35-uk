@@ -16,29 +16,6 @@ spring:
         "schema.registry.url": "http://localhost:8081"
 
 component-config:
-  trCode: TRRGS
-  regulationReference: EMIR
-  submissionVolumesFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35A_YYYYMMDD.csv
-  reportGenerationFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35B_YYYYMMDD.csv
-  storageCapacityFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35C_YYYYMMDD.csv
-  computeCapacityFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35D_YYYYMMDD.csv
-  translation:
-    accounts:
-      - name: eudrp0uu0000
-        value: EIOPA
-      - name: eudrp4dc3000
-        value: COVIP
-      - name: eudrp4ea0000
-        value: CAFME
-      - name: eudrp5cb4000
-        value: SVERIGES RIKSBANK
-      - name: eudrp0pbp000
-        value: NATIONAL BANK OF ROMANIA
-    reports:
-      - name: I091
-        value: REC091
-      - name: S091
-        value: REC091
   participant:
     accountId: 'eudb%'
     reportType: PARTICIPANT
@@ -57,17 +34,15 @@ component-config:
         reportName: RJC092
       - name: WARN000
         reportName: WRN106
-      - name: IMDT092
-        reportName: IMDT092
-      - name: REC091
-        reportName: REC091
+      - name: RECS
+        reportName: RECS
     reports_custom:
-      - name: REC091
-        reportName: REC091
+      - name: RECS
+        reportName: RECS
   regulator:
     accountId: 'eudr%'
     reportTypeEsma: ESMA
-    reportTypeNca: NCA
+    reportTypeFca: FCA
     reports:
       - name: TAR030
         reportName: TAR030
@@ -90,9 +65,15 @@ component-config:
       - name: WARN000
         reportName: WRN106
         report_query_eod: WARN000
-      - name: REC091
-        reportName: REC091
+      - name: RECS
+        reportName: RECS
         report_query_eod: RECO000
+      - name: RECI
+        reportName: RECI
+        report_query_eod: RECO000
+      - name: TPST000
+        report-name: TPST000
+        report-query-eod: POSC
   tr:
     accountId: 'tr%'
     reportType: TR
@@ -130,10 +111,7 @@ component-config:
         - name: WARN000
           sla-init: yyyy-MM-ddT00:00:00Z
           sla-end: yyyy-MM-ddT06:00:00Z
-        - name: IMDT092
-          sla-init: yyyy-MM-ddT00:00:00Z
-          sla-end: yyyy-MM-ddT06:00:00Z
-        - name: REC091
+        - name: RECS
           sla-init: yyyy-MM-ddT00:00:00Z
           sla-end: yyyy-MM-ddT06:00:00Z
       authority:
@@ -158,7 +136,10 @@ component-config:
         - name: WARN000
           sla-init: yyyy-MM-ddT00:00:00Z
           sla-end: yyyy-MM-ddT12:00:00Z
-        - name: REC091
+        - name: RECS
+          sla-init: yyyy-MM-ddT00:00:00Z
+          sla-end: yyyy-MM-ddT12:00:00Z
+        - name: RECI
           sla-init: yyyy-MM-ddT00:00:00Z
           sla-end: yyyy-MM-ddT12:00:00Z
       tr:

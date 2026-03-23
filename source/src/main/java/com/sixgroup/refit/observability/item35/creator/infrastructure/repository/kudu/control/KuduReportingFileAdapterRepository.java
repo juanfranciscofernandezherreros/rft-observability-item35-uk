@@ -1,9 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.control;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.TrProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.*;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.config.TranslationData;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
@@ -31,7 +28,7 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
     private final ParticipantProperties participantProperties;
     private final RegulatorProperties regulatorProperties;
     private final TrProperties trProperties;
-    private final ReportProperties reportProperties;
+    private final ReportItemProperties reportProperties;
 
     public List<ParticipantDTO> findParticipantsByDayAccountAndFileType(final String initDate, final String endDate) {
         log.debug("Find Participants by day and fileType");

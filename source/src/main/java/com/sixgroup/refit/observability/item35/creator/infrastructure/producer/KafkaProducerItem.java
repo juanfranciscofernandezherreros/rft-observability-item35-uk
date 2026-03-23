@@ -60,7 +60,8 @@ public class KafkaProducerItem implements ProducerItemService {
             .setCreationTimestamp(Instant.now())
             .setItemDate(itemCommandDTO.getItemDate())
             .setFileInfo(FileInfo.newBuilder()
-                .setFileName(itemCommandDTO.getFileName()).setFileUrl(itemCommandDTO.getFileUrl()).build()).build();
+                .setFileName(itemCommandDTO.getFileName())
+                .setFileUrl(itemCommandDTO.getFileUrl()).build()).build();
     }
 
 }

@@ -12,6 +12,7 @@ import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConst
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -44,7 +45,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest(classes = {ApplicationMain.class})
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "test-uk"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 class UseCaseComputeCapacityITTest {
@@ -68,8 +69,8 @@ class UseCaseComputeCapacityITTest {
         // Configurar el productor
         Properties producerProps = new Properties();
         producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-        producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class.getName());
-        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class.getName());
+        producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
+        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
         producerProps.put("schema.registry.url", "mock://not-used");
         producer = new KafkaProducer<>(producerProps);
 
@@ -78,7 +79,10 @@ class UseCaseComputeCapacityITTest {
     @Test
     @DisplayName("Given a message item35 with itemType ComputeCapacity from topic, validate create and save file")
     void when_send_item_request_item_35_create_and_save_file_compute_capacity() throws IOException {
-        producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
+        producer.send(new ProducerRecord<>(topic,
+            ItemId.newBuilder()
+                .setItemId(AppConstants.ITEM35_ID)
+                .build(),
             ItemCommand
                 .newBuilder()
                 .setItemId(AppConstants.ITEM35_ID)
@@ -91,7 +95,7 @@ class UseCaseComputeCapacityITTest {
                     .setFileUrl("").build())
                 .build()));
 
-        waitAtMost(20, TimeUnit.SECONDS)
+        waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
                     "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240315.csv").getStateName()
                 .equals(State.SENT_RESPONSE.getName()));
@@ -139,9 +143,11 @@ class UseCaseComputeCapacityITTest {
                 .build()));
 
         waitAtMost(15, TimeUnit.SECONDS)
-            .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv").getStateName().equals(State.ERROR.getName())
-            );
+            .until(() -> {
+                var r = sqlServerItemFileFinderRepository
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv");
+                return r != null && State.ERROR.getName().equals(r.getStateName());
+            });
 
     }
 
@@ -165,9 +171,11 @@ class UseCaseComputeCapacityITTest {
                 .build()));
 
         waitAtMost(15, TimeUnit.SECONDS)
-            .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv").getStateName().equals(State.ERROR.getName())
-            );
+            .until(() -> {
+                var r = sqlServerItemFileFinderRepository
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv");
+                return r != null && State.ERROR.getName().equals(r.getStateName());
+            });
     }
 
     @Test
@@ -190,9 +198,11 @@ class UseCaseComputeCapacityITTest {
                 .build()));
 
         waitAtMost(15, TimeUnit.SECONDS)
-            .until(() -> sqlServerItemFileFinderRepository.
-                findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv").getStateName().equals(State.ERROR.getName())
-            );
+            .until(() -> {
+                var r = sqlServerItemFileFinderRepository
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv");
+                return r != null && State.ERROR.getName().equals(r.getStateName());
+            });
     }
 
 

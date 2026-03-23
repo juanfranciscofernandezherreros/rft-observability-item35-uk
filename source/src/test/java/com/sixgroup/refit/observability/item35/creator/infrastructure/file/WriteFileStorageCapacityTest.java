@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -33,7 +33,7 @@ class WriteFileStorageCapacityTest {
     @Mock
     private CsvProperties csvProperties;
     @Mock
-    private ReportProperties reportProperties;
+    private ReportItemProperties reportProperties;
 
     private static ItemCommandDTO getItemCommandDTO() {
         ItemCommandDTO itemCommandDTO = ItemCommandDTO.builder()
@@ -64,6 +64,7 @@ class WriteFileStorageCapacityTest {
             .when(csvProperties).getOutputPath();
         when(reportProperties.getTrCode()).thenReturn("TRRGS");
         when(reportProperties.getRegulationReference()).thenReturn("EMIR");
+        when(reportProperties.getIncidentIdHeader()).thenReturn("TR_INCIDENT_ID");
 
         Path locationPath = FileSystems.getDefault().getPath("src/test/resources/work-repository-observability/upload/");
 

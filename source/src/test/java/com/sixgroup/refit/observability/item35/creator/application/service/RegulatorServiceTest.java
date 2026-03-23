@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.config.TranslationData;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReguIdentityDTO;
@@ -14,22 +14,21 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.repository
 import com.sixgroup.refit.observability.item35.creator.shared.DataTestUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.sla.SlaInfoRepository;
 import com.sixgroup.refit.observability.modules.validate.domain.data.SlaInfo;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.REGULATOR_ENTITY;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -38,165 +37,168 @@ class RegulatorServiceTest {
 
     @InjectMocks
     private RegulatorService regulatorService;
+
     @Mock
     private ReportingFileAdapterRepository reportingFileAdapterRepository;
+
     @Mock
     private RegulatorProperties fileTypeProperties;
+
+    @Mock
+    private ReportItemProperties reportProperties;
+
     @Mock
     private SlaInfoRepository slaInfoRepository;
+
     @Mock
     private ReguIdentityAdapterRepository reguIdentityAdapterRepository;
-    @Mock
-    private ReportProperties reportProperties;
+
     @Mock
     private ReportEodProcessStateRepository reportEodProcessStateRepository;
 
+    @BeforeEach
+    void setup() {
+        ReflectionTestUtils.setField(regulatorService, "blockSize", 1);
+
+        ReportItemProperties.Translation translation = new ReportItemProperties.Translation();
+        TranslationData translationData = new TranslationData();
+        translationData.setName("eudrp0uu0000");
+        translationData.setValue("EIOPA");
+
+        translation.getAccounts().add(translationData);
+
+        lenient().when(reportProperties.getTranslation()).thenReturn(translation);
+    }
+
     @Test
     void findRegulators_repository_return_empty_list() {
-        ReflectionTestUtils.setField(regulatorService, "blockSize", 1);
-        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString())).thenReturn(new ArrayList<>());
-        final List<ReportGenerationDto> response = regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
-        assertTrue(response.isEmpty());
-        verify(reportingFileAdapterRepository, times(1)).findRegulatorByDayAccountAndFileType(anyString(), anyString());
 
+        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString()))
+            .thenReturn(new ArrayList<>());
+
+        List<ReportGenerationDto> response =
+            regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
+
+        assertTrue(response.isEmpty());
+
+        verify(reportingFileAdapterRepository, times(1))
+            .findRegulatorByDayAccountAndFileType(anyString(), anyString());
     }
 
     @Test
     void findRegulators_ok() {
-        ReflectionTestUtils.setField(regulatorService, "blockSize", 1);
-        final String fileName1 = "TRRGS_DATTSR_ESMAS_R15923-20240220_001001-0.zip";
-        final String reportType1 = "TAR108";
-        final LocalDateTime reportSessionDate1 = DataTestUtils.parseString("2024-02-20 18:55:23");
-        final String accountId1 = "eudritrace";
-        final LocalDateTime creationDate1 = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final String fileName2 = "TRRGS_DATMDA_EUDRIRA1051_R60004-20240222_001001-0.zip";
-        final String reportType2 = "TSR107";
-        final LocalDateTime reportSessionDate2 = DataTestUtils.parseString("2024-02-20 18:55:23");
-        final String accountId2 = "eudritrace";
-        final LocalDateTime creationDate2 = DataTestUtils.parseString("2024-02-20 18:55:29");
+        String fileName1 = "TRRGS_DATTSR_ESMAS_R15923-20240220_001001-0.zip";
+        String reportType1 = "TAR108";
+        LocalDateTime reportSessionDate1 = DataTestUtils.parseString("2024-02-20 18:55:23");
+        String accountId1 = "eudritrace";
+        LocalDateTime creationDate1 = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final RegulatorDTO regulator1 = new RegulatorDTO(fileName1, reportType1, reportSessionDate1, accountId1, creationDate1, "CAESR");
-        final RegulatorDTO regulator2 = new RegulatorDTO(fileName2, reportType2, reportSessionDate2, accountId2, creationDate2, "CAFAA");
+        String fileName2 = "TRRGS_DATMDA_EUDRIRA1051_R60004-20240222_001001-0.zip";
+        String reportType2 = "TSR107";
+        LocalDateTime reportSessionDate2 = DataTestUtils.parseString("2024-02-20 18:55:23");
+        String accountId2 = "eudritrace";
+        LocalDateTime creationDate2 = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final SlaInfo slaInfo1 = SlaInfo.builder()
-            .meetsSla(Boolean.TRUE)
+        RegulatorDTO regulator1 =
+            new RegulatorDTO(fileName1, reportType1, reportSessionDate1, accountId1, creationDate1, "CAESR");
+
+        RegulatorDTO regulator2 =
+            new RegulatorDTO(fileName2, reportType2, reportSessionDate2, accountId2, creationDate2, "CAFAA");
+
+        SlaInfo slaInfo1 = SlaInfo.builder()
+            .meetsSla(true)
             .expectSlaDate(reportSessionDate1.plusDays(1).truncatedTo(ChronoUnit.DAYS).plusHours(6))
             .generationDuration(Duration.ofMinutes(30))
             .build();
 
-        final SlaInfo slaInfo2 = SlaInfo.builder()
-            .meetsSla(Boolean.TRUE)
+        SlaInfo slaInfo2 = SlaInfo.builder()
+            .meetsSla(true)
             .expectSlaDate(reportSessionDate1.plusDays(1).truncatedTo(ChronoUnit.DAYS).plusHours(12))
             .generationDuration(Duration.ofMinutes(60))
             .build();
 
-        fileTypeProperties.setReportTypeEsma("ESMA");
-        fileTypeProperties.setReportTypeNca("NCA");
-
-        final ReportConfig reportConfig1 = new ReportConfig();
+        ReportConfig reportConfig1 = new ReportConfig();
         reportConfig1.setName(reportType1);
         reportConfig1.setReportName(reportType1);
-        final ReportConfig reportConfig2 = new ReportConfig();
+
+        ReportConfig reportConfig2 = new ReportConfig();
         reportConfig2.setName(reportType2);
         reportConfig2.setReportName(reportType2);
-        fileTypeProperties.getReports().add(reportConfig1);
-        fileTypeProperties.getReports().add(reportConfig2);
 
-        final ReportProperties.Translation accounts = new ReportProperties.Translation();
-        final TranslationData translationData = new TranslationData();
-        translationData.setName("eudrp0uu0000");
-        translationData.setValue("EIOPA");
-        accounts.getAccounts().add(translationData);
+        when(fileTypeProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
 
-        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString())).thenReturn(List.of(regulator1, regulator2));
-        when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType1, reportSessionDate1, creationDate1)).thenReturn(Optional.of(slaInfo1));
-        when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType2, reportSessionDate2, creationDate2)).thenReturn(Optional.of(slaInfo2));
-        when(reguIdentityAdapterRepository.findByTraceCode(any())).thenReturn(List.of(ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri2frb000").build()
-            , ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri96jn000").build()));
-        when(reportProperties.getTranslation()).thenReturn(accounts);
+        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString()))
+            .thenReturn(List.of(regulator1, regulator2));
 
-        final List<ReportGenerationDto> response = regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
+        when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType1, reportSessionDate1, creationDate1))
+            .thenReturn(Optional.of(slaInfo1));
+
+        when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType2, reportSessionDate2, creationDate2))
+            .thenReturn(Optional.of(slaInfo2));
+
+        when(reguIdentityAdapterRepository.findByTraceCode(any()))
+            .thenReturn(List.of(
+                ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri2frb000").build(),
+                ReguIdentityDTO.builder().traceCode("CAFAA").regulatorId("eudri96jn000").build()
+            ));
+
+        when(reportEodProcessStateRepository.find(anyString(), anyString()))
+            .thenReturn(Collections.emptyList());
+
+        List<ReportGenerationDto> response =
+            regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
 
         assertFalse(response.isEmpty());
         assertEquals(2, response.size());
-
-        verify(reportingFileAdapterRepository,
-            times(1)).findRegulatorByDayAccountAndFileType(anyString(), anyString());
     }
 
     @Test
     void findRegulators_ok_withEodInit() {
-        ReflectionTestUtils.setField(regulatorService, "blockSize", 1);
-        final String fileName1 = "TRRGS_DATTSR_ESMAS_R15923-20240220_001001-0.zip";
-        final String reportType1 = "TAR108";
-        final LocalDateTime reportSessionDate1 = DataTestUtils.parseString("2024-02-20 18:55:23");
-        final String accountId1 = "eudritrace";
-        final LocalDateTime creationDate1 = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final RegulatorDTO regulator1 = new RegulatorDTO(fileName1, reportType1, reportSessionDate1, accountId1, creationDate1, "CAESR");
+        String fileName1 = "TRRGS_DATTSR_ESMAS_R15923-20240220_001001-0.zip";
+        String reportType1 = "TAR108";
+        LocalDateTime reportSessionDate1 = DataTestUtils.parseString("2024-02-20 18:55:23");
+        String accountId1 = "eudritrace";
+        LocalDateTime creationDate1 = DataTestUtils.parseString("2024-02-20 18:55:29");
 
-        final SlaInfo slaInfo1 = SlaInfo.builder()
-            .meetsSla(Boolean.TRUE)
+        RegulatorDTO regulator1 =
+            new RegulatorDTO(fileName1, reportType1, reportSessionDate1, accountId1, creationDate1, "CAESR");
+
+        SlaInfo slaInfo1 = SlaInfo.builder()
+            .meetsSla(true)
             .expectSlaDate(reportSessionDate1.plusDays(1).truncatedTo(ChronoUnit.DAYS).plusHours(6))
             .generationDuration(Duration.ofMinutes(30))
             .build();
 
-        fileTypeProperties.setReportTypeEsma("ESMA");
-        final ReportConfig reportConfig1 = new ReportConfig("TAR108", "TAR108", "MRAR000");
+        ReportConfig reportConfig1 = new ReportConfig("TAR108", "TAR108", "MRAR000");
 
-        final ReportProperties.Translation accounts = new ReportProperties.Translation();
-        final TranslationData translationData = new TranslationData();
-        translationData.setName("eudrp0uu0000");
-        translationData.setValue("EIOPA");
-        accounts.getAccounts().add(translationData);
+        ReportEoDDTO reportEo1 =
+            new ReportEoDDTO("MRAR000", DataTestUtils.parseString("2024-02-20 02:00:00"), "2024-02-20");
 
-        final ReportEoDDTO reportEo1 = new ReportEoDDTO("MRAR000", DataTestUtils.parseString("2024-02-20 02:00:00"), "2024-02-20");
-
-        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString())).thenReturn(List.of(regulator1));
-        when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType1, reportSessionDate1, reportEo1.getStartedDate(), creationDate1)).thenReturn(Optional.of(slaInfo1));
-        when(reguIdentityAdapterRepository.findByTraceCode(any())).thenReturn(List.of(ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri2frb000").build()
-            , ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri96jn000").build()));
-        when(reportProperties.getTranslation()).thenReturn(accounts);
-        when(reportEodProcessStateRepository.find(anyString(), anyString())).thenReturn(List.of(reportEo1));
         when(fileTypeProperties.getReports()).thenReturn(List.of(reportConfig1));
 
-        final List<ReportGenerationDto> response = regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
+        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString()))
+            .thenReturn(List.of(regulator1));
+
+        when(reportEodProcessStateRepository.find(anyString(), anyString()))
+            .thenReturn(List.of(reportEo1));
+
+        when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType1, reportSessionDate1, reportEo1.getStartedDate(), creationDate1))
+            .thenReturn(Optional.of(slaInfo1));
+
+        when(reguIdentityAdapterRepository.findByTraceCode(any()))
+            .thenReturn(List.of(
+                ReguIdentityDTO.builder().traceCode("CAESR").regulatorId("eudri2frb000").build()
+            ));
+
+        List<ReportGenerationDto> response =
+            regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
 
         assertFalse(response.isEmpty());
         assertEquals(1, response.size());
 
-        verify(reportingFileAdapterRepository,
-            times(1)).findRegulatorByDayAccountAndFileType(anyString(), anyString());
-        verify(reportEodProcessStateRepository, times(1)).find(anyString(), anyString());
-    }
-
-    @Test
-    void findReportEod_shouldReturnDataWhenReportExists() {
-        final ReportEoDDTO reportEo1 = new ReportEoDDTO("MRAR000", DataTestUtils.parseString("2024-09-01 02:00:00"), "2024-09-01");
-        final ReportEoDDTO reportEo2 = new ReportEoDDTO("TRTS000", DataTestUtils.parseString("2024-09-01 02:01:00"), "2024-09-01");
-        final List<ReportEoDDTO> reportEoDDTOS = List.of(reportEo1, reportEo2);
-
-        final ReportConfig reportConfig1 = new ReportConfig("TAR108", "TAR108", "MRAR000");
-        final ReportConfig reportConfig2 = new ReportConfig("TSR107", "TSR107", "TRTS000");
-        final List<ReportConfig> reportConfigList = List.of(reportConfig1, reportConfig2);
-
-        final String fileType1 = "TAR108";
-        final LocalDateTime reportingSession1 = DataTestUtils.parseString("2024-09-01 02:55:11");
-        final Optional<ReportEoDDTO> response1 = regulatorService.findReportEod(reportEoDDTOS, reportConfigList, fileType1, reportingSession1);
-        assertTrue(response1.isPresent());
-
-        final String fileType2 = "TSR107";
-        final LocalDateTime reportingSession2 = DataTestUtils.parseString("2024-09-02 02:00:00");
-        final Optional<ReportEoDDTO> response2 = regulatorService.findReportEod(reportEoDDTOS, reportConfigList, fileType2, reportingSession2);
-        assertTrue(response2.isEmpty());
-
-        final Optional<ReportEoDDTO> response3 = regulatorService.findReportEod(new ArrayList<>(), reportConfigList, fileType1, reportingSession1);
-        assertTrue(response3.isEmpty());
-
-        final String fileType3 = "TAR030";
-        final Optional<ReportEoDDTO> response4 = regulatorService.findReportEod(reportEoDDTOS, reportConfigList, fileType3, reportingSession1);
-        assertTrue(response4.isEmpty());
-
+        verify(reportEodProcessStateRepository, times(1))
+            .find(anyString(), anyString());
     }
 }

@@ -27,7 +27,6 @@ import java.util.List;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
 import static com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType.COMPUTE_CAPACITY;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.ITEM35_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -47,10 +46,11 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
 
         log.debug("Generating compute capacity file ...");
         final String fileName = fileNameService.getFileName(COMPUTE_CAPACITY, itemCommand.getItemDate());
+        final String itemId = itemCommand.getItemId();
         File file = null;
 
         try {
-            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(itemId).build());
 
             //Find information
             final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemCommand.getItemDate());
@@ -60,14 +60,14 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
             final List<Capacity> capacityRam = capacityRamService.findByCapacityRam(dateFrom, dateTo);
 
             if (CollectionUtils.isEmpty(capacityCpu) || CollectionUtils.isEmpty(capacityRam)) {
-                iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
+                iLog.info(ItemReportingDto.builder().itemType(itemId).build(), ERROR);
                 log.error("No data found in compute capacity, skipping report generation");
-                stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("No record status found, skipping file generation").build());
+                stateService.setError(StateRequest.builder().fileName(fileName).itemType(itemId).errorDescription("No record status found, skipping file generation").build());
                 return null;
             }
 
             //Saving information
-            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(itemId).build());
             iLog.info(itemCommand, SAVING_INFORMATION);
 
             //Saved information
@@ -77,19 +77,19 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
             recordsCapacity.sort(Comparator.comparing(Capacity::getDate));
 
             file = writeFileComputeCapacity.writeFile(recordsCapacity, itemCommand, fileName);
-            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).fileUrl(file.getPath()).build());
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(itemId).fileUrl(file.getPath()).build());
             iLog.info(itemCommand, SAVED_INFORMATION);
 
             //Sent response
             itemCommand.setFileName(file.getName());
             itemCommand.setFileUrl(file.getAbsolutePath());
             producerItemService.send(itemCommand, headers);
-            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(itemId).build());
             iLog.info(itemCommand, SENT_RESPONSE);
         } catch (Exception e) {
-            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
+            iLog.info(ItemReportingDto.builder().itemType(itemId).build(), ERROR);
             log.error("Error to generate file compute capacity {}", e.getMessage(), e);
-            stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("Error to generate file compute capacity: " + e.getMessage()).build());
+            stateService.setError(StateRequest.builder().fileName(fileName).itemType(itemId).errorDescription("Error to generate file compute capacity: " + e.getMessage()).build());
         }
         return file;
     }

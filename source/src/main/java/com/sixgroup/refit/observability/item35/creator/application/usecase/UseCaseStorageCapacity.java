@@ -6,6 +6,8 @@ import com.sixgroup.refit.observability.item.state.domain.model.ItemReportingDto
 import com.sixgroup.refit.observability.item.state.domain.model.StateRequest;
 import com.sixgroup.refit.observability.item35.creator.application.service.FileNameService;
 import com.sixgroup.refit.observability.item35.creator.application.service.StorageService;
+import com.sixgroup.refit.observability.item35.creator.configuration.Regulation;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Storage;
@@ -30,7 +32,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
 import static com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType.STORAGE_CAPACITY;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.ITEM35_ID;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.NUM_DECIMALS;
 
 @Service
@@ -44,92 +45,200 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
     private final FileNameService fileNameService;
     private final StorageService storageService;
     private final ItemLog iLog = new ItemLog();
+    private final ReportItemProperties reportItemProperties;
 
     @Override
     public File execute(ItemCommandDTO itemCommand, Headers headers) {
-        log.debug("Generating storage capacity file ...");
-        final String fileName = fileNameService.getFileName(STORAGE_CAPACITY, itemCommand.getItemDate());
-        File file;
-        try {
-            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
 
-            //Find information
-            final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemCommand.getItemDate());
-            final String dateTo = DateUtils.firstDayOfCurrentMonth(itemCommand.getItemDate());
+        final ItemType itemType = getItemType();
+        final String itemId = itemCommand.getItemId();
+        final String itemDate = itemCommand.getItemDate();
+        final String fileName = fileNameService.getFileName(itemType, itemDate);
+
+        log.info("Starting processing for itemType: {} itemId: {} itemDate: {}", itemType, itemId, itemDate);
+        log.debug("Generated fileName: {}", fileName);
+
+        File file = null;
+
+        try {
+
+            stateService.nextStep(StateRequest.builder()
+                .fileName(fileName)
+                .itemType(itemId)
+                .build());
+
+            log.info("Fetching storage capacity data for period calculation...");
+
+            final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemDate);
+            final String dateTo = DateUtils.firstDayOfCurrentMonth(itemDate);
+
+            log.debug("Date range calculated -> from: {} to: {}", dateFrom, dateTo);
 
             final List<Storage> totalCapacityList = storageService.getTotalCapacity(dateFrom, dateTo);
             final List<Storage> totalFreeCapacityList = storageService.getTotalFreeCapacity(dateFrom, dateTo);
 
+            log.info("Data retrieved -> totalCapacityRecords: {} totalFreeCapacityRecords: {}",
+                totalCapacityList.size(), totalFreeCapacityList.size());
+
             if (CollectionUtils.isEmpty(totalCapacityList) || CollectionUtils.isEmpty(totalFreeCapacityList)) {
-                iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
-                log.error("No data found in storage capacity, skipping report generation");
-                stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("No record status found, skipping file generation").build());
+
+                log.error("No data found for storage capacity calculation. totalCapacityListEmpty={} totalFreeCapacityListEmpty={}",
+                    CollectionUtils.isEmpty(totalCapacityList),
+                    CollectionUtils.isEmpty(totalFreeCapacityList));
+
+                iLog.info(ItemReportingDto.builder().itemType(itemType.name()).build(), ERROR);
+
+                stateService.setError(StateRequest.builder()
+                    .fileName(fileName)
+                    .itemType(itemId)
+                    .errorDescription("No record status found, skipping file generation")
+                    .build());
+
                 return null;
             }
 
-            final List<StorageCapacityDto> storageCapacityFinalList = calculateFinalList(itemCommand.getItemDate(),
-                totalCapacityList, totalFreeCapacityList);
+            log.info("Calculating final storage capacity dataset...");
+
+            final List<StorageCapacityDto> storageCapacityFinalList =
+                calculateFinalList(itemDate, totalCapacityList, totalFreeCapacityList);
+
+            log.info("Calculated storage capacity dataset size: {}", storageCapacityFinalList.size());
+
             if (CollectionUtils.isEmpty(storageCapacityFinalList)) {
-                iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
-                log.error("Not exist any match between 'total free capacity data' and 'total capacity data'");
-                stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("Not exist any match between 'total free capacity data' and 'total capacity data'").build());
+
+                log.error("No matching timestamps between total capacity and free capacity datasets");
+
+                iLog.info(ItemReportingDto.builder().itemType(itemType.name()).build(), ERROR);
+
+                stateService.setError(StateRequest.builder()
+                    .fileName(fileName)
+                    .itemType(itemId)
+                    .errorDescription("No match between 'total free capacity data' and 'total capacity data'")
+                    .build());
+
                 return null;
             }
 
-            //Saving information
-            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
+            stateService.nextStep(StateRequest.builder()
+                .fileName(fileName)
+                .itemType(itemId)
+                .build());
+
+            log.info("Writing storage capacity file: {}", fileName);
+
             iLog.info(itemCommand, SAVING_INFORMATION);
 
-            //Saved information
-            file = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommand, fileName);
-            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).fileUrl(file.getPath()).build());
+            try {
+                file = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommand, fileName);
+            } catch (Exception ex) {
+                log.error("Error writing file for item type {}", getItemType(), ex);
+            }
+
+            log.info("File successfully generated at path: {}", file.getAbsolutePath());
+
+            stateService.nextStep(StateRequest.builder()
+                .fileName(fileName)
+                .itemType(itemId)
+                .fileUrl(file.getPath())
+                .build());
+
             iLog.info(itemCommand, SAVED_INFORMATION);
 
-            //Sent response
+            log.info("Sending response event to Kafka for itemType {}", itemType);
+
             itemCommand.setFileName(file.getName());
             itemCommand.setFileUrl(file.getAbsolutePath());
+
             producerItemService.send(itemCommand, headers);
-            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
+
+            stateService.nextStep(StateRequest.builder()
+                .fileName(fileName)
+                .itemType(itemId)
+                .build());
+
             iLog.info(itemCommand, SENT_RESPONSE);
+
+            log.info("Processing finished successfully for itemType {} file {}", itemType, fileName);
+
         } catch (Exception e) {
-            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
-            log.error("Error to generate file storage capacity: {}", e.getMessage(), e);
-            stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("Error to generate file storage capacity: " + e.getMessage()).build());
+
+            log.error("Error generating storage capacity file for itemType {} itemId {} : {}",
+                itemType, itemId, e.getMessage(), e);
+
+            iLog.info(ItemReportingDto.builder().itemType(itemType.name()).build(), ERROR);
+
+            stateService.setError(StateRequest.builder()
+                .fileName(fileName)
+                .itemType(itemId)
+                .errorDescription("Error generating storage capacity file: " + e.getMessage())
+                .build());
+
             return null;
         }
+
         return file;
     }
 
-    private List<StorageCapacityDto> calculateFinalList(String itemDate, List<Storage> totalCapacityList,
+    private List<StorageCapacityDto> calculateFinalList(String itemDate,
+                                                        List<Storage> totalCapacityList,
                                                         List<Storage> totalFreeCapacityList) {
-        final AtomicReference<BigDecimal> referenceCapacity = new AtomicReference<>(totalCapacityList.get(0).getCapacity());
-        final AtomicReference<BigDecimal> referenceAvailableCapacity = new AtomicReference<>(totalFreeCapacityList.get(0).getCapacity());
+
+        log.debug("Starting capacity calculations...");
+
+        final AtomicReference<BigDecimal> referenceCapacity =
+            new AtomicReference<>(totalCapacityList.get(0).getCapacity());
+
+        final AtomicReference<BigDecimal> referenceAvailableCapacity =
+            new AtomicReference<>(totalFreeCapacityList.get(0).getCapacity());
 
         final List<StorageCapacityDto> storageCapacityFinalList = new ArrayList<>();
+
         totalCapacityList.forEach(totalStorage ->
             totalFreeCapacityList.forEach(totalFreeStorage -> {
+
                 if (totalStorage.getTimeStamp().equals(totalFreeStorage.getTimeStamp())) {
+
                     final StorageCapacityDto storageCapacityDto = new StorageCapacityDto();
                     storageCapacityDto.setTimeStamp(totalStorage.getTimeStamp());
 
-                    //Capacity
                     referenceAvailableCapacity.set(totalFreeStorage.getCapacity());
-                    if (MathsUtils.isIntoMayorPercent(referenceCapacity.get(), totalStorage.getCapacity())) {
-                        if (totalFreeStorage.getCapacity().compareTo(totalStorage.getCapacity()) > 0) {
+
+                    if (isCapacityIncrease(referenceCapacity.get(), totalStorage.getCapacity())) {
+
+                        if (isFreeCapacityGreaterThanTotal(
+                            totalFreeStorage.getCapacity(),
+                            totalStorage.getCapacity())) {
+
                             referenceCapacity.set(totalFreeStorage.getCapacity());
                             referenceAvailableCapacity.set(totalStorage.getCapacity());
+
                         } else {
+
                             referenceCapacity.set(totalStorage.getCapacity());
                         }
                     }
-                    storageCapacityDto.setCapacity(referenceCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
-                    storageCapacityDto.setAvailableCapacity(referenceAvailableCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
 
-                    // CALCULATED VALUES
-                    final BigDecimal usedCapacity = storageCapacityDto.getCapacity().subtract(storageCapacityDto.getAvailableCapacity());
-                    storageCapacityDto.setUsedCapacity(usedCapacity.setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
-                    final BigDecimal utilization = storageCapacityDto.getUsedCapacity().divide(storageCapacityDto.getCapacity(), NUM_DECIMALS, RoundingMode.HALF_UP);
-                    storageCapacityDto.setUtilization(utilization.setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+                    storageCapacityDto.setCapacity(
+                        referenceCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+
+                    storageCapacityDto.setAvailableCapacity(
+                        referenceAvailableCapacity.get().setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+
+                    final BigDecimal usedCapacity =
+                        storageCapacityDto.getCapacity().subtract(storageCapacityDto.getAvailableCapacity());
+
+                    storageCapacityDto.setUsedCapacity(
+                        usedCapacity.setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+
+                    final BigDecimal utilization =
+                        storageCapacityDto.getUsedCapacity().divide(
+                            storageCapacityDto.getCapacity(),
+                            NUM_DECIMALS,
+                            RoundingMode.HALF_UP);
+
+                    storageCapacityDto.setUtilization(
+                        utilization.setScale(NUM_DECIMALS, RoundingMode.HALF_UP));
+
                     String date = DateUtils.createFileDateFromTimeStamp(storageCapacityDto.getTimeStamp());
                     storageCapacityDto.setDate(date);
 
@@ -138,12 +247,24 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
                     storageCapacityFinalList.add(storageCapacityDto);
                 }
-            }));
+            })
+        );
+
+        log.debug("Capacity calculation finished. Records generated: {}", storageCapacityFinalList.size());
+
         return storageCapacityFinalList;
     }
 
     @Override
     public ItemType getItemType() {
         return STORAGE_CAPACITY;
+    }
+
+    private boolean isCapacityIncrease(BigDecimal referenceCapacity, BigDecimal newCapacity) {
+        return MathsUtils.isIntoMayorPercent(referenceCapacity, newCapacity);
+    }
+
+    private boolean isFreeCapacityGreaterThanTotal(BigDecimal freeCapacity, BigDecimal totalCapacity) {
+        return freeCapacity.compareTo(totalCapacity) > 0;
     }
 }

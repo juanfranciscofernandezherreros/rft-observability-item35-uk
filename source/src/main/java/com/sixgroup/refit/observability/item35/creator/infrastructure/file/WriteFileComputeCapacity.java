@@ -2,7 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -29,7 +29,7 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.C
 @Slf4j
 public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity> {
     private final CsvProperties csvProperties;
-    private final ReportProperties reportProperties;
+    private final ReportItemProperties reportItemProperties;
 
     @Override
     public File writeFile(final List<Capacity> capacities, final ItemCommandDTO itemCommandDTO, final String fileName) throws IOException {
@@ -47,15 +47,16 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
     }
 
     private void writeHeader(final CSVWriter csvWriter) {
-        csvWriter.writeNext(ItemType.COMPUTE_CAPACITY.getHeaders());
+        String[] headers = ItemType.COMPUTE_CAPACITY.getHeadersWithIncidentId(reportItemProperties.getIncidentIdHeader());
+        csvWriter.writeNext(headers);
     }
 
 
     private void writeRecord(final CSVWriter csvWriter, final Capacity capacityData, final String itemDate) {
         String[] data = {
-            reportProperties.getTrCode(),
+            reportItemProperties.getTrCode(),
             DateUtils.itemDateFormatted(itemDate),
-            reportProperties.getRegulationReference(),
+            reportItemProperties.getRegulationReference(),
             DATA_CENTER_LOCATION,
             DATABASE_SERVER_OR_PLATFORM,
             capacityData.getTypeCapacity(),

@@ -56,7 +56,7 @@ class RegulatorMapperTest {
     }
 
     @Test
-    void with_NCA_report_type() {
+    void with_FCA_report_type() {
         final String fileName = "TRRGS_DATTAR_CAESR_R99998-20240220_001001-0.zip";
         final String reportType = "TSR107";
         final LocalDateTime reportSessionDate = DataTestUtils.parseString("2024-02-20 18:55:23");
@@ -64,7 +64,7 @@ class RegulatorMapperTest {
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
         final RegulatorProperties fileTypeProperties = new RegulatorProperties();
-        fileTypeProperties.setReportTypeNca("NCA");
+        fileTypeProperties.setReportTypeFca("FCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
         reportConfig.setReportName(reportType);
@@ -81,7 +81,7 @@ class RegulatorMapperTest {
         final RegulatorMapper regulatorMapper = new RegulatorMapper();
         final ReportGenerationDto response = regulatorMapper.toReportGenerationDto(regulatorDTO, fileTypeProperties, slaInfo, new HashMap<>());
 
-        assertEquals("NCA", response.getReportType());
+        assertEquals("FCA", response.getReportType());
     }
 
     @Test
@@ -93,7 +93,7 @@ class RegulatorMapperTest {
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
         final RegulatorProperties fileTypeProperties = new RegulatorProperties();
-        fileTypeProperties.setReportTypeNca("NCA");
+        fileTypeProperties.setReportTypeFca("FCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
         reportConfig.setReportName(reportType);
@@ -128,7 +128,7 @@ class RegulatorMapperTest {
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
         final RegulatorProperties fileTypeProperties = new RegulatorProperties();
-        fileTypeProperties.setReportTypeNca("NCA");
+        fileTypeProperties.setReportTypeFca("FCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
         reportConfig.setReportName(reportType);
@@ -163,7 +163,7 @@ class RegulatorMapperTest {
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
         final RegulatorProperties fileTypeProperties = new RegulatorProperties();
-        fileTypeProperties.setReportTypeNca("NCA");
+        fileTypeProperties.setReportTypeFca("FCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
         reportConfig.setReportName(reportType);
@@ -198,7 +198,7 @@ class RegulatorMapperTest {
         final LocalDateTime creationDate = DataTestUtils.parseString("2024-02-20 18:55:29");
 
         final RegulatorProperties fileTypeProperties = new RegulatorProperties();
-        fileTypeProperties.setReportTypeNca("NCA");
+        fileTypeProperties.setReportTypeFca("FCA");
         final ReportConfig reportConfig = new ReportConfig();
         reportConfig.setName(reportType);
         reportConfig.setReportName(reportType);
