@@ -54,6 +54,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
         final String itemId = itemCommand.getItemId();
         final String itemDate = itemCommand.getItemDate();
         final String fileName = fileNameService.getFileName(itemType, itemDate);
+        final String stateItemId = reportItemProperties.getEffectiveItemId();
 
         log.info("Starting processing for itemType: {} itemId: {} itemDate: {}", itemType, itemId, itemDate);
         log.debug("Generated fileName: {}", fileName);
@@ -64,7 +65,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
             stateService.nextStep(StateRequest.builder()
                 .fileName(fileName)
-                .itemType(itemId)
+                .itemType(stateItemId)
                 .build());
 
             log.info("Fetching storage capacity data for period calculation...");
@@ -86,11 +87,11 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
                     CollectionUtils.isEmpty(totalCapacityList),
                     CollectionUtils.isEmpty(totalFreeCapacityList));
 
-                iLog.info(ItemReportingDto.builder().itemType(itemType.name()).build(), ERROR);
+                iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), ERROR);
 
                 stateService.setError(StateRequest.builder()
                     .fileName(fileName)
-                    .itemType(itemId)
+                    .itemType(stateItemId)
                     .errorDescription("No record status found, skipping file generation")
                     .build());
 
@@ -108,11 +109,11 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
                 log.error("No matching timestamps between total capacity and free capacity datasets");
 
-                iLog.info(ItemReportingDto.builder().itemType(itemType.name()).build(), ERROR);
+                iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), ERROR);
 
                 stateService.setError(StateRequest.builder()
                     .fileName(fileName)
-                    .itemType(itemId)
+                    .itemType(stateItemId)
                     .errorDescription("No match between 'total free capacity data' and 'total capacity data'")
                     .build());
 
@@ -121,12 +122,12 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
             stateService.nextStep(StateRequest.builder()
                 .fileName(fileName)
-                .itemType(itemId)
+                .itemType(stateItemId)
                 .build());
 
             log.info("Writing storage capacity file: {}", fileName);
 
-            iLog.info(itemCommand, SAVING_INFORMATION);
+            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), SAVING_INFORMATION);
 
             try {
                 file = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommand, fileName);
@@ -138,11 +139,11 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
             stateService.nextStep(StateRequest.builder()
                 .fileName(fileName)
-                .itemType(itemId)
+                .itemType(stateItemId)
                 .fileUrl(file.getPath())
                 .build());
 
-            iLog.info(itemCommand, SAVED_INFORMATION);
+            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), SAVED_INFORMATION);
 
             log.info("Sending response event to Kafka for itemType {}", itemType);
 
@@ -153,10 +154,10 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
             stateService.nextStep(StateRequest.builder()
                 .fileName(fileName)
-                .itemType(itemId)
+                .itemType(stateItemId)
                 .build());
 
-            iLog.info(itemCommand, SENT_RESPONSE);
+            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), SENT_RESPONSE);
 
             log.info("Processing finished successfully for itemType {} file {}", itemType, fileName);
 
@@ -165,11 +166,11 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             log.error("Error generating storage capacity file for itemType {} itemId {} : {}",
                 itemType, itemId, e.getMessage(), e);
 
-            iLog.info(ItemReportingDto.builder().itemType(itemType.name()).build(), ERROR);
+            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), ERROR);
 
             stateService.setError(StateRequest.builder()
                 .fileName(fileName)
-                .itemType(itemId)
+                .itemType(stateItemId)
                 .errorDescription("Error generating storage capacity file: " + e.getMessage())
                 .build());
 

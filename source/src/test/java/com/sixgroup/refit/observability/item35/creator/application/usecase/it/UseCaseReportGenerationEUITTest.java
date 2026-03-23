@@ -97,13 +97,13 @@ class UseCaseReportGenerationEUITTest {
 
         waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> {
-                var r = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
-                    "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240315.csv");
+                var r = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM32_ID,
+                    "TRRGS_EMIR_PR_FU_ND_ITEM32B_20240315.csv");
                 return r != null && State.SENT_RESPONSE.getName().equals(r.getStateName());
             });
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM35B_20240315.csv");
+            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM32B_20240315.csv");
 
         assertNotNull(path);
 
@@ -134,7 +134,7 @@ class UseCaseReportGenerationEUITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM32_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32B_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
     }
@@ -160,7 +160,7 @@ class UseCaseReportGenerationEUITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM32_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32B_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
     }
@@ -186,7 +186,7 @@ class UseCaseReportGenerationEUITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM32_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32B_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
     }
@@ -212,7 +212,7 @@ class UseCaseReportGenerationEUITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM32_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32B_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
     }

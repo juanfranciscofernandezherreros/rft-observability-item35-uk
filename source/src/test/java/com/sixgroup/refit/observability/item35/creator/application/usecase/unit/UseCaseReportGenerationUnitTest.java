@@ -7,6 +7,7 @@ import com.sixgroup.refit.observability.item35.creator.application.service.Parti
 import com.sixgroup.refit.observability.item35.creator.application.service.RegulatorService;
 import com.sixgroup.refit.observability.item35.creator.application.service.TrService;
 import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseReportGeneration;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -53,6 +54,8 @@ class UseCaseReportGenerationUnitTest {
     private FileNameService fileNameService;
     @Mock
     private StateService stateService;
+    @Mock
+    private ReportItemProperties reportItemProperties;
 
     @Test
     void getItemType() {

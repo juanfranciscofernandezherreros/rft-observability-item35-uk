@@ -6,6 +6,7 @@ import com.sixgroup.refit.observability.item35.creator.application.mock.ItemComm
 import com.sixgroup.refit.observability.item35.creator.application.service.FileNameService;
 import com.sixgroup.refit.observability.item35.creator.application.service.RecordStatusService;
 import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseSubmissionVolumes;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.RecordStatus;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
@@ -42,6 +43,8 @@ class UseCaseSubmissionVolumesUnitTest {
     private FileNameService fileNameService;
     @Mock
     private StateService stateService;
+    @Mock
+    private ReportItemProperties reportItemProperties;
 
     @Test
     void testManageFileSubmissionVolumes_Success() throws Exception {

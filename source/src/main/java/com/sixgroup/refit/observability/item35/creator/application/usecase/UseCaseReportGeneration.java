@@ -8,6 +8,7 @@ import com.sixgroup.refit.observability.item35.creator.application.service.FileN
 import com.sixgroup.refit.observability.item35.creator.application.service.ParticipantService;
 import com.sixgroup.refit.observability.item35.creator.application.service.RegulatorService;
 import com.sixgroup.refit.observability.item35.creator.application.service.TrService;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
@@ -41,6 +42,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
     private final TrService trService;
     private final FileNameService fileNameService;
     private final StateService stateService;
+    private final ReportItemProperties reportItemProperties;
     private final ItemLog iLog = new ItemLog();
 
     @Override
@@ -53,6 +55,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
 
         final String fileName = fileNameService.getFileName(REPORT_GENERATION, itemCommand.getItemDate());
         final String itemId = itemCommand.getItemId();
+        final String stateItemId = reportItemProperties.getEffectiveItemId();
 
         log.info("Generated fileName: {}", fileName);
         log.info("ItemId: {}", itemId);
@@ -65,7 +68,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
             log.info("Updating state: INITIAL STEP");
             stateService.nextStep(StateRequest.builder()
                 .fileName(fileName)
-                .itemType(itemId)
+                .itemType(stateItemId)
                 .build());
 
             // Calculate dates
@@ -105,12 +108,12 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
 
                 log.error("No data found in report generation. Skipping report generation.");
 
-                iLog.info(ItemReportingDto.builder().itemType(itemId).build(), ERROR);
+                iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), ERROR);
 
                 stateService.setError(
                     StateRequest.builder()
                         .fileName(fileName)
-                        .itemType(itemId)
+                        .itemType(stateItemId)
                         .errorDescription("No record status found, skipping file generation")
                         .build()
                 );
@@ -122,10 +125,10 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
             log.info("Saving information step started");
             stateService.nextStep(StateRequest.builder()
                 .fileName(fileName)
-                .itemType(itemId)
+                .itemType(stateItemId)
                 .build());
 
-            iLog.info(itemCommand, SAVING_INFORMATION);
+            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), SAVING_INFORMATION);
 
             // Order data
             log.info("Ordering records by date...");
@@ -148,11 +151,11 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
 
             stateService.nextStep(StateRequest.builder()
                 .fileName(fileName)
-                .itemType(itemId)
+                .itemType(stateItemId)
                 .fileUrl(file.getPath())
                 .build());
 
-            iLog.info(itemCommand, SAVED_INFORMATION);
+            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), SAVED_INFORMATION);
 
             // Send response
             log.info("Sending response event...");
@@ -166,10 +169,10 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
 
             stateService.nextStep(StateRequest.builder()
                 .fileName(fileName)
-                .itemType(itemId)
+                .itemType(stateItemId)
                 .build());
 
-            iLog.info(itemCommand, SENT_RESPONSE);
+            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), SENT_RESPONSE);
 
             log.info("REPORT_GENERATION process finished successfully");
 
@@ -177,12 +180,12 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
 
             log.error("Error while generating report generation file: {}", e.getMessage(), e);
 
-            iLog.info(ItemReportingDto.builder().itemType(itemId).build(), ERROR);
+            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), ERROR);
 
             stateService.setError(
                 StateRequest.builder()
                     .fileName(fileName)
-                    .itemType(itemId)
+                    .itemType(stateItemId)
                     .errorDescription("Error to generate file report generation: " + e.getMessage())
                     .build()
             );

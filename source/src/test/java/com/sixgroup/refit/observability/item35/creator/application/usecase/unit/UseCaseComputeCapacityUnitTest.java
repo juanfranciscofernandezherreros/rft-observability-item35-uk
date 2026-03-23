@@ -8,6 +8,7 @@ import com.sixgroup.refit.observability.item35.creator.application.service.Capac
 import com.sixgroup.refit.observability.item35.creator.application.service.CapacityRamService;
 import com.sixgroup.refit.observability.item35.creator.application.service.FileNameService;
 import com.sixgroup.refit.observability.item35.creator.application.usecase.UseCaseComputeCapacity;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
@@ -43,6 +44,8 @@ class UseCaseComputeCapacityUnitTest {
     private FileNameService fileNameService;
     @Mock
     private StateService stateService;
+    @Mock
+    private ReportItemProperties reportItemProperties;
 
     @Test
     void testExecuteSuccess() throws Exception {
