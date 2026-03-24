@@ -1,6 +1,5 @@
 package com.sixgroup.refit.observability.item35.creator.application.usecase.it;
 
-
 import com.sixgroup.refit.observability.ApplicationMain;
 import com.sixgroup.refit.observability.item.state.domain.enums.State;
 import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
@@ -28,7 +27,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -50,6 +48,7 @@ class UseCaseReportGenerationITTest {
 
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
     private Producer<ItemId, ItemCommand> producer;
+
     @Value("${component-config.topics.observability-item-topic}")
     private String topic;
 
@@ -61,42 +60,46 @@ class UseCaseReportGenerationITTest {
 
     @BeforeEach
     public void setUp() {
-        // Configurar el productor
+        // Configurar el productor Kafka
         Properties producerProps = new Properties();
         producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
         producerProps.put("schema.registry.url", "mock://not-used");
         producer = new KafkaProducer<>(producerProps);
-
     }
 
     @Test
     @DisplayName("Given a message item35 with itemType ReportGeneration from topic, validate create and save file")
     void when_send_item_request_item_35_create_and_save_file_repot_generation() throws IOException {
+        String fileName = "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240315.csv";
+        String itemDate = "20240315";
+
+        // 1. Enviar comando a Kafka
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
-            ItemCommand
-                .newBuilder()
+            ItemCommand.newBuilder()
                 .setItemId(AppConstants.ITEM35_ID)
                 .setItemType(ItemType.REPORT_GENERATION.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
-                .setItemDate("20240315")
-                .setFileInfo(FileInfo.newBuilder()
-                    .setFileName("")
-                    .setFileUrl("").build())
+                .setItemDate(itemDate)
+                .setFileInfo(FileInfo.newBuilder().setFileName("").setFileUrl("").build())
                 .build()));
 
+        // 2. Esperar a que el proceso termine y el estado sea SENT_RESPONSE en DB
         waitAtMost(200, TimeUnit.SECONDS)
-            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
-                    "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240315.csv").getStateName()
-                .equals(State.SENT_RESPONSE.getName()));
+            .until(() -> {
+                var record = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID, fileName);
+                return record != null && State.SENT_RESPONSE.getName().equals(record.getStateName());
+            });
 
-        Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM35B_20240315.csv");
+        // 3. RELEVANTE: Validar la existencia del archivo en la subcarpeta 'item35'
+        // Según los perfiles 'test' y 'test-uk', la lógica de tus servicios enviará esto a item35
+        Path path = Path.of("work-repository-observability", "upload", "item35", fileName);
 
-        assertNotNull(path);
+        assertNotNull(path, "El path no debería ser nulo");
 
+        // 4. Validar contenido del CSV
         String lineHeader = "TR_CODE;REPORTING_DATE;REGULATION_REFERENCE;REPORT_NAME;REPORT_TYPE;REPORT_GENERATION_TIME;" +
             "REPORT_COMPLETION_TIME;REPORT_PUBLICATION_TIME;DATE;SLA;DIFFERENCE;TR_INCIDENT_ID";
 
@@ -112,63 +115,52 @@ class UseCaseReportGenerationITTest {
         assertEquals(lineTwo, allLines.get(2));
         assertEquals(penultimateLine, allLines.get(allLines.size() - 2));
         assertEquals(lastLine, allLines.get(allLines.size() - 1));
-
         assertEquals(19, allLines.size());
-
     }
 
     @Test
     @DisplayName("Given a message item from topic, when service return empty list validate state is error with no exist record")
     void item_35_then_state_error_not_exist_records() {
+        String fileName = "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv";
+
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
-            ItemCommand
-                .newBuilder()
+            ItemCommand.newBuilder()
                 .setItemId(AppConstants.ITEM35_ID)
                 .setItemType(ItemType.REPORT_GENERATION.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
                 .setItemDate("20240115")
-                .setFileInfo(FileInfo.newBuilder()
-                    .setFileName("")
-                    .setFileUrl("").build())
+                .setFileInfo(FileInfo.newBuilder().setFileName("").setFileUrl("").build())
                 .build()));
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
-                var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv");
-                return r != null && State.ERROR.getName().equals(r.getStateName());
+                var record = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID, fileName);
+                return record != null && State.ERROR.getName().equals(record.getStateName());
             });
-
     }
 
     @Test
     @DisplayName("Given a message item from topic, when error from service then validate state is error")
     void item_35_state_error() {
+        String fileName = "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv";
 
         doThrow(new RuntimeException("error")).when(participantService).findParticipants(any(), any(), any());
 
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
-            ItemCommand
-                .newBuilder()
+            ItemCommand.newBuilder()
                 .setItemId(AppConstants.ITEM35_ID)
                 .setItemType(ItemType.REPORT_GENERATION.getName())
                 .setCommand(Command.REQUEST.getDescription())
                 .setCreationTimestamp(Instant.now())
                 .setItemDate("20240115")
-                .setFileInfo(FileInfo.newBuilder()
-                    .setFileName("")
-                    .setFileUrl("").build())
+                .setFileInfo(FileInfo.newBuilder().setFileName("").setFileUrl("").build())
                 .build()));
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
-                var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35B_20240115.csv");
-                return r != null && State.ERROR.getName().equals(r.getStateName());
+                var record = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID, fileName);
+                return record != null && State.ERROR.getName().equals(record.getStateName());
             });
     }
-
-
 }
-
