@@ -2,6 +2,7 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.Regulation;
 import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.*;
@@ -29,25 +32,34 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
     private final ReportItemProperties reportItemProperties;
 
     @Override
-    public File writeFile(final List<StorageCapacityDto> storageCapacityDtoList, final ItemCommandDTO itemCommandDTO, final String fileName) throws IOException {
-        log.debug("Creating and writing file");
-        String filePath = csvProperties.getOutputPath() + fileName;
-        try (FileWriter writer = new FileWriter(filePath);
+    public File writeFile(final List<StorageCapacityDto> storageCapacityDtoList,
+                          final ItemCommandDTO itemCommandDTO,
+                          final String fileName) throws IOException {
+
+        log.debug("Determining output directory based on regulation");
+        String subFolder = (Regulation.EU.equals(reportItemProperties.getRegulation())) ? "item32" : "item35";
+        log.info("SubFolder {} :" , subFolder);
+        Path targetPath = java.nio.file.Path.of(csvProperties.getOutputPath(), subFolder);
+        log.info("TargetPath {} :" , targetPath);
+        Files.createDirectories(targetPath);
+        java.nio.file.Path finalFile = targetPath.resolve(fileName);
+        log.info("Target file path: {}", finalFile);
+        try (FileWriter writer = new FileWriter(finalFile.toFile());
              CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
             for (StorageCapacityDto storageCapacityData : storageCapacityDtoList) {
                 writeRecord(csvWriter, storageCapacityData);
             }
         }
-        log.debug("File created and written: {}", filePath);
-        return new File(filePath);
+
+        log.info("File created and written successfully at: {}", finalFile);
+        return finalFile.toFile();
     }
 
     private void writeHeader(final CSVWriter csvWriter) {
         String[] headers = ItemType.STORAGE_CAPACITY.getHeadersWithIncidentId(reportItemProperties.getIncidentIdHeader());
         csvWriter.writeNext(headers);
     }
-
 
     private void writeRecord(final CSVWriter csvWriter, final StorageCapacityDto storageCapacityData) {
         String[] data = {
@@ -66,6 +78,4 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
         };
         csvWriter.writeNext(data);
     }
-
 }
-

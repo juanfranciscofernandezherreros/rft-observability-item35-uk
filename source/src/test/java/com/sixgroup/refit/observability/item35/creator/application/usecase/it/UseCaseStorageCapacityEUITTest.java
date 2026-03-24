@@ -95,7 +95,7 @@ class UseCaseStorageCapacityEUITTest {
             });
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM32C_20240315.csv");
+            .getPath("work-repository-observability/upload/item32/TRRGS_EMIR_PR_FU_ND_ITEM32C_20240315.csv");
 
         assertNotNull(path);
 
