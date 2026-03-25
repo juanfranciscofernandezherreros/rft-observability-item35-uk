@@ -4,6 +4,7 @@ import com.sixgroup.refit.observability.ApplicationMain;
 import com.sixgroup.refit.observability.item.state.domain.enums.State;
 import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
 import com.sixgroup.refit.observability.item35.creator.application.service.ParticipantService;
+import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
@@ -55,6 +56,9 @@ class UseCaseReportGenerationITTest {
     @Autowired
     private ItemFileFinderRepository sqlServerItemFileFinderRepository;
 
+    @Autowired
+    private CsvProperties csvProperties;
+
     @SpyBean
     private ParticipantService participantService;
 
@@ -95,7 +99,7 @@ class UseCaseReportGenerationITTest {
 
         // 3. RELEVANTE: Validar la existencia del archivo en la subcarpeta 'item35'
         // Según los perfiles 'test' y 'test-uk', la lógica de tus servicios enviará esto a item35
-        Path path = Path.of("work-repository-observability", "upload", "item35", fileName);
+        Path path = Path.of(csvProperties.getOutputPath(), fileName);
 
         assertNotNull(path, "El path no debería ser nulo");
 

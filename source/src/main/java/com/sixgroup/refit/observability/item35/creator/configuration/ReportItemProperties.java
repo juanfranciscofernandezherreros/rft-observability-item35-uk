@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.HEADER_SLA_BREACH_ID;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.ITEM32_ID;
-import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.ITEM35_ID;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.HEADER_TR_INCIDENT_ID;
 
 @Getter
@@ -19,10 +17,6 @@ public class ReportItemProperties {
 
     public String getIncidentIdHeader() {
         return regulation == Regulation.EU ? HEADER_SLA_BREACH_ID : HEADER_TR_INCIDENT_ID;
-    }
-
-    public String getEffectiveItemId() {
-        return regulation == Regulation.EU ? ITEM32_ID : ITEM35_ID;
     }
 
     @NotNull

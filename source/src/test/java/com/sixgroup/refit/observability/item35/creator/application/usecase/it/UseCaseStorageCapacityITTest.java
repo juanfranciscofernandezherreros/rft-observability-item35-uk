@@ -5,6 +5,7 @@ import com.sixgroup.refit.observability.ApplicationMain;
 import com.sixgroup.refit.observability.item.state.domain.enums.State;
 import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
 import com.sixgroup.refit.observability.item35.creator.application.service.StorageService;
+import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
@@ -58,6 +59,9 @@ class UseCaseStorageCapacityITTest {
     @Autowired
     private ItemFileFinderRepository sqlServerItemFileFinderRepository;
 
+    @Autowired
+    private CsvProperties csvProperties;
+
     @SpyBean
     private StorageService storageService;
 
@@ -99,7 +103,7 @@ class UseCaseStorageCapacityITTest {
             });
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM35C_20240315.csv");
+            .getPath(csvProperties.getOutputPath() + "TRRGS_EMIR_PR_FU_ND_ITEM35C_20240315.csv");
 
         assertNotNull(path);
 

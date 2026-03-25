@@ -4,6 +4,7 @@ import com.sixgroup.refit.observability.ApplicationMain;
 import com.sixgroup.refit.observability.item.state.domain.enums.State;
 import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
 import com.sixgroup.refit.observability.item35.creator.application.service.RecordStatusService;
+import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
@@ -55,6 +56,9 @@ class UseCaseSubmissionVolumesITTest {
     @Autowired
     private ItemFileFinderRepository sqlServerItemFileFinderRepository;
 
+    @Autowired
+    private CsvProperties csvProperties;
+
     @SpyBean
     private RecordStatusService recordStatusService;
 
@@ -94,7 +98,7 @@ class UseCaseSubmissionVolumesITTest {
             });
 
         // RELEVANTE: Ajustar el Path para incluir la subcarpeta 'item35' según la lógica del perfil 'test-uk'
-        Path path = Path.of("work-repository-observability", "upload", "item35", fileName);
+        Path path = Path.of(csvProperties.getOutputPath(), fileName);
 
         assertNotNull(path, "El path del archivo generado no debería ser nulo");
 

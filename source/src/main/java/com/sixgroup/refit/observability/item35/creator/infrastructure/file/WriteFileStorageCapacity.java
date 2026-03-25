@@ -37,16 +37,18 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
                           final String fileName) throws IOException {
 
         log.debug("Determining output directory based on regulation");
-        String subFolder = (Regulation.EU.equals(reportItemProperties.getRegulation())) ? "item32" : "item35";
-        log.info("SubFolder {} :" , subFolder);
-        Path targetPath = java.nio.file.Path.of(csvProperties.getOutputPath(), subFolder);
-        log.info("TargetPath {} :" , targetPath);
+
+        Path targetPath = java.nio.file.Path.of(csvProperties.getOutputPath());
+        log.info("TargetPath {} :", targetPath);
+
         Files.createDirectories(targetPath);
         java.nio.file.Path finalFile = targetPath.resolve(fileName);
         log.info("Target file path: {}", finalFile);
+
         try (FileWriter writer = new FileWriter(finalFile.toFile());
              CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
+
             for (StorageCapacityDto storageCapacityData : storageCapacityDtoList) {
                 writeRecord(csvWriter, storageCapacityData);
             }

@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class WriteFileStorageCapacityTest {
 
-    private static final String TEST_CSV_FILE_PATH = "src/test/resources/work-repository-observability/upload/";
+    private static final String TEST_CSV_FILE_PATH = "target/work-repository-observability/upload/item35/";
     @InjectMocks
     private WriteFileStorageCapacity writeFileStorageCapacity;
     @Mock
@@ -66,7 +66,7 @@ class WriteFileStorageCapacityTest {
         when(reportProperties.getRegulationReference()).thenReturn("EMIR");
         when(reportProperties.getIncidentIdHeader()).thenReturn("TR_INCIDENT_ID");
 
-        Path locationPath = FileSystems.getDefault().getPath("src/test/resources/work-repository-observability/upload/");
+        Path locationPath = FileSystems.getDefault().getPath(csvProperties.getOutputPath());
 
         if (!Files.exists(locationPath)) {
             Files.createDirectories(locationPath);

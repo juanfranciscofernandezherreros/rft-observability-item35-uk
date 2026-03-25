@@ -182,7 +182,7 @@ component-config:
           sla-end: yyyy-MM-ddT12:00:00Z
 
   csv:
-    output_path: "work-repository-observability/upload/item35/"
+    output_path: "target/work-repository-observability/upload/item35/"
   topics:
     observability-item-topic: rft.dev.observability.item.private.v1
     observability-item-consumer-group-id: rft.dev.rft-observability-item35-creator

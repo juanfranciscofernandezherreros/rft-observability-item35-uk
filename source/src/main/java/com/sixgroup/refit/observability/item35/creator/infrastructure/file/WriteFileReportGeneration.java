@@ -2,7 +2,6 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.Regulation;
 import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -37,9 +36,7 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
 
         log.debug("Determining output directory based on regulation for Report Generation");
 
-        String subFolder = (Regulation.EU.equals(reportProperties.getRegulation())) ? "item32" : "item35";
-
-        Path targetPath = Path.of(csvProperties.getOutputPath(), subFolder);
+        Path targetPath = Path.of(csvProperties.getOutputPath());
         log.info("Target path: {}", targetPath);
 
         Files.createDirectories(targetPath);

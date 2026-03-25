@@ -25,7 +25,7 @@ public final class AppConstants {
     public static final String API = "api";
     public static final String WEB = "web";
     public static final String ITEM35_ID = "item35";
-    public static final String ITEM32_ID = "item32";
+//    public static final String ITEM32_ID = "item32";
     public static final String HEADER_DATA_CENTER_LOCATION = "DATA_CENTER_LOCATION";
     public static final String HEADER_DATABASE_SERVER_OR_PLATFORM = "DATABASE_SERVER_OR_PLATFORM";
     public static final String HEADER_CAPACITY = "CAPACITY";

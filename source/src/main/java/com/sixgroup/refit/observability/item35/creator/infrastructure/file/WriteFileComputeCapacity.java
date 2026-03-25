@@ -41,20 +41,17 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
 
         log.debug("Determining output directory based on regulation for Compute Capacity");
 
-        // 1. Lógica de subcarpeta (item32 para EU, item35 para otros)
-        String subFolder = (Regulation.EU.equals(reportItemProperties.getRegulation())) ? "item32" : "item35";
-
-        // 2. Construcción de ruta segura con Path
-        Path targetPath = Path.of(csvProperties.getOutputPath(), subFolder);
+        // 1. Construcción de ruta segura con Path
+        Path targetPath = Path.of(csvProperties.getOutputPath());
         log.info("Target path: {}", targetPath);
 
-        // 3. Crear directorios si no existen
+        // 2. Crear directorios si no existen
         Files.createDirectories(targetPath);
 
         Path finalFile = targetPath.resolve(fileName);
         log.info("Target file path: {}", finalFile);
 
-        // 4. Escritura del CSV
+        // 3. Escritura del CSV
         try (FileWriter writer = new FileWriter(finalFile.toFile());
              CSVWriter csvWriter = CSVCreator.create(writer)) {
 

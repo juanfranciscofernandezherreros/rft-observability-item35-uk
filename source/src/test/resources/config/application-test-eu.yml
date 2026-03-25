@@ -25,7 +25,7 @@ component-config:
         - name: S091
           value: REC091
   csv:
-    output_path: "work-repository-observability/upload/item35/"
+    output_path: "target/work-repository-observability/upload/item32/"
   cloudera:
     knox-auth: true
     cpu:

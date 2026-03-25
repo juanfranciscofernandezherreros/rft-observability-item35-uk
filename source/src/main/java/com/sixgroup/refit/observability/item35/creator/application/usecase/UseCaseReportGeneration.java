@@ -8,7 +8,6 @@ import com.sixgroup.refit.observability.item35.creator.application.service.FileN
 import com.sixgroup.refit.observability.item35.creator.application.service.ParticipantService;
 import com.sixgroup.refit.observability.item35.creator.application.service.RegulatorService;
 import com.sixgroup.refit.observability.item35.creator.application.service.TrService;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
@@ -29,6 +28,7 @@ import java.util.stream.Stream;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
 import static com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType.REPORT_GENERATION;
+import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.ITEM35_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +42,6 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
     private final TrService trService;
     private final FileNameService fileNameService;
     private final StateService stateService;
-    private final ReportItemProperties reportItemProperties;
     private final ItemLog iLog = new ItemLog();
 
     @Override
@@ -54,11 +53,9 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
         log.info("--------------------------------------------------");
 
         final String fileName = fileNameService.getFileName(REPORT_GENERATION, itemCommand.getItemDate());
-        final String itemId = itemCommand.getItemId();
-        final String stateItemId = reportItemProperties.getEffectiveItemId();
 
         log.info("Generated fileName: {}", fileName);
-        log.info("ItemId: {}", itemId);
+        log.info("ItemId: {}", ITEM35_ID);
         log.info("ItemDate received: {}", itemCommand.getItemDate());
 
         File file = null;
@@ -66,10 +63,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
         try {
 
             log.info("Updating state: INITIAL STEP");
-            stateService.nextStep(StateRequest.builder()
-                .fileName(fileName)
-                .itemType(stateItemId)
-                .build());
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
 
             // Calculate dates
             final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemCommand.getItemDate());
@@ -81,81 +75,49 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
 
             // Retrieve data
             log.info("Retrieving participants...");
-            final List<ReportGenerationDto> participants =
-                participantService.findParticipants(dateFrom, dateTo, itemCommand.getItemDate());
+            final List<ReportGenerationDto> participants = participantService.findParticipants(dateFrom, dateTo, itemCommand.getItemDate());
             log.info("Participants found: {}", participants.size());
 
             log.info("Retrieving regulators...");
-            final List<ReportGenerationDto> regulators =
-                regulatorService.findRegulator(dateFrom, dateTo, itemCommand.getItemDate());
+            final List<ReportGenerationDto> regulators = regulatorService.findRegulator(dateFrom, dateTo, itemCommand.getItemDate());
             log.info("Regulators found: {}", regulators.size());
 
             log.info("Retrieving TRs...");
-            final List<ReportGenerationDto> trs =
-                trService.findTr(dateFrom, dateTo, itemCommand.getItemDate());
+            final List<ReportGenerationDto> trs = trService.findTr(dateFrom, dateTo, itemCommand.getItemDate());
             log.info("TRs found: {}", trs.size());
 
             // Join collections
-            final List<ReportGenerationDto> joinedCollection =
-                Stream.concat(
-                    Stream.concat(participants.stream(), regulators.stream()),
-                    trs.stream()
-                ).toList();
-
+            final List<ReportGenerationDto> joinedCollection = Stream.concat(Stream.concat(participants.stream(), regulators.stream()), trs.stream()).toList();
             log.info("Total records after joining collections: {}", joinedCollection.size());
 
             if (CollectionUtils.isEmpty(joinedCollection)) {
-
                 log.error("No data found in report generation. Skipping report generation.");
-
-                iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), ERROR);
-
-                stateService.setError(
-                    StateRequest.builder()
-                        .fileName(fileName)
-                        .itemType(stateItemId)
-                        .errorDescription("No record status found, skipping file generation")
-                        .build()
-                );
+                iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
+                stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("No record status found, skipping file generation").build());
 
                 return null;
             }
 
             // Saving information
             log.info("Saving information step started");
-            stateService.nextStep(StateRequest.builder()
-                .fileName(fileName)
-                .itemType(stateItemId)
-                .build());
-
-            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), SAVING_INFORMATION);
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
+            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SAVING_INFORMATION);
 
             // Order data
             log.info("Ordering records by date...");
-            final List<ReportGenerationDto> orderedCollection =
-                CollectionsUtils.getOrderCollectionsByDate(joinedCollection);
-
+            final List<ReportGenerationDto> orderedCollection = CollectionsUtils.getOrderCollectionsByDate(joinedCollection);
             log.info("Ordered collection size: {}", orderedCollection.size());
 
             // Write file
             log.info("Writing report file...");
-            file = writeFileReportGenerationService.writeFile(
-                orderedCollection,
-                itemCommand,
-                fileName
-            );
+            file = writeFileReportGenerationService.writeFile(orderedCollection, itemCommand, fileName);
 
             log.info("File successfully written.");
             log.info("File path: {}", file.getPath());
             log.info("File absolute path: {}", file.getAbsolutePath());
 
-            stateService.nextStep(StateRequest.builder()
-                .fileName(fileName)
-                .itemType(stateItemId)
-                .fileUrl(file.getPath())
-                .build());
-
-            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), SAVED_INFORMATION);
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).fileUrl(file.getPath()).build());
+            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SAVED_INFORMATION);
 
             // Send response
             log.info("Sending response event...");
@@ -164,31 +126,16 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
             itemCommand.setFileUrl(file.getAbsolutePath());
 
             producerItemService.send(itemCommand, headers);
-
             log.info("Response event sent to Kafka");
 
-            stateService.nextStep(StateRequest.builder()
-                .fileName(fileName)
-                .itemType(stateItemId)
-                .build());
-
-            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), SENT_RESPONSE);
-
+            stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
+            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SENT_RESPONSE);
             log.info("REPORT_GENERATION process finished successfully");
 
         } catch (Exception e) {
-
             log.error("Error while generating report generation file: {}", e.getMessage(), e);
-
-            iLog.info(ItemReportingDto.builder().itemType(stateItemId).build(), ERROR);
-
-            stateService.setError(
-                StateRequest.builder()
-                    .fileName(fileName)
-                    .itemType(stateItemId)
-                    .errorDescription("Error to generate file report generation: " + e.getMessage())
-                    .build()
-            );
+            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
+            stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("Error to generate file report generation: " + e.getMessage()).build());
         }
 
         return file;

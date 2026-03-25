@@ -5,6 +5,7 @@ import com.sixgroup.refit.observability.ApplicationMain;
 import com.sixgroup.refit.observability.item.state.domain.enums.State;
 import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
 import com.sixgroup.refit.observability.item35.creator.application.service.RecordStatusService;
+import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
@@ -57,6 +58,9 @@ class UseCaseSubmissionVolumesEUITTest {
     @Autowired
     private ItemFileFinderRepository sqlServerItemFileFinderRepository;
 
+    @Autowired
+    private CsvProperties csvProperties;
+
     @SpyBean
     private RecordStatusService recordStatusService;
 
@@ -92,13 +96,13 @@ class UseCaseSubmissionVolumesEUITTest {
 
         waitAtMost(60, TimeUnit.SECONDS)
             .until(() -> {
-                var r = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM32_ID,
+                var r = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
                     "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240315.csv");
                 return r != null && State.SENT_RESPONSE.getName().equals(r.getStateName());
             });
 
         Path path = FileSystems.getDefault()
-            .getPath("work-repository-observability/upload/item35/TRRGS_EMIR_PR_FU_ND_ITEM32A_20240315.csv");
+            .getPath(csvProperties.getOutputPath() + "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240315.csv");
 
         assertNotNull(path);
 
@@ -141,7 +145,7 @@ class UseCaseSubmissionVolumesEUITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM32_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
 
@@ -169,7 +173,7 @@ class UseCaseSubmissionVolumesEUITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM32_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
     }

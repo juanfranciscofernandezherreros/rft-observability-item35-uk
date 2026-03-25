@@ -37,9 +37,7 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
 
         log.debug("Determining output directory based on regulation for Submission Volumes");
 
-        String subFolder = (Regulation.EU.equals(reportProperties.getRegulation())) ? "item32" : "item35";
-
-        Path targetPath = Path.of(csvProperties.getOutputPath(), subFolder);
+        Path targetPath = Path.of(csvProperties.getOutputPath());
         log.info("Target path: {}", targetPath);
 
         Files.createDirectories(targetPath);

@@ -51,7 +51,8 @@ public class KafkaConsumerItem {
     }
 
     private boolean isItemIdAccepted(final String itemId) {
-        return AppConstants.ITEM32_ID.equals(itemId) || AppConstants.ITEM35_ID.equals(itemId);
+//        return AppConstants.ITEM32_ID.equals(itemId) || AppConstants.ITEM35_ID.equals(itemId);
+        return AppConstants.ITEM35_ID.equals(itemId);
     }
 
     private boolean isRequestTypeAccepted(final String requestItemType) {
