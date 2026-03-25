@@ -1,2 +1,0 @@
-logging:
-  config: classpath:unified-log-config/logback-unified-logging-1_2.xml

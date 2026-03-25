@@ -210,7 +210,6 @@ component-config:
       entityName: rftemir-cldr-qa-mbt
 
 logging:
-  config: classpath:unified-log-config/logback-unified-logging-1_2.xml
   level:
     org:
       hibernate:
@@ -219,4 +218,4 @@ logging:
             sql: trace
     root: INFO
     "org.apache.kafka": INFO
-    "com.sixgroup.refit": DEBUG
+    "com.sixgroup.refit": INFO
