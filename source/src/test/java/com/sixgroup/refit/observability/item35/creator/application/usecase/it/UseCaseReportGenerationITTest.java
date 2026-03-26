@@ -91,7 +91,7 @@ class UseCaseReportGenerationITTest {
                 .build()));
 
         // 2. Esperar a que el proceso termine y el estado sea SENT_RESPONSE en DB
-        waitAtMost(200, TimeUnit.SECONDS)
+        waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> {
                 var record = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID, fileName);
                 return record != null && State.SENT_RESPONSE.getName().equals(record.getStateName());
