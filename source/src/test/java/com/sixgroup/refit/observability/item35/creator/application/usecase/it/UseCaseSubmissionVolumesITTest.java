@@ -76,7 +76,7 @@ class UseCaseSubmissionVolumesITTest {
     @Test
     @DisplayName("Given a message item from topic, validate create and save file")
     void when_send_item_request_item_35_create_and_save_file_submission_volumes() throws IOException {
-        String fileName = "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240315.csv";
+        String fileName = "TRRGS_UKEMIR_PR_FU_ND_ITEM35A_20240315.csv";
         String itemDate = "20240315";
 
         ItemCommand itemCommand = ItemCommand.newBuilder()
@@ -124,7 +124,7 @@ class UseCaseSubmissionVolumesITTest {
     @Test
     @DisplayName("Given a message item from topic, when service return empty list validate state is error with no exist record")
     void item_35_then_state_error_not_exist_records() {
-        String fileName = "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240115.csv";
+        String fileName = "TRRGS_UKEMIR_PR_FU_ND_ITEM35A_20240115.csv";
 
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
             ItemCommand.newBuilder()
@@ -146,7 +146,7 @@ class UseCaseSubmissionVolumesITTest {
     @Test
     @DisplayName("Given a message item from topic, when error from service then validate state is error")
     void item_35_state_error() {
-        String fileName = "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240115.csv";
+        String fileName = "TRRGS_UKEMIR_PR_FU_ND_ITEM35A_20240115.csv";
 
         doThrow(new RuntimeException("error")).when(recordStatusService).findRecordStatus(any(), any());
 

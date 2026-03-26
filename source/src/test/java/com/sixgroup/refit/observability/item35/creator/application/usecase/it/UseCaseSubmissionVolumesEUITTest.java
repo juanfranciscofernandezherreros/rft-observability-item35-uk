@@ -94,15 +94,15 @@ class UseCaseSubmissionVolumesEUITTest {
             itemCommand));
         producer.flush();
 
-        waitAtMost(60, TimeUnit.SECONDS)
+        waitAtMost(20, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
-                    "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240315.csv");
+                    "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240315.csv");
                 return r != null && State.SENT_RESPONSE.getName().equals(r.getStateName());
             });
 
         Path path = FileSystems.getDefault()
-            .getPath(csvProperties.getOutputPath() + "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240315.csv");
+            .getPath(csvProperties.getOutputPath() + "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240315.csv");
 
         assertNotNull(path);
 
@@ -145,7 +145,7 @@ class UseCaseSubmissionVolumesEUITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
 
@@ -173,7 +173,7 @@ class UseCaseSubmissionVolumesEUITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM32A_20240115.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35A_20240115.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
     }

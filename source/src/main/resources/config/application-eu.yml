@@ -3,10 +3,9 @@ component-config:
     regulation: EU
     trCode: TRRGS
     regulationReference: EMIR
-    submissionVolumesFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM32A_YYYYMMDD.csv
-    reportGenerationFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM32B_YYYYMMDD.csv
-    storageCapacityFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM32C_YYYYMMDD.csv
-    computeCapacityFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM32D_YYYYMMDD.csv
+    submissionVolumesFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35A_YYYYMMDD.csv
+    reportGenerationFileNamePattern: TRAAA_REGU_TY_VS_PD_ITEM32C_YYYYMMDD.csv
+    computeCapacityFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35D_YYYYMMDD.csv
     translation:
       accounts:
         - name: eudrp0uu0000

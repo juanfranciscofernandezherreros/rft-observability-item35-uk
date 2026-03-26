@@ -81,7 +81,7 @@ class WriteFileStorageCapacityTest {
             0.012784361f);
 
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
-        File file = writeFileStorageCapacity.writeFile(storageCapacityDtoList, getItemCommandDTO(), "TRRGS_EMIR_PR_FU_ND_ITEM35C_20240915.csv");
+        File file = writeFileStorageCapacity.writeFile(storageCapacityDtoList, getItemCommandDTO(), "TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240915.csv");
 
         assertNotNull(file);
 

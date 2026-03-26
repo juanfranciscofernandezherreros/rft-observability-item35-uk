@@ -101,11 +101,11 @@ class UseCaseComputeCapacityITTest {
 
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
-                    "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240315.csv").getStateName()
+                    "TRRGS_UKEMIR_PR_FU_ND_ITEM35D_20240315.csv").getStateName()
                 .equals(State.SENT_RESPONSE.getName()));
 
         Path path = FileSystems.getDefault()
-            .getPath(csvProperties.getOutputPath() + "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240315.csv");
+            .getPath(csvProperties.getOutputPath() + "TRRGS_UKEMIR_PR_FU_ND_ITEM35D_20240315.csv");
 
         assertNotNull(path);
 
@@ -149,7 +149,7 @@ class UseCaseComputeCapacityITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_UKEMIR_PR_FU_ND_ITEM35D_20240215.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
 
@@ -177,7 +177,7 @@ class UseCaseComputeCapacityITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_UKEMIR_PR_FU_ND_ITEM35D_20240215.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
     }
@@ -204,7 +204,7 @@ class UseCaseComputeCapacityITTest {
         waitAtMost(15, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository
-                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_EMIR_PR_FU_ND_ITEM35D_20240215.csv");
+                    .findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_UKEMIR_PR_FU_ND_ITEM35D_20240215.csv");
                 return r != null && State.ERROR.getName().equals(r.getStateName());
             });
     }

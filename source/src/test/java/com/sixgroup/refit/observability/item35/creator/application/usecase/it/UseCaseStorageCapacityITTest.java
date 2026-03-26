@@ -5,14 +5,13 @@ import com.sixgroup.refit.observability.ApplicationMain;
 import com.sixgroup.refit.observability.item.state.domain.enums.State;
 import com.sixgroup.refit.observability.item.state.domain.repository.ItemFileFinderRepository;
 import com.sixgroup.refit.observability.item35.creator.application.service.StorageService;
-import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants;
 import com.sixgroup.refit.observability.topic.item.FileInfo;
 import com.sixgroup.refit.observability.topic.item.ItemCommand;
 import com.sixgroup.refit.observability.topic.item.ItemId;
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -41,8 +40,7 @@ import static org.awaitility.Awaitility.waitAtMost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {ApplicationMain.class})
 @ActiveProfiles({"test", "test-uk"})
@@ -52,15 +50,11 @@ class UseCaseStorageCapacityITTest {
 
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
     private Producer<ItemId, ItemCommand> producer;
-
     @Value("${component-config.topics.observability-item-topic}")
     private String topic;
 
     @Autowired
     private ItemFileFinderRepository sqlServerItemFileFinderRepository;
-
-    @Autowired
-    private CsvProperties csvProperties;
 
     @SpyBean
     private StorageService storageService;
@@ -70,8 +64,8 @@ class UseCaseStorageCapacityITTest {
         // Configurar el productor
         Properties producerProps = new Properties();
         producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-        producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
-        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
+        producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class.getName());
+        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class.getName());
         producerProps.put("schema.registry.url", "mock://not-used");
         producer = new KafkaProducer<>(producerProps);
     }
@@ -91,19 +85,14 @@ class UseCaseStorageCapacityITTest {
                     .setFileName("")
                     .setFileUrl("").build())
                 .build()));
-        producer.flush();
 
-        waitAtMost(60, TimeUnit.SECONDS)
-            .until(() -> {
-                var dto = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(
-                    AppConstants.ITEM35_ID,
-                    "TRRGS_EMIR_PR_FU_ND_ITEM35C_20240315.csv"
-                );
-                return dto != null && State.SENT_RESPONSE.getName().equals(dto.getStateName());
-            });
+        waitAtMost(20, TimeUnit.SECONDS)
+            .until(() -> sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240315.csv")
+                .getStateName()
+                .equals(State.SENT_RESPONSE.getName()));
 
         Path path = FileSystems.getDefault()
-            .getPath(csvProperties.getOutputPath() + "TRRGS_EMIR_PR_FU_ND_ITEM35C_20240315.csv");
+            .getPath("target/work-repository-observability/upload/item35/TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240315.csv");
 
         assertNotNull(path);
 
@@ -131,7 +120,6 @@ class UseCaseStorageCapacityITTest {
     void item_35_then_state_error_not_exist_records() {
         doReturn(List.of()).when(storageService).getTotalCapacity(any(), any());
         doReturn(List.of()).when(storageService).getTotalFreeCapacity(any(), any());
-
         producer.send(new ProducerRecord<>(topic, ItemId.newBuilder().setItemId(AppConstants.ITEM35_ID).build(),
             ItemCommand
                 .newBuilder()
@@ -146,13 +134,10 @@ class UseCaseStorageCapacityITTest {
                 .build()));
 
         waitAtMost(15, TimeUnit.SECONDS)
-            .until(() -> {
-                var dto = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(
-                    AppConstants.ITEM35_ID,
-                    "TRRGS_EMIR_PR_FU_ND_ITEM35C_20240115.csv"
-                );
-                return dto != null && State.ERROR.getName().equals(dto.getStateName());
-            });
+            .until(() -> sqlServerItemFileFinderRepository.
+                findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240115.csv").getStateName().equals(State.ERROR.getName())
+            );
+
     }
 
     @Test
@@ -175,13 +160,9 @@ class UseCaseStorageCapacityITTest {
                 .build()));
 
         waitAtMost(15, TimeUnit.SECONDS)
-            .until(() -> {
-                var dto = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(
-                    AppConstants.ITEM35_ID,
-                    "TRRGS_EMIR_PR_FU_ND_ITEM35C_20240215.csv"
-                );
-                return dto != null && State.ERROR.getName().equals(dto.getStateName());
-            });
+            .until(() -> sqlServerItemFileFinderRepository.
+                findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240215.csv").getStateName().equals(State.ERROR.getName())
+            );
     }
 
     @Test
@@ -204,12 +185,11 @@ class UseCaseStorageCapacityITTest {
                 .build()));
 
         waitAtMost(15, TimeUnit.SECONDS)
-            .until(() -> {
-                var dto = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(
-                    AppConstants.ITEM35_ID,
-                    "TRRGS_EMIR_PR_FU_ND_ITEM35C_20240215.csv"
-                );
-                return dto != null && State.ERROR.getName().equals(dto.getStateName());
-            });
+            .until(() -> sqlServerItemFileFinderRepository.
+                findByItemTypeAndFileName(AppConstants.ITEM35_ID, "TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240215.csv").getStateName().equals(State.ERROR.getName())
+            );
     }
+
+
 }
+
