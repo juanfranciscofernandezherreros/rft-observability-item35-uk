@@ -99,7 +99,7 @@ class UseCaseReportGenerationEUITTest {
 
         producer.flush();
 
-        waitAtMost(40, TimeUnit.SECONDS)
+        waitAtMost(10, TimeUnit.SECONDS)
             .until(() -> {
                 var r = sqlServerItemFileFinderRepository.findByItemTypeAndFileName(AppConstants.ITEM35_ID,
                     "TRAAA_REGU_TY_VS_PD_ITEM32C_20240315.csv");
