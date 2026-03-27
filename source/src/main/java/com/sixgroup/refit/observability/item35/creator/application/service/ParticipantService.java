@@ -37,7 +37,7 @@ public class ParticipantService {
         totalParticipants.addAll(participants);
         totalParticipants.addAll(participantsReco);
         if (totalParticipants.isEmpty()) {
-            log.info("10.3 No se encontraron participantes totales para procesar en el rango {} - {}", initDate, endDate);
+            log.info("10.3 No data fount for range {} - {}", initDate, endDate);
             return new ArrayList<>();
         }
 

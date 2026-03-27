@@ -8,6 +8,9 @@ import com.sixgroup.refit.observability.item35.creator.application.service.FileN
 import com.sixgroup.refit.observability.item35.creator.application.service.ParticipantService;
 import com.sixgroup.refit.observability.item35.creator.application.service.RegulatorService;
 import com.sixgroup.refit.observability.item35.creator.application.service.TrService;
+import com.sixgroup.refit.observability.item35.creator.configuration.Regulation;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenerationDto;
@@ -43,6 +46,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
     private final FileNameService fileNameService;
     private final StateService stateService;
     private final ItemLog iLog = new ItemLog();
+    private final ReportItemProperties reportItemProperties;
 
     @Override
     public File execute(final ItemCommandDTO itemCommand, final Headers headers) {
@@ -63,10 +67,11 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
         try {
 
             log.info("6 Updating state: INITIAL STEP");
+
             stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
 
             // Calculate dates
-            final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemCommand.getItemDate());
+            final String dateFrom = "2000-02-01";
             final String dateTo = DateUtils.firstDayOfCurrentMonth(itemCommand.getItemDate());
 
             log.info("7 Date range calculated:");
