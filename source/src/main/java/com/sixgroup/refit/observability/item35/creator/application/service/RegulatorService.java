@@ -44,19 +44,17 @@ public class RegulatorService {
     private int blockSize;
 
     public List<ReportGenerationDto> findRegulator(final String initDate, final String endDate, final String itemDate) {
-        // Query 1: Find regulators
         final List<RegulatorDTO> regulations = reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(initDate, endDate);
-        log.info("12.1 Query 'findRegulatorByDayAccountAndFileType' finished. Records found: {} for range {} to {}",
+        log.debug("Query 'findRegulatorByDayAccountAndFileType' finished. Records found: {} for range {} to {}",
             regulations.size(), initDate, endDate);
 
         final List<String> accountTraces = regulations.stream().map(RegulatorDTO::getAccountTrace).distinct().toList();
 
-        // Query 2: Fetch identities (internally logs batches)
         final List<ReguIdentityDTO> reguIdentities = fetchAllReguIdentityEntities(accountTraces);
-        log.info("12.2 Successfully fetched a total of {} ReguIdentity entities", reguIdentities.size());
+        log.debug("Successfully fetched a total of {} ReguIdentity entities", reguIdentities.size());
 
         if (regulations.isEmpty() || reguIdentities.isEmpty()) {
-            log.info("12.3 Process stopped: Regulations empty ({}) or ReguIdentities empty ({})",
+            log.debug("Process stopped: Regulations empty ({}) or ReguIdentities empty ({})",
                 regulations.isEmpty(), reguIdentities.isEmpty());
             return new ArrayList<>();
         }
@@ -64,16 +62,14 @@ public class RegulatorService {
         final Map<String, ReguIdentityDTO> traceCodeRegulatorMap = buildRegulatorMap(reguIdentities);
         printTraceCodeRegulatorId(reguIdentities);
 
-        // Query 3: Find start report type
         final List<ReportEoDDTO> reportsEoD = reportEodProcessStateRepository.find(initDate, endDate);
-        log.info("12.4 Query 'reportEodProcessStateRepository.find' finished. Retrieved {} ReportEoD records", reportsEoD.size());
+        log.debug("Query 'reportEodProcessStateRepository.find' finished. Retrieved {} ReportEoD records", reportsEoD.size());
 
         final List<ReportGenerationDto> regulatorReportGenerationData = new ArrayList<>();
         regulations.forEach(regulator -> {
             Optional<SlaInfo> slaInfo;
             final Optional<ReportEoDDTO> reportEoDFound = findReportEod(reportsEoD, fileTypeProperties.getReports(), regulator.getFileType(), regulator.getReportingSession());
 
-            // Query 4: SLA Info retrieval
             if (reportEoDFound.isPresent()) {
                 slaInfo = slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), reportEoDFound.get().getStartedDate(), regulator.getCreationDate());
             } else {
@@ -81,10 +77,10 @@ public class RegulatorService {
             }
 
             if (slaInfo.isEmpty()) {
-                log.error("12.5 Failed to find SlaInfo for entity: {}, fileType: {}, session: {}, creationDate: {}. Check configuration.",
+                log.error("Failed to find SlaInfo for entity: {}, fileType: {}, session: {}, creationDate: {}. Check configuration.",
                     REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
             } else {
-                log.info("12.6 SlaInfo retrieved successfully for FileType: {} and Session: {}",
+                log.debug("SlaInfo retrieved successfully for FileType: {} and Session: {}",
                     regulator.getFileType(), regulator.getReportingSession());
 
                 final ReportGenerationDto reportGenerationDto = regulatorMapper.toReportGenerationDto(regulator, fileTypeProperties, slaInfo.get(), traceCodeRegulatorMap);
@@ -93,7 +89,7 @@ public class RegulatorService {
             }
         });
 
-        log.info("12.7 Regulator processing completed. Total ReportGenerationDto objects created: {}", regulatorReportGenerationData.size());
+        log.debug("Regulator processing completed. Total ReportGenerationDto objects created: {}", regulatorReportGenerationData.size());
         return regulatorReportGenerationData;
     }
 
@@ -139,11 +135,11 @@ public class RegulatorService {
         final List<ReguIdentityDTO> definitiveList = new ArrayList<>();
         final List<List<String>> partitionedAccountTraces = ListUtils.partition(accountTraces, blockSize);
 
-        log.info("12.8 Starting batch processing for {} account traces with block size {}", accountTraces.size(), blockSize);
+        log.debug("Starting batch processing for {} account traces with block size {}", accountTraces.size(), blockSize);
 
         partitionedAccountTraces.forEach(partition -> {
             final List<ReguIdentityDTO> reguIdentityEntities = reguIdentityAdapterRepository.findByTraceCode(partition);
-            log.info("12.9 Batch query 'findByTraceCode' found {} identities for partition size: {}",
+            log.debug("Batch query 'findByTraceCode' found {} identities for partition size: {}",
                 reguIdentityEntities.size(), partition.size());
             definitiveList.addAll(reguIdentityEntities);
         });
@@ -152,7 +148,7 @@ public class RegulatorService {
     }
 
     private void printTraceCodeRegulatorId(final List<ReguIdentityDTO> definitiveList) {
-        log.info("12.10 Identity List JSON Trace: {}", new Gson().toJson(definitiveList));
+        log.debug("Identity List JSON Trace: {}", new Gson().toJson(definitiveList));
     }
 
 }

@@ -78,7 +78,6 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
                 log.error("No data found for storage capacity calculation. totalCapacityListEmpty={} totalFreeCapacityListEmpty={}", CollectionUtils.isEmpty(totalCapacityList), CollectionUtils.isEmpty(totalFreeCapacityList));
                 iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
                 stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("No record status found, skipping file generation").build());
-
                 return null;
             }
 

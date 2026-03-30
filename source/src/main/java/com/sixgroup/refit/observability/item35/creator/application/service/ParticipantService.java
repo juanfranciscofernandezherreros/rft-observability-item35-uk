@@ -28,16 +28,16 @@ public class ParticipantService {
 
     public List<ReportGenerationDto> findParticipants(final String initDate, final String endDate, final String itemDate) {
         final List<ParticipantDTO> participants = reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(initDate, endDate);
-        log.info("10.1 Query findParticipantsByDayAccountAndFileType finalizada. Registros encontrados: {} para el rango {} - {}",
+        log.debug("Query findParticipantsByDayAccountAndFileType finalizada. Registros encontrados: {} para el rango {} - {}",
             participants.size(), initDate, endDate);
         final List<ParticipantDTO> participantsReco = reportingFileAdapterRepository.findParticipantsRecoFileType(initDate, endDate);
-        log.info("10.2 Query findParticipantsRecoFileType finalizada. Registros encontrados: {} para el rango {} - {}",
+        log.debug("Query findParticipantsRecoFileType finalizada. Registros encontrados: {} para el rango {} - {}",
             participantsReco.size(), initDate, endDate);
         final List<ParticipantDTO> totalParticipants = new ArrayList<>();
         totalParticipants.addAll(participants);
         totalParticipants.addAll(participantsReco);
         if (totalParticipants.isEmpty()) {
-            log.info("10.3 No data fount for range {} - {}", initDate, endDate);
+            log.debug("No data fount for range {} - {}", initDate, endDate);
             return new ArrayList<>();
         }
 
