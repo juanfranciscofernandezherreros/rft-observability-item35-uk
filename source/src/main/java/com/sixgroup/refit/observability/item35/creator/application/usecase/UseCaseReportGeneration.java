@@ -51,7 +51,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
     @Override
     public File execute(final ItemCommandDTO itemCommand, final Headers headers) {
 
-        log.debug("Starting REPORT_GENERATION use case");
+        log.info("Starting REPORT_GENERATION use case");
         log.debug("ItemCommand received: {}", itemCommand);
 
         final String fileName = fileNameService.getFileName(REPORT_GENERATION, itemCommand.getItemDate());
@@ -76,7 +76,7 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
             log.debug("dateFrom: {}", dateFrom);
             log.debug("dateTo: {}", dateTo);
 
-            // Retrieve data
+            log.info("Calculating records for date range: [{} to {} and {} ]", dateFrom, dateTo , itemCommand.getItemDate());
             final List<ReportGenerationDto> participants = participantService.findParticipants(dateFrom, dateTo, itemCommand.getItemDate());
             log.debug("Participants found: {}", participants.size());
 
