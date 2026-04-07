@@ -15,7 +15,5 @@ public interface ReportingFileAdapterRepository {
 
     List<TrDTO> findTrByDayAccountAndFileType(String initDate, String endDate);
 
-    //Test new method
-    List<ParticipantDTO> findParticipantsByDayAccount(String initDate, String endDate);
 }
 

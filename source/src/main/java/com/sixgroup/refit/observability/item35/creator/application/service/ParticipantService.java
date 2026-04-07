@@ -34,7 +34,7 @@ public class ParticipantService {
         log.info("[INPUT PARAMETERS] initDate: '{}', endDate: '{}', itemDate: '{}'", initDate, endDate, itemDate);
         // 1. Fetching first group of participants
         log.info("[QUERY] Executing findParticipantsByDayAccountAndFileType for range {} to {}", initDate, endDate);
-        final List<ParticipantDTO> participants = reportingFileAdapterRepository.findParticipantsByDayAccount(initDate, endDate);
+        final List<ParticipantDTO> participants = reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(initDate, endDate);
         log.info("[QUERY RESULT] findParticipantsByDayAccountAndFileType returned {} records.", participants.size());
         // 2. Fetching second group of participants (Reco)
         log.info("[QUERY] Executing findParticipantsRecoFileType for range {} to {}", initDate, endDate);
