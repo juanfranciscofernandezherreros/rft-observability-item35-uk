@@ -11,12 +11,12 @@ import com.sixgroup.refit.observability.item35.creator.shared.utils.ReportUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 @Repository
 @RequiredArgsConstructor
@@ -30,137 +30,118 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
     private final ReportItemProperties reportProperties;
 
     public List<ParticipantDTO> findParticipantsByDayAccountAndFileType(final String initDate, final String endDate) {
-        log.info("[START] findParticipantsByDayAccountAndFileType execution with dates: [{} to {}]", initDate, endDate);
-
+        log.info("[START] findParticipantsByDayAccountAndFileType | Range: [{} - {}]", initDate, endDate);
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-        log.debug("[PROCESS] Dates successfully converted to LocalDateTime: {} - {}", startDate, finalDate);
+        log.info("[PROCESS] | Range: [{} - {}]", startDate, finalDate);
         final List<ReportConfig> reports = participantProperties.getReports();
-        log.info("[CONFIG] Full reports list (names): {}", reports.stream().map(ReportConfig::getName).toList());
-        final List<String> reportsCustom = participantProperties.getReportsCustom().stream()
-            .map(ReportConfig::getName)
-            .toList();
-        log.info("[CONFIG] Custom reports list to exclude: {}", reportsCustom);
-        log.info("[CONFIG] Properties loaded. Total reports available: {}. Custom reports to exclude: {}", reports.size(), reportsCustom);
-
+        log.info("[REPORTS] | reports: [{}]", reports);
+        final List<String> reportsCustom = participantProperties.getReportsCustom().stream().map(ReportConfig::getName).toList();
+        log.info("[REPORT_CUSTOM] | reportsCustom: [{}]", reportsCustom);
+        log.info("[CONFIG] Total reports in properties: {}. Custom reports to exclude: {}", reports.size(), reportsCustom.size());
         final List<ReportConfig> reportsQuery = reports.stream()
             .filter(report -> {
                 boolean isNotCustom = !reportsCustom.contains(report.getName());
                 if (!isNotCustom) {
-                    log.debug("[FILTER] Excluding custom report from standard query: {}", report.getName());
+                    log.trace("[FILTER] Excluding custom report: {}", report.getName());
                 }
                 return isNotCustom;
             })
             .toList();
-
+        log.info("[REPORTSQUERY] | reportsQuery: [{}]", reportsQuery);
         if (reportsQuery.isEmpty()) {
-            log.warn("[SKIP] The filtered reports list is empty. No query will be executed for standard participants.");
+            log.info("[SKIP] No standard reports found after filtering. Returning empty list.");
             return new ArrayList<>();
         }
-
         List<String> reportTypes = ReportUtils.getReportsTypeQuery(reportsQuery);
-        log.info("[QUERY] Requesting standard participants from Kudu. AccountId: {}, ReportTypes: {}",
-            participantProperties.getAccountId(), reportTypes);
-
-        List<ParticipantDTO> result = reportingFileKudu.findParticipantsByDayAccountAndFileType(startDate, finalDate,
-            reportTypes, participantProperties.getAccountId());
-
-        log.info("[END] Query finished. Total standard participants retrieved: {}", result.size());
+        log.info("[REPORT_TYPES] | reportTypes: [{}]", reportTypes);
+        long startTime = System.currentTimeMillis();
+        log.info("[START_TIME] | start_time: [{}]", startTime);
+        log.info("[ACCOUNT_ID] | participantProperties.getAccountId(): [{}]", participantProperties.getAccountId());
+        List<ParticipantDTO> result = reportingFileKudu.findParticipantsByDayAccountAndFileType(startDate, finalDate, reportTypes, participantProperties.getAccountId());
+        log.info("[RESULT] | result: [{}]", result);
+        long duration = System.currentTimeMillis() - startTime;
+        log.info("[DURATION] | duration: [{}]", duration);
         return result;
     }
 
     public List<ParticipantDTO> findParticipantsRecoFileType(final String initDate, final String endDate) {
-        log.info("[START] findParticipantsRecoFileType execution with dates: [{} to {}]", initDate, endDate);
-
+        log.info("[START] findParticipantsRecoFileType | Range: [{} - {}]", initDate, endDate);
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-
+        log.info("[PROCESS] | Range: [{} - {}]", startDate, finalDate);
         final List<ReportConfig> reports = participantProperties.getReports();
-        final List<String> reportsCustom = participantProperties.getReportsCustom().stream()
-            .map(ReportConfig::getName)
-            .toList();
-
-        final List<ReportConfig> reportsQuery = reports.stream()
-            .filter(report -> {
-                boolean isCustom = reportsCustom.contains(report.getName());
-                if (isCustom) {
-                    log.debug("[FILTER] Including custom report for RECO query: {}", report.getName());
-                }
-                return isCustom;
-            })
-            .toList();
-
+        log.info("[REPORTS] | reports: [{}]", reports);
+        final List<String> reportsCustomNames = participantProperties.getReportsCustom().stream().map(ReportConfig::getName).toList();
+        log.info("[REPORT_CUSTOM_NAMES] | reportsCustomNames: [{}]", reportsCustomNames);
+        final List<ReportConfig> reportsQuery = reports.stream().filter(report -> reportsCustomNames.contains(report.getName())).toList();
+        log.info("[REPORTSQUERY] | reportsQuery: [{}]", reportsQuery);
         if (reportsQuery.isEmpty()) {
-            log.warn("[SKIP] No custom/RECO reports found in configuration. Aborting query.");
+            log.info("[SKIP] No custom/RECO reports found for query. Check configuration.");
             return new ArrayList<>();
         }
-
         List<String> reportTypes = ReportUtils.getReportsTypeQuery(reportsQuery);
-        log.info("[QUERY] Requesting RECO participants from Kudu for types: {}", reportTypes);
-
-        final List<ParticipantDTO> participantsFound = reportingFileKudu.findParticipantsRecoFileType(startDate, finalDate,
-            reportTypes, participantProperties.getAccountId());
-
+        log.info("[QUERY] Kudu RECO Participants | Account: {} | Types: {}", participantProperties.getAccountId(), reportTypes);
+        long startTime = System.currentTimeMillis();
+        final List<ParticipantDTO> participantsFound = reportingFileKudu.findParticipantsRecoFileType(startDate, finalDate, reportTypes, participantProperties.getAccountId());
+        log.info("[PARTICIPANTSFOUND] | participantsFound: [{}]", reportsQuery);
+        long duration = System.currentTimeMillis() - startTime;
+        log.info("[DURATION] | duration: [{}]", duration);
         if (participantsFound.isEmpty()) {
-            log.info("[END] No RECO participants found for the given criteria.");
+            log.info("[END] No RECO participants found in Kudu | Time: {}ms", duration);
             return new ArrayList<>();
         }
-
-        log.info("[LIST PROCESSING] Starting translation for {} retrieved participants", participantsFound.size());
-
+        log.info("[PROCESS] Translating {} participants...", participantsFound.size());
         int translatedCount = 0;
         for (ParticipantDTO participant : participantsFound) {
             final String originalType = participant.getFileType();
-            final Optional<TranslationData> translationFound = reportProperties.getTranslation().getReports().stream()
-                .filter(report -> report.getName().equals(originalType))
+            Optional<TranslationData> translation = reportProperties.getTranslation().getReports().stream()
+                .filter(t -> t.getName().equals(originalType))
                 .findFirst();
 
-            if (translationFound.isPresent()) {
-                String newValue = translationFound.get().getValue();
+            if (translation.isPresent()) {
+                String newValue = translation.get().getValue();
                 participant.setFileType(newValue);
-                log.debug("[TRANSLATE] Item updated: [{}] -> [{}]", originalType, newValue);
+                log.trace("[TRANSLATE] {} -> {}", originalType, newValue);
                 translatedCount++;
-            } else {
-                log.trace("[TRANSLATE] No translation rule found for type: {}. Keeping original.", originalType);
             }
         }
 
-        log.info("[END] RECO processing finished. Items processed: {}. Items translated: {}",
-            participantsFound.size(), translatedCount);
+        log.info("[END] RECO finished | Total: {} | Translated: {} | Kudu Time: {}ms",
+            participantsFound.size(), translatedCount, duration);
         return participantsFound;
     }
 
     public List<RegulatorDTO> findRegulatorByDayAccountAndFileType(final String initDate, final String endDate) {
-        log.info("[START] findRegulatorByDayAccountAndFileType - Range: [{} to {}]", initDate, endDate);
+        log.info("[START] findRegulatorByDayAccountAndFileType | Range: [{} - {}]", initDate, endDate);
 
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-
+        log.info("[PROCESS] | Range: [{} - {}]", startDate, finalDate);
         List<String> reportTypes = ReportUtils.getReportsTypeQuery(regulatorProperties.getReports());
-        log.info("[QUERY] Executing Regulator query. Account: {}, Types: {}",
-            regulatorProperties.getAccountId(), reportTypes);
+        log.info("[QUERY] Kudu Regulator | Account: {} | Types: {}", regulatorProperties.getAccountId(), reportTypes);
+        long startTime = System.currentTimeMillis();
+        List<RegulatorDTO> result = reportingFileKudu.findRegulatorByDayAccountAndFileType(startDate, finalDate, reportTypes, regulatorProperties.getAccountId());
+        long duration = System.currentTimeMillis() - startTime;
 
-        List<RegulatorDTO> result = reportingFileKudu.findRegulatorByDayAccountAndFileType(startDate, finalDate,
-            reportTypes, regulatorProperties.getAccountId());
-
-        log.info("[END] Regulator query completed. Records found: {}", result.size());
+        log.info("[END] Regulator records found: {} | Time: {}ms", result.size(), duration);
         return result;
     }
 
     public List<TrDTO> findTrByDayAccountAndFileType(final String initDate, final String endDate) {
-        log.info("[START] findTrByDayAccountAndFileType - Range: [{} to {}]", initDate, endDate);
+        log.info("[START] findTrByDayAccountAndFileType | Range: [{} - {}]", initDate, endDate);
 
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
 
         List<String> reportTypes = ReportUtils.getReportsTypeQuery(trProperties.getReports());
-        log.info("[QUERY] Executing TR query. Account: {}, Types: {}",
-            trProperties.getAccountId(), reportTypes);
-
+        log.info("[QUERY] Kudu TR | Account: {} | Types: {}", trProperties.getAccountId(), reportTypes);
+        long startTime = System.currentTimeMillis();
         List<TrDTO> result = reportingFileKudu.findTrByDayAccountAndFileType(startDate, finalDate,
             reportTypes, trProperties.getAccountId());
+        long duration = System.currentTimeMillis() - startTime;
 
-        log.info("[END] TR query completed. Records found: {}", result.size());
+        log.info("[END] TR records found: {} | Time: {}ms", result.size(), duration);
         return result;
     }
 }
