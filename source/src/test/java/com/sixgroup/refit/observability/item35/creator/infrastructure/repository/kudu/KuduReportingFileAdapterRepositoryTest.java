@@ -44,8 +44,7 @@ class KuduReportingFileAdapterRepositoryTest {
         reportConfig2.setName("TAR108");
         reportConfig2.setReportName("TAR108");
 
-        doReturn(List.of(new ParticipantDTO())).when(reportingFileKudu)
-            .findParticipantsByDayAccountAndFileType(any(), any(), anyList(), any());
+        doReturn(List.of(new ParticipantDTO())).when(reportingFileKudu).findParticipantsByDayAccountAndFileType(any(), any(), anyList(), any());
 
         when(participantProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
 

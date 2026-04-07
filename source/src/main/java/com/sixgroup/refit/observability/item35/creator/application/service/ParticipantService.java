@@ -32,17 +32,14 @@ public class ParticipantService {
     public List<ReportGenerationDto> findParticipants(final String initDate, final String endDate, final String itemDate) {
         log.info("[START] Entering findParticipants method.");
         log.info("[INPUT PARAMETERS] initDate: '{}', endDate: '{}', itemDate: '{}'", initDate, endDate, itemDate);
-
         // 1. Fetching first group of participants
         log.info("[QUERY] Executing findParticipantsByDayAccountAndFileType for range {} to {}", initDate, endDate);
-        final List<ParticipantDTO> participants = reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(initDate, endDate);
+        final List<ParticipantDTO> participants = reportingFileAdapterRepository.findParticipantsByDayAccount(initDate, endDate);
         log.info("[QUERY RESULT] findParticipantsByDayAccountAndFileType returned {} records.", participants.size());
-
         // 2. Fetching second group of participants (Reco)
         log.info("[QUERY] Executing findParticipantsRecoFileType for range {} to {}", initDate, endDate);
         final List<ParticipantDTO> participantsReco = reportingFileAdapterRepository.findParticipantsRecoFileType(initDate, endDate);
         log.info("[QUERY RESULT] findParticipantsRecoFileType returned {} records.", participantsReco.size());
-
         // 3. Merging lists
         final List<ParticipantDTO> totalParticipants = new ArrayList<>();
         totalParticipants.addAll(participants);
