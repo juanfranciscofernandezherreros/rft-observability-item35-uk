@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Slf4j
 public final class ReportUtils {
+
     private ReportUtils() {
     }
 
