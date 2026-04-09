@@ -1,0 +1,27 @@
+component-config:
+  item35:
+    regulation: UK
+    trCode: TRRGS
+    regulationReference: EMIR
+    submissionVolumesFileNamePattern: TRRGS_UKEMIR_PR_FU_ND_ITEM35A_YYYYMMDD.csv
+    reportGenerationFileNamePattern: TRRGS_UKEMIR_PR_FU_ND_ITEM35B_YYYYMMDD.csv
+    storageCapacityFileNamePattern: TRRGS_UKEMIR_PR_FU_ND_ITEM35C_YYYYMMDD.csv
+    computeCapacityFileNamePattern: TRRGS_UKEMIR_PR_FU_ND_ITEM35D_YYYYMMDD.csv
+    translation:
+      accounts:
+        - name: eudrp0uu0000
+          value: EIOPA
+        - name: eudrp4dc3000
+          value: COVIP
+        - name: eudrp4ea0000
+          value: CAFME
+        - name: eudrp5cb4000
+          value: SVERIGES RIKSBANK
+        - name: eudrp0pbp000
+          value: NATIONAL BANK OF ROMANIA
+      reports:
+        - name: I091
+          value: RECS
+        - name: S091
+          value: RECI
+

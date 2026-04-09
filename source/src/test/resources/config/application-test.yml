@@ -56,29 +56,6 @@ api:
     url: /api/v54/timeseries
 
 component-config:
-  trCode: TRRGS
-  regulationReference: EMIR
-  submissionVolumesFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35A_YYYYMMDD.csv
-  reportGenerationFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35B_YYYYMMDD.csv
-  storageCapacityFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35C_YYYYMMDD.csv
-  computeCapacityFileNamePattern: TRRGS_EMIR_PR_FU_ND_ITEM35D_YYYYMMDD.csv
-  translation:
-    accounts:
-      - name: eudrp0uu0000
-        value: EIOPA
-      - name: eudrp4dc3000
-        value: COVIP
-      - name: eudrp4ea0000
-        value: CAFME
-      - name: eudrp5cb4000
-        value: SVERIGES RIKSBANK
-      - name: eudrp0pbp000
-        value: NATIONAL BANK OF ROMANIA
-    reports:
-      - name: I091
-        value: REC091
-      - name: S091
-        value: REC091
   participant:
     accountId: 'eudb%'
     reportType: PARTICIPANT
@@ -97,8 +74,6 @@ component-config:
         reportName: RJC092
       - name: WARN000
         reportName: WRN106
-      - name: IMDT092
-        reportName: IMDT092
       - name: REC091
         reportName: REC091
     reports_custom:
@@ -107,7 +82,7 @@ component-config:
   regulator:
     accountId: 'eudr%'
     reportTypeEsma: ESMA
-    reportTypeNca: NCA
+    reportTypeFca: FCA
     reports:
       - name: TAR030
         reportName: TAR030
@@ -170,9 +145,6 @@ component-config:
         - name: WARN000
           sla-init: yyyy-MM-ddT00:00:00Z
           sla-end: yyyy-MM-ddT06:00:00Z
-        - name: IMDT092
-          sla-init: yyyy-MM-ddT00:00:00Z
-          sla-end: yyyy-MM-ddT06:00:00Z
         - name: REC091
           sla-init: yyyy-MM-ddT00:00:00Z
           sla-end: yyyy-MM-ddT06:00:00Z
@@ -210,7 +182,7 @@ component-config:
           sla-end: yyyy-MM-ddT12:00:00Z
 
   csv:
-    output_path: "work-repository-observability/upload/item35/"
+    output_path: "target/work-repository-observability/upload/item35/"
   topics:
     observability-item-topic: rft.dev.observability.item.private.v1
     observability-item-consumer-group-id: rft.dev.rft-observability-item35-creator
@@ -235,10 +207,9 @@ component-config:
       selectTotalApi: select total_capacity_across_filesystems
       selectFreeApi: select total_capacity_free_across_filesystems
       desiredRollup: DAILY
-      entityName: dm-rftemir-light-qa
+      entityName: rftemir-cldr-qa-mbt
 
 logging:
-  config: classpath:unified-log-config/logback-unified-logging-1_2.xml
   level:
     org:
       hibernate:
@@ -247,4 +218,4 @@ logging:
             sql: trace
     root: INFO
     "org.apache.kafka": INFO
-    "com.sixgroup.refit": DEBUG
+    "com.sixgroup.refit": INFO

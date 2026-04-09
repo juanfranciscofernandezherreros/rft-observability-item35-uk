@@ -14,4 +14,6 @@ public interface ReportingFileAdapterRepository {
     List<RegulatorDTO> findRegulatorByDayAccountAndFileType(String initDate, String endDate);
 
     List<TrDTO> findTrByDayAccountAndFileType(String initDate, String endDate);
+
 }
+

@@ -1,9 +1,6 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.control;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.ParticipantProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.RegulatorProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.TrProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.*;
 import com.sixgroup.refit.observability.item35.creator.domain.config.ReportConfig;
 import com.sixgroup.refit.observability.item35.creator.domain.config.TranslationData;
 import com.sixgroup.refit.observability.item35.creator.domain.repository.control.ReportingFileAdapterRepository;
@@ -21,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 @Repository
 @RequiredArgsConstructor
 @Slf4j
@@ -31,64 +27,121 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
     private final ParticipantProperties participantProperties;
     private final RegulatorProperties regulatorProperties;
     private final TrProperties trProperties;
-    private final ReportProperties reportProperties;
+    private final ReportItemProperties reportProperties;
 
     public List<ParticipantDTO> findParticipantsByDayAccountAndFileType(final String initDate, final String endDate) {
-        log.debug("Find Participants by day and fileType");
+        log.debug("[START] findParticipantsByDayAccountAndFileType | Range: [{} - {}]", initDate, endDate);
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
+        log.debug("[PROCESS] | Range: [{} - {}]", startDate, finalDate);
         final List<ReportConfig> reports = participantProperties.getReports();
+        log.debug("[REPORTS] | reports: [{}]", reports);
         final List<String> reportsCustom = participantProperties.getReportsCustom().stream().map(ReportConfig::getName).toList();
-        final List<ReportConfig> reportsQuery = reports.stream().filter(report -> !reportsCustom.contains(report.getName())).toList();
+        log.debug("[REPORT_CUSTOM] | reportsCustom: [{}]", reportsCustom);
+        log.debug("[CONFIG] Total reports in properties: {}. Custom reports to exclude: {}", reports.size(), reportsCustom.size());
+        final List<ReportConfig> reportsQuery = reports.stream()
+            .filter(report -> {
+                boolean isNotCustom = !reportsCustom.contains(report.getName());
+                if (!isNotCustom) {
+                    log.trace("[FILTER] Excluding custom report: {}", report.getName());
+                }
+                return isNotCustom;
+            })
+            .toList();
+        log.debug("[REPORTSQUERY] | reportsQuery: [{}]", reportsQuery);
         if (reportsQuery.isEmpty()) {
+            log.error("[SKIP] No standard reports found after filtering. Returning empty list.");
             return new ArrayList<>();
         }
-        return reportingFileKudu.findParticipantsByDayAccountAndFileType(startDate, finalDate,
-            ReportUtils.getReportsTypeQuery(reportsQuery),
-            participantProperties.getAccountId());
+        List<String> reportTypes = ReportUtils.getReportsTypeQuery(reportsQuery);
+        log.debug("[REPORT_TYPES] | reportTypes: [{}]", reportTypes);
+        long startTime = System.currentTimeMillis();
+        log.debug("[START_TIME] | start_time: [{}]", startTime);
+        log.debug("[ACCOUNT_ID] | participantProperties.getAccountId(): [{}]", participantProperties.getAccountId());
+        List<ParticipantDTO> result = reportingFileKudu.findParticipantsByDayAccountAndFileType(startDate, finalDate, reportTypes, participantProperties.getAccountId());
+        log.debug("[RESULT] | result: [{}]", result);
+        long duration = System.currentTimeMillis() - startTime;
+        log.debug("[DURATION] | duration: [{}]", duration);
+        return result;
     }
 
     public List<ParticipantDTO> findParticipantsRecoFileType(final String initDate, final String endDate) {
-        log.debug("Find Participants reco by day and fileType");
+        log.debug("[START] findParticipantsRecoFileType | Range: [{} - {}]", initDate, endDate);
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
+        log.debug("[PROCESS] | Range: [{} - {}]", startDate, finalDate);
         final List<ReportConfig> reports = participantProperties.getReports();
-        final List<String> reportsCustom = participantProperties.getReportsCustom().stream().map(ReportConfig::getName).toList();
-        final List<ReportConfig> reportsQuery = reports.stream().filter(report -> reportsCustom.contains(report.getName())).toList();
+        log.debug("[REPORTS] | reports: [{}]", reports);
+        final List<String> reportsCustomNames = participantProperties.getReportsCustom().stream().map(ReportConfig::getName).toList();
+        log.debug("[REPORT_CUSTOM_NAMES] | reportsCustomNames: [{}]", reportsCustomNames);
+        final List<ReportConfig> reportsQuery = reports.stream().filter(report -> reportsCustomNames.contains(report.getName())).toList();
+        log.debug("[REPORTSQUERY] | reportsQuery: [{}]", reportsQuery);
         if (reportsQuery.isEmpty()) {
+            log.error("[SKIP] No custom/RECO reports found for query. Check configuration.");
             return new ArrayList<>();
         }
-        final List<ParticipantDTO> participantsFound = reportingFileKudu.findParticipantsRecoFileType(startDate, finalDate,
-            ReportUtils.getReportsTypeQuery(reportsQuery),
-            participantProperties.getAccountId());
+        List<String> reportTypes = ReportUtils.getReportsTypeQuery(reportsQuery);
+        log.debug("[QUERY] Kudu RECO Participants | Account: {} | Types: {}", participantProperties.getAccountId(), reportTypes);
+        long startTime = System.currentTimeMillis();
+        final List<ParticipantDTO> participantsFound = reportingFileKudu.findParticipantsRecoFileType(startDate, finalDate, reportTypes, participantProperties.getAccountId());
+        log.debug("[PARTICIPANTSFOUND] | participantsFound: [{}]", reportsQuery);
+        long duration = System.currentTimeMillis() - startTime;
+        log.debug("[DURATION] | duration: [{}]", duration);
         if (participantsFound.isEmpty()) {
+            log.error("[END] No RECO participants found in Kudu | Time: {}ms", duration);
             return new ArrayList<>();
         }
+        log.debug("[PROCESS] Translating {} participants...", participantsFound.size());
+        int translatedCount = 0;
         for (ParticipantDTO participant : participantsFound) {
-            final Optional<TranslationData> translationFound = reportProperties.getTranslation().getReports().stream().filter(report -> report.getName().equals(participant.getFileType())).findFirst();
-            translationFound.ifPresent(translationData -> participant.setFileType(translationData.getValue()));
+            final String originalType = participant.getFileType();
+            Optional<TranslationData> translation = reportProperties.getTranslation().getReports().stream()
+                .filter(t -> t.getName().equals(originalType))
+                .findFirst();
+
+            if (translation.isPresent()) {
+                String newValue = translation.get().getValue();
+                participant.setFileType(newValue);
+                log.trace("[TRANSLATE] {} -> {}", originalType, newValue);
+                translatedCount++;
+            }
         }
+
+        log.debug("[END] RECO finished | Total: {} | Translated: {} | Kudu Time: {}ms",
+            participantsFound.size(), translatedCount, duration);
         return participantsFound;
     }
 
     public List<RegulatorDTO> findRegulatorByDayAccountAndFileType(final String initDate, final String endDate) {
-        log.debug("Find Regulators by day and fileType");
+        log.debug("[START] findRegulatorByDayAccountAndFileType | Range: [{} - {}]", initDate, endDate);
+
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-        return reportingFileKudu.
-            findRegulatorByDayAccountAndFileType(startDate, finalDate,
-                ReportUtils.getReportsTypeQuery(regulatorProperties.getReports()),
-                regulatorProperties.getAccountId());
+        log.debug("[PROCESS] | Range: [{} - {}]", startDate, finalDate);
+        List<String> reportTypes = ReportUtils.getReportsTypeQuery(regulatorProperties.getReports());
+        log.debug("[QUERY] Kudu Regulator | Account: {} | Types: {}", regulatorProperties.getAccountId(), reportTypes);
+        long startTime = System.currentTimeMillis();
+        List<RegulatorDTO> result = reportingFileKudu.findRegulatorByDayAccountAndFileType(startDate, finalDate, reportTypes, regulatorProperties.getAccountId());
+        long duration = System.currentTimeMillis() - startTime;
+
+        log.debug("[END] Regulator records found: {} | Time: {}ms", result.size(), duration);
+        return result;
     }
 
     public List<TrDTO> findTrByDayAccountAndFileType(final String initDate, final String endDate) {
-        log.debug("Find Regulators by day and fileType");
+        log.debug("[START] findTrByDayAccountAndFileType | Range: [{} - {}]", initDate, endDate);
+
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
-        return reportingFileKudu
-            .findTrByDayAccountAndFileType(startDate, finalDate,
-                ReportUtils.getReportsTypeQuery(trProperties.getReports()),
-                trProperties.getAccountId());
-    }
 
+        List<String> reportTypes = ReportUtils.getReportsTypeQuery(trProperties.getReports());
+        log.debug("[QUERY] Kudu TR | Account: {} | Types: {}", trProperties.getAccountId(), reportTypes);
+        long startTime = System.currentTimeMillis();
+        List<TrDTO> result = reportingFileKudu.findTrByDayAccountAndFileType(startDate, finalDate,
+            reportTypes, trProperties.getAccountId());
+        long duration = System.currentTimeMillis() - startTime;
+
+        log.debug("[END] TR records found: {} | Time: {}ms", result.size(), duration);
+        return result;
+    }
 }

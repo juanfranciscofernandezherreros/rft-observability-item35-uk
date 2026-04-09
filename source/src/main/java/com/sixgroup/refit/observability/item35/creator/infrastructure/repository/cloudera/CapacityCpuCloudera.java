@@ -86,7 +86,7 @@ public class CapacityCpuCloudera implements CapacityCpuRepository {
             final StorageCapacityResponse storageCapacityResponseBody = objectMapper.readValue(response.body().string(), StorageCapacityResponse.class);
             return CapacityMapper.mapperResponseToListCapacity(storageCapacityResponseBody);
         } catch (IOException e) {
-            log.error("Error to call Cloudera CPU with message: {}, code: {}, exception: ",
+            log.error("Error to call Cloudera CPU with message: {}, code: {}",
                 e.getMessage(), ERROR_CALL_CLOUDERA, e);
             return new ArrayList<>();
         } finally {

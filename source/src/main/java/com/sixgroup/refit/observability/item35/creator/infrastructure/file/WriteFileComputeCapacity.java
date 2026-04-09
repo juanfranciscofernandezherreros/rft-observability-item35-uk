@@ -2,7 +2,8 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.Regulation; // Asegúrate de importar esto
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.Capacity;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.DATABASE_SERVER_OR_PLATFORM;
@@ -23,39 +26,56 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.A
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.FIELD_INCIDENT_RELATED_FILE;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.CapacityConstants.FIELD_TR_INCIDENT_ID_RELATED_FILE;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity> {
+
     private final CsvProperties csvProperties;
-    private final ReportProperties reportProperties;
+    private final ReportItemProperties reportItemProperties;
 
     @Override
-    public File writeFile(final List<Capacity> capacities, final ItemCommandDTO itemCommandDTO, final String fileName) throws IOException {
-        log.debug("Creating and writing file");
-        String filePath = csvProperties.getOutputPath() + fileName;
-        try (FileWriter writer = new FileWriter(filePath);
+    public File writeFile(final List<Capacity> capacities,
+                          final ItemCommandDTO itemCommandDTO,
+                          final String fileName) throws IOException {
+
+        log.debug("Determining output directory based on regulation for Compute Capacity");
+
+        // 1. Construcción de ruta segura con Path
+        Path targetPath = Path.of(csvProperties.getOutputPath());
+        log.info("Target path: {}", targetPath);
+
+        // 2. Crear directorios si no existen
+        Files.createDirectories(targetPath);
+
+        Path finalFile = targetPath.resolve(fileName);
+        log.info("Target file path: {}", finalFile);
+
+        // 3. Escritura del CSV
+        try (FileWriter writer = new FileWriter(finalFile.toFile());
              CSVWriter csvWriter = CSVCreator.create(writer)) {
+
             writeHeader(csvWriter);
+
             for (Capacity capacityData : capacities) {
                 writeRecord(csvWriter, capacityData, itemCommandDTO.getItemDate());
             }
         }
-        log.debug("File created and written: " + filePath);
-        return new File(filePath);
+
+        log.info("File created and written successfully at: {}", finalFile);
+        return finalFile.toFile();
     }
 
     private void writeHeader(final CSVWriter csvWriter) {
-        csvWriter.writeNext(ItemType.COMPUTE_CAPACITY.getHeaders());
+        String[] headers = ItemType.COMPUTE_CAPACITY.getHeadersWithIncidentId(reportItemProperties.getIncidentIdHeader());
+        csvWriter.writeNext(headers);
     }
-
 
     private void writeRecord(final CSVWriter csvWriter, final Capacity capacityData, final String itemDate) {
         String[] data = {
-            reportProperties.getTrCode(),
+            reportItemProperties.getTrCode(),
             DateUtils.itemDateFormatted(itemDate),
-            reportProperties.getRegulationReference(),
+            reportItemProperties.getRegulationReference(),
             DATA_CENTER_LOCATION,
             DATABASE_SERVER_OR_PLATFORM,
             capacityData.getTypeCapacity(),
@@ -64,8 +84,8 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
             capacityData.getMean(),
             capacityData.getMax(),
             FIELD_INCIDENT_RELATED_FILE,
-            FIELD_TR_INCIDENT_ID_RELATED_FILE};
+            FIELD_TR_INCIDENT_ID_RELATED_FILE
+        };
         csvWriter.writeNext(data);
     }
-
 }

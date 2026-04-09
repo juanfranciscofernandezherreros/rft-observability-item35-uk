@@ -1,7 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Command;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -27,13 +27,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class WriteFileStorageCapacityTest {
 
-    private static final String TEST_CSV_FILE_PATH = "src/test/resources/work-repository-observability/upload/";
+    private static final String TEST_CSV_FILE_PATH = "target/work-repository-observability/upload/item35/";
     @InjectMocks
     private WriteFileStorageCapacity writeFileStorageCapacity;
     @Mock
     private CsvProperties csvProperties;
     @Mock
-    private ReportProperties reportProperties;
+    private ReportItemProperties reportProperties;
 
     private static ItemCommandDTO getItemCommandDTO() {
         ItemCommandDTO itemCommandDTO = ItemCommandDTO.builder()
@@ -64,8 +64,9 @@ class WriteFileStorageCapacityTest {
             .when(csvProperties).getOutputPath();
         when(reportProperties.getTrCode()).thenReturn("TRRGS");
         when(reportProperties.getRegulationReference()).thenReturn("EMIR");
+        when(reportProperties.getIncidentIdHeader()).thenReturn("TR_INCIDENT_ID");
 
-        Path locationPath = FileSystems.getDefault().getPath("src/test/resources/work-repository-observability/upload/");
+        Path locationPath = FileSystems.getDefault().getPath(csvProperties.getOutputPath());
 
         if (!Files.exists(locationPath)) {
             Files.createDirectories(locationPath);
@@ -80,7 +81,7 @@ class WriteFileStorageCapacityTest {
             0.012784361f);
 
         List<StorageCapacityDto> storageCapacityDtoList = List.of(storageCapacityDto_1, storageCapacityDto_2);
-        File file = writeFileStorageCapacity.writeFile(storageCapacityDtoList, getItemCommandDTO(), "TRRGS_EMIR_PR_FU_ND_ITEM35C_20240915.csv");
+        File file = writeFileStorageCapacity.writeFile(storageCapacityDtoList, getItemCommandDTO(), "TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240915.csv");
 
         assertNotNull(file);
 

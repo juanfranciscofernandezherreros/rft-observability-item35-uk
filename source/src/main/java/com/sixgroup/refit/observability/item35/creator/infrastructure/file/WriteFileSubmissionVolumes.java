@@ -2,7 +2,8 @@ package com.sixgroup.refit.observability.item35.creator.infrastructure.file;
 
 import com.opencsv.CSVWriter;
 import com.sixgroup.refit.observability.item35.creator.configuration.CsvProperties;
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.Regulation;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.Status;
 import com.sixgroup.refit.observability.item35.creator.domain.model.ItemCommandDTO;
@@ -17,32 +18,49 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class WriteFileSubmissionVolumes implements WriteFileItem35Service<RecordStatus> {
+
     private final CsvProperties csvProperties;
-    private final ReportProperties reportProperties;
+    private final ReportItemProperties reportProperties;
 
     @Override
-    public File writeFile(final List<RecordStatus> recordStatus, final ItemCommandDTO itemCommandDTO, final String fileName) throws IOException {
-        log.debug("Creating and writing file");
-        final String filePath = csvProperties.getOutputPath() + fileName;
-        try (FileWriter writer = new FileWriter(filePath);
+    public File writeFile(final List<RecordStatus> recordStatus,
+                          final ItemCommandDTO itemCommandDTO,
+                          final String fileName) throws IOException {
+
+        log.debug("Determining output directory based on regulation for Submission Volumes");
+
+        Path targetPath = Path.of(csvProperties.getOutputPath());
+        log.info("Target path: {}", targetPath);
+
+        Files.createDirectories(targetPath);
+
+        Path finalFile = targetPath.resolve(fileName);
+        log.info("Target file path: {}", finalFile);
+
+        try (FileWriter writer = new FileWriter(finalFile.toFile());
              CSVWriter csvWriter = CSVCreator.create(writer)) {
+
             writeHeader(csvWriter);
+
             for (RecordStatus recordStatusData : recordStatus) {
                 writeRecord(csvWriter, recordStatusData, itemCommandDTO.getItemDate());
             }
         }
-        log.debug("File created and written: " + filePath);
-        return new File(filePath);
+
+        log.info("File created and written successfully at: {}", finalFile);
+        return finalFile.toFile();
     }
 
-
     private void writeHeader(final CSVWriter csvWriter) {
+        // Nota: He mantenido getHeaders() tal como estaba en tu original para esta clase
         csvWriter.writeNext(ItemType.SUBMISSION_VOLUMES.getHeaders());
     }
 
@@ -58,6 +76,4 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
         };
         csvWriter.writeNext(data);
     }
-
 }
-

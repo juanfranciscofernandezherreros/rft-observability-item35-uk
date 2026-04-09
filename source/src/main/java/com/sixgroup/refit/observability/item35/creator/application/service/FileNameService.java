@@ -1,6 +1,7 @@
 package com.sixgroup.refit.observability.item35.creator.application.service;
 
-import com.sixgroup.refit.observability.item35.creator.configuration.ReportProperties;
+import com.sixgroup.refit.observability.item35.creator.configuration.Regulation;
+import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.shared.exception.InternalErrorException;
 import lombok.RequiredArgsConstructor;
@@ -14,18 +15,34 @@ import static com.sixgroup.refit.observability.item35.creator.shared.constants.A
 @RequiredArgsConstructor
 public class FileNameService {
 
-    private final ReportProperties reportProperties;
+    private final ReportItemProperties reportProperties;
 
     public String getFileName(final ItemType itemType, final String itemDate) {
-        String fileNamePatters;
-        switch (itemType) {
-            case SUBMISSION_VOLUMES -> fileNamePatters = reportProperties.submissionVolumesFileNamePattern;
-            case REPORT_GENERATION -> fileNamePatters = reportProperties.reportGenerationFileNamePattern;
-            case STORAGE_CAPACITY -> fileNamePatters = reportProperties.storageCapacityFileNamePattern;
-            case COMPUTE_CAPACITY -> fileNamePatters = reportProperties.computeCapacityFileNamePattern;
-            default -> throw new InternalErrorException("ItemType " + itemType + "not exists to fileName");
-        }
-        return fileNamePatters.replace(FILE_NAME_PATTERN_YYYYMMDD, itemDate);
+        log.info("Generating filename for itemType: {} and itemDate: {}", itemType, itemDate);
+        validateRegulationSupport(itemType);
+        String fileNamePattern = getPatternByItemType(itemType);
+        log.info("Replacing '{}' in pattern '{}' with date '{}'", FILE_NAME_PATTERN_YYYYMMDD, fileNamePattern, itemDate);
+        String finalFileName = fileNamePattern.replace(FILE_NAME_PATTERN_YYYYMMDD, itemDate);
+        log.info("Final generated filename: {}", finalFileName);
+        return finalFileName;
     }
 
+    private void validateRegulationSupport(ItemType itemType) {
+        if (Regulation.EU.equals(reportProperties.getRegulation()) && ItemType.STORAGE_CAPACITY.equals(itemType)) {
+            log.error("ItemType STORAGE_CAPACITY is not supported for regulation: {}", Regulation.EU);
+        }
+    }
+
+    private String getPatternByItemType(ItemType itemType) {
+        return switch (itemType) {
+            case SUBMISSION_VOLUMES -> reportProperties.getSubmissionVolumesFileNamePattern();
+            case REPORT_GENERATION -> reportProperties.getReportGenerationFileNamePattern();
+            case STORAGE_CAPACITY -> reportProperties.getStorageCapacityFileNamePattern();
+            case COMPUTE_CAPACITY -> reportProperties.getComputeCapacityFileNamePattern();
+            default -> {
+                log.error("ItemType {} not supported for filename generation", itemType);
+                throw new InternalErrorException("ItemType " + itemType + " does not exist for fileName");
+            }
+        };
+    }
 }

@@ -64,6 +64,6 @@ public class RegulatorMapper {
 
     private String getReportType(final String fileName,
                                  final RegulatorProperties fileTypeProperties) {
-        return fileName.contains("ESMA") ? fileTypeProperties.getReportTypeEsma() : fileTypeProperties.getReportTypeNca();
+        return fileName.contains("ESMA") ? fileTypeProperties.getReportTypeEsma() : fileTypeProperties.getReportTypeFca();
     }
 }

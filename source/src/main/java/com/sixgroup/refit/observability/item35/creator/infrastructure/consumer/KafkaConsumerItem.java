@@ -34,12 +34,11 @@ public class KafkaConsumerItem {
     @KafkaListener(topics = "${component-config.topics.observability-item-topic}", groupId = "${component-config.topics.observability-item-consumer-group-id}")
     public void consume(final ConsumerRecord<ItemId, ItemCommand> item) {
         log.debug("Consume message: {}", item);
-        if (AppConstants.ITEM35_ID.equals(item.key().getItemId())
+        if (isItemIdAccepted(item.key().getItemId())
             && Command.REQUEST.getDescription().equals(item.value().getCommand())) {
-
             kafkaConsumerTracing.initTrace(item.headers());
             final ItemCommandDTO itemCommand = ItemCommandDTO.generateItemCommandDTO(item.value());
-            log.info("Item35 request itemCommand: {}", itemCommand);
+            log.info("Item request itemCommand: {}", itemCommand);
             iLog.info(ItemReportingDto.builder().itemType(itemCommand.getItemType()).build(), INTERNAL_REQUEST_RECEIVED);
 
             if (!isRequestTypeAccepted(item.value().getItemType())) {
@@ -49,6 +48,11 @@ public class KafkaConsumerItem {
             final ItemTypeStrategy itemTypeStrategy = itemType.get(ItemType.getItemTypeFromName(item.value().getItemType()));
             executor.execute(() -> itemTypeStrategy.execute(itemCommand, item.headers()));
         }
+    }
+
+    private boolean isItemIdAccepted(final String itemId) {
+//        return AppConstants.ITEM32_ID.equals(itemId) || AppConstants.ITEM35_ID.equals(itemId);
+        return AppConstants.ITEM35_ID.equals(itemId);
     }
 
     private boolean isRequestTypeAccepted(final String requestItemType) {

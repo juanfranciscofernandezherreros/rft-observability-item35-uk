@@ -1,0 +1,97 @@
+{
+  "properties": [
+    {
+      "name": "component-config.item32",
+      "type": "com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties",
+      "description": "EU regulation item configuration (ITEM 32c). Mutually exclusive with item35."
+    },
+    {
+      "name": "component-config.item32.regulation",
+      "type": "com.sixgroup.refit.observability.item35.creator.configuration.Regulation",
+      "description": "Regulation type. Must be EU for item32.",
+      "defaultValue": "EU"
+    },
+    {
+      "name": "component-config.item32.tr-code",
+      "type": "java.lang.String",
+      "description": "TR code used in the CSV file header (e.g. TRRGS)."
+    },
+    {
+      "name": "component-config.item32.regulation-reference",
+      "type": "java.lang.String",
+      "description": "Regulation reference used in the CSV file header (e.g. EMIR)."
+    },
+    {
+      "name": "component-config.item32.submission-volumes-file-name-pattern",
+      "type": "java.lang.String",
+      "description": "File name pattern for Submission Volumes report. Use YYYYMMDD as date placeholder."
+    },
+    {
+      "name": "component-config.item32.report-generation-file-name-pattern",
+      "type": "java.lang.String",
+      "description": "File name pattern for Report Generation report (ITEM32c for EU). Use YYYYMMDD as date placeholder."
+    },
+    {
+      "name": "component-config.item32.storage-capacity-file-name-pattern",
+      "type": "java.lang.String",
+      "description": "File name pattern for Storage Capacity report. Use YYYYMMDD as date placeholder."
+    },
+    {
+      "name": "component-config.item32.compute-capacity-file-name-pattern",
+      "type": "java.lang.String",
+      "description": "File name pattern for Compute Capacity report. Use YYYYMMDD as date placeholder."
+    },
+    {
+      "name": "component-config.item32.translation",
+      "type": "com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties$Translation",
+      "description": "Translation mappings for accounts and reports."
+    },
+    {
+      "name": "component-config.item35",
+      "type": "com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties",
+      "description": "UK regulation item configuration (ITEM 35b). Mutually exclusive with item32."
+    },
+    {
+      "name": "component-config.item35.regulation",
+      "type": "com.sixgroup.refit.observability.item35.creator.configuration.Regulation",
+      "description": "Regulation type. Must be UK for item35.",
+      "defaultValue": "UK"
+    },
+    {
+      "name": "component-config.item35.tr-code",
+      "type": "java.lang.String",
+      "description": "TR code used in the CSV file header (e.g. TRRGS)."
+    },
+    {
+      "name": "component-config.item35.regulation-reference",
+      "type": "java.lang.String",
+      "description": "Regulation reference used in the CSV file header (e.g. EMIR)."
+    },
+    {
+      "name": "component-config.item35.submission-volumes-file-name-pattern",
+      "type": "java.lang.String",
+      "description": "File name pattern for Submission Volumes report. Use YYYYMMDD as date placeholder."
+    },
+    {
+      "name": "component-config.item35.report-generation-file-name-pattern",
+      "type": "java.lang.String",
+      "description": "File name pattern for Report Generation report (ITEM35b for UK). Use YYYYMMDD as date placeholder."
+    },
+    {
+      "name": "component-config.item35.storage-capacity-file-name-pattern",
+      "type": "java.lang.String",
+      "description": "File name pattern for Storage Capacity report. Use YYYYMMDD as date placeholder."
+    },
+    {
+      "name": "component-config.item35.compute-capacity-file-name-pattern",
+      "type": "java.lang.String",
+      "description": "File name pattern for Compute Capacity report. Use YYYYMMDD as date placeholder."
+    },
+    {
+      "name": "component-config.item35.translation",
+      "type": "com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties$Translation",
+      "description": "Translation mappings for accounts and reports."
+    }
+  ]
+}
+

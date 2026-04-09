@@ -68,7 +68,7 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
 
             //Saving information
             stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
-            iLog.info(itemCommand, SAVING_INFORMATION);
+            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SAVING_INFORMATION);
 
             //Saved information
             final List<Capacity> recordsCapacity = new ArrayList<>();
@@ -78,14 +78,14 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
 
             file = writeFileComputeCapacity.writeFile(recordsCapacity, itemCommand, fileName);
             stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).fileUrl(file.getPath()).build());
-            iLog.info(itemCommand, SAVED_INFORMATION);
+            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SAVED_INFORMATION);
 
             //Sent response
             itemCommand.setFileName(file.getName());
             itemCommand.setFileUrl(file.getAbsolutePath());
             producerItemService.send(itemCommand, headers);
             stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
-            iLog.info(itemCommand, SENT_RESPONSE);
+            iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SENT_RESPONSE);
         } catch (Exception e) {
             iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
             log.error("Error to generate file compute capacity {}", e.getMessage(), e);

@@ -13,6 +13,6 @@ public class RegulatorProperties {
 
     private String accountId;
     private String reportTypeEsma;
-    private String reportTypeNca;
+    private String reportTypeFca;
     private List<ReportConfig> reports = new ArrayList<>();
 }

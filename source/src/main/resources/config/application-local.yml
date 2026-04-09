@@ -32,4 +32,4 @@ logging:
   level:
     root: INFO
     "org.apache.kafka": INFO
-    "com.sixgroup.refit": DEBUG
+    "com.sixgroup.refit": INFO
