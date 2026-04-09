@@ -30,24 +30,24 @@ public class ParticipantService {
     private final ParticipantMapper participantMapper = new ParticipantMapper();
 
     public List<ReportGenerationDto> findParticipants(final String initDate, final String endDate, final String itemDate) {
-        log.info("[START] Entering findParticipants method.");
-        log.info("[INPUT PARAMETERS] initDate: '{}', endDate: '{}', itemDate: '{}'", initDate, endDate, itemDate);
+        log.debug("[START] Entering findParticipants method.");
+        log.debug("[INPUT PARAMETERS] initDate: '{}', endDate: '{}', itemDate: '{}'", initDate, endDate, itemDate);
         // 1. Fetching first group of participants
-        log.info("[QUERY] Executing findParticipantsByDayAccountAndFileType for range {} to {}", initDate, endDate);
+        log.debug("[QUERY] Executing findParticipantsByDayAccountAndFileType for range {} to {}", initDate, endDate);
         final List<ParticipantDTO> participants = reportingFileAdapterRepository.findParticipantsByDayAccountAndFileType(initDate, endDate);
-        log.info("[QUERY RESULT] findParticipantsByDayAccountAndFileType returned {} records.", participants.size());
+        log.debug("[QUERY RESULT] findParticipantsByDayAccountAndFileType returned {} records.", participants.size());
         // 2. Fetching second group of participants (Reco)
-        log.info("[QUERY] Executing findParticipantsRecoFileType for range {} to {}", initDate, endDate);
+        log.debug("[QUERY] Executing findParticipantsRecoFileType for range {} to {}", initDate, endDate);
         final List<ParticipantDTO> participantsReco = reportingFileAdapterRepository.findParticipantsRecoFileType(initDate, endDate);
-        log.info("[QUERY RESULT] findParticipantsRecoFileType returned {} records.", participantsReco.size());
+        log.debug("[QUERY RESULT] findParticipantsRecoFileType returned {} records.", participantsReco.size());
         // 3. Merging lists
         final List<ParticipantDTO> totalParticipants = new ArrayList<>();
         totalParticipants.addAll(participants);
         totalParticipants.addAll(participantsReco);
-        log.info("[DATA MERGE] Total participants combined: {}. Proceeding to process list.", totalParticipants.size());
+        log.debug("[DATA MERGE] Total participants combined: {}. Proceeding to process list.", totalParticipants.size());
 
         if (totalParticipants.isEmpty()) {
-            log.info("[TERMINATION] No participants found to process. Returning empty list.");
+            log.error("[TERMINATION] No participants found to process. Returning empty list.");
             return new ArrayList<>();
         }
 
@@ -58,11 +58,11 @@ public class ParticipantService {
         // 4. Processing each participant
         totalParticipants.forEach(participant -> {
             int currentIndex = counter.getAndIncrement();
-            log.info("[ITERATION {}/{}] Processing Participant: FileType='{}', Session='{}', InitDate='{}', EndDate='{}'",
+            log.debug("[ITERATION {}/{}] Processing Participant: FileType='{}', Session='{}', InitDate='{}', EndDate='{}'",
                 currentIndex, totalSize, participant.getFileType(), participant.getReportingSession(),
                 participant.getInitDate(), participant.getEndDate());
 
-            log.info("[SLA LOOKUP] Searching SlaInfo for Entity: '{}', FileType: '{}', Session: '{}'",
+            log.debug("[SLA LOOKUP] Searching SlaInfo for Entity: '{}', FileType: '{}', Session: '{}'",
                 PARTICIPANT_ENTITY, participant.getFileType(), participant.getReportingSession());
 
             final Optional<SlaInfo> slaInfo = slaInfoRepository.getSlaInfo(
@@ -74,30 +74,30 @@ public class ParticipantService {
             );
 
             if (slaInfo.isEmpty()) {
-                log.info("[SLA NOT FOUND] SlaInfo is missing for entity: {}, report: {}, session: {}",
+                log.debug("[SLA NOT FOUND] SlaInfo is missing for entity: {}, report: {}, session: {}",
                     PARTICIPANT_ENTITY, participant.getFileType(), participant.getReportingSession());
 
                 // Keeping the specific error log format as per your original requirement
                 log.error("10.4 Error to find SlaInfo with entity {}, reportName {}, reportSession {}, reportDate {}. Configure properties",
                     PARTICIPANT_ENTITY, participant.getFileType(), participant.getReportingSession(), participant.getEndDate());
             } else {
-                log.info("[SLA FOUND] Successfully retrieved SlaInfo: {}", slaInfo.get());
+                log.debug("[SLA FOUND] Successfully retrieved SlaInfo: {}", slaInfo.get());
 
-                log.info("[MAPPING] Mapping ParticipantDTO and SlaInfo to ReportGenerationDto...");
+                log.debug("[MAPPING] Mapping ParticipantDTO and SlaInfo to ReportGenerationDto...");
                 final ReportGenerationDto reportGenerationDto = participantMapper.toReportGenerationDto(participant, fileTypeProperties, slaInfo.get());
 
-                log.info("[DATE FORMATTING] Formatting itemDate '{}' using DateUtils...", itemDate);
+                log.debug("[DATE FORMATTING] Formatting itemDate '{}' using DateUtils...", itemDate);
                 String formattedDate = DateUtils.itemDateFormatted(itemDate);
                 reportGenerationDto.setReportingDate(formattedDate);
 
-                log.info("[SUCCESS] ReportGenerationDto created for {}. Final ReportingDate: {}",
+                log.debug("[SUCCESS] ReportGenerationDto created for {}. Final ReportingDate: {}",
                     participant.getFileType(), reportGenerationDto.getReportingDate());
 
                 participantReportGenerationData.add(reportGenerationDto);
             }
         });
 
-        log.info("[FINISH] findParticipants completed. Total ReportGenerationDto objects generated: {}/{}",
+        log.debug("[FINISH] findParticipants completed. Total ReportGenerationDto objects generated: {}/{}",
             participantReportGenerationData.size(), totalSize);
 
         return participantReportGenerationData;

@@ -30,16 +30,16 @@ public class TrService {
     private final TrMapper trMapper = new TrMapper();
 
     public List<ReportGenerationDto> findTr(final String initDate, final String endDate, final String itemDate) {
-        log.info("[START] Entering findTr method. Input parameters: initDate='{}', endDate='{}', itemDate='{}'",
+        log.debug("[START] Entering findTr method. Input parameters: initDate='{}', endDate='{}', itemDate='{}'",
             initDate, endDate, itemDate);
 
         // 1. Fetching TR data
-        log.info("[QUERY] Fetching TR records from Kudu via findTrByDayAccountAndFileType for range {} to {}", initDate, endDate);
+        log.debug("[QUERY] Fetching TR records from Kudu via findTrByDayAccountAndFileType for range {} to {}", initDate, endDate);
         final List<TrDTO> trs = reportingFileAdapterRepository.findTrByDayAccountAndFileType(initDate, endDate);
-        log.info("[QUERY RESULT] Found {} TR records.", trs.size());
+        log.debug("[QUERY RESULT] Found {} TR records.", trs.size());
 
         if (trs.isEmpty()) {
-            log.info("[STOP] No TR records found for the given dates. Returning empty list.");
+            log.debug("[STOP] No TR records found for the given dates. Returning empty list.");
             return new ArrayList<>();
         }
 
@@ -48,14 +48,14 @@ public class TrService {
         int totalToProcess = trs.size();
 
         // 2. Processing each TR record
-        log.info("[PROCESS] Starting to process TR list...");
+        log.debug("[PROCESS] Starting to process TR list...");
         trs.forEach(tr -> {
             int currentIdx = counter.getAndIncrement();
-            log.info("[ITERATION {}/{}] Processing TR: FileType='{}', Session='{}', CreationDate='{}'",
+            log.debug("[ITERATION {}/{}] Processing TR: FileType='{}', Session='{}', CreationDate='{}'",
                 currentIdx, totalToProcess, tr.getFileType(), tr.getReportingSession(), tr.getCreationDate());
 
             // 3. SLA Lookup
-            log.info("[SLA LOOKUP] Searching SlaInfo for Entity: '{}', FileType: '{}', Session: '{}'",
+            log.debug("[SLA LOOKUP] Searching SlaInfo for Entity: '{}', FileType: '{}', Session: '{}'",
                 TR_ENTITY, tr.getFileType(), tr.getReportingSession());
 
             final Optional<SlaInfo> slaInfo = slaInfoRepository.getSlaInfo(
@@ -66,27 +66,27 @@ public class TrService {
             );
 
             if (slaInfo.isEmpty()) {
-                log.info("[SLA NOT FOUND] SlaInfo is missing for TR: {}, Session: {}", tr.getFileType(), tr.getReportingSession());
+                log.debug("[SLA NOT FOUND] SlaInfo is missing for TR: {}, Session: {}", tr.getFileType(), tr.getReportingSession());
                 log.error("Error to find SlaInfo with entity {}, reportName {}, reportSession {}, reportDate {}. Configure properties",
                     TR_ENTITY, tr.getFileType(), tr.getReportingSession(), tr.getCreationDate());
             } else {
-                log.info("[SLA SUCCESS] SlaInfo retrieved successfully: {}", slaInfo.get());
+                log.debug("[SLA SUCCESS] SlaInfo retrieved successfully: {}", slaInfo.get());
 
                 // 4. Mapping and Date Formatting
-                log.info("[MAPPING] Mapping TR data and SLA info to ReportGenerationDto...");
+                log.debug("[MAPPING] Mapping TR data and SLA info to ReportGenerationDto...");
                 final ReportGenerationDto reportGenerationDto = trMapper.toReportGenerationDto(tr, fileTypeProperties, slaInfo.get());
 
                 String formattedDate = DateUtils.itemDateFormatted(itemDate);
                 reportGenerationDto.setReportingDate(formattedDate);
 
-                log.info("[SUCCESS] DTO created for FileType: {}. Final ReportingDate: {}",
+                log.debug("[SUCCESS] DTO created for FileType: {}. Final ReportingDate: {}",
                     tr.getFileType(), reportGenerationDto.getReportingDate());
 
                 trReportGenerationData.add(reportGenerationDto);
             }
         });
 
-        log.info("[FINISH] findTr execution completed. Total DTOs generated: {}/{}",
+        log.debug("[FINISH] findTr execution completed. Total DTOs generated: {}/{}",
             trReportGenerationData.size(), totalToProcess);
 
         return trReportGenerationData;
