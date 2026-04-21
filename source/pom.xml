@@ -5,226 +5,72 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.sixgroup.fate</groupId>
-        <artifactId>fate-commons</artifactId>
-        <version>6.0.0.3</version>
+        <groupId>com.sixgroup.refit.common.base</groupId>
+        <artifactId>rft-common-base-parent-featured</artifactId>
+        <version>1.3.0</version>
     </parent>
     <groupId>com.sixgroup.refit.observability</groupId>
     <artifactId>rft-observability-item35-creator</artifactId>
     <version>${revision}${sha1}${changelist}</version>
     <properties>
-        <revision>1.10.0</revision>
+        <revision>1.10.1</revision>
         <sha1></sha1>
         <changelist>-SNAPSHOT</changelist>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <java.version>17</java.version>
-        <avro.version>1.11.1</avro.version>
-        <kafka.version>3.2.3</kafka.version>
-        <kafka-clients.version>7.2.2</kafka-clients.version>
-        <spring-kafka.version>3.0.11</spring-kafka.version>
         <mssql-jdbc.version>11.2.0.jre11</mssql-jdbc.version>
-        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
-        <spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
-        <imapala-jdbc.version>2.6.29.1035</imapala-jdbc.version>
-        <sql-server-version>11.2.3.jre17</sql-server-version>
-        <!-- rft libs -->
-        <rft-commons-observability.version>4.3.0</rft-commons-observability.version>
-        <rft-commons-spring-support.version>1.0.5</rft-commons-spring-support.version>
         <rft-observability-item-topic-version>1.0.2</rft-observability-item-topic-version>
         <rft-observability-sla-validator.version>0.2.1</rft-observability-sla-validator.version>
         <rft-observability-item-state-library.version>1.1.2</rft-observability-item-state-library.version>
-        <sonar-maven-plugin.version>3.4.0.905</sonar-maven-plugin.version>
-
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-clients</artifactId>
-                <version>${kafka-clients.version}-ccs</version>
-            </dependency>
-            <dependency>
-                <groupId>io.confluent</groupId>
-                <artifactId>kafka-avro-serializer</artifactId>
-                <version>${kafka-clients.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.kafka</groupId>
-                <artifactId>spring-kafka</artifactId>
-                <version>${spring-kafka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.kafka</groupId>
-                <artifactId>spring-kafka-test</artifactId>
-                <version>${spring-kafka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.cucumber</groupId>
-                <artifactId>cucumber-bom</artifactId>
-                <version>7.8.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.github.classgraph</groupId>
-                <artifactId>classgraph</artifactId>
-                <version>4.8.139</version>
-            </dependency>
-            <!-- Instrumentation patching to support latest kafka clients
-            version -->
-            <dependency>
-                <groupId>io.zipkin.brave</groupId>
-                <artifactId>brave-bom</artifactId>
-                <!-- Compatible with kafka 3.2.x -->
-                <version>5.14.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-sleuth-dependencies</artifactId>
-                <version>3.1.9</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.microsoft.sqlserver</groupId>
-                <artifactId>mssql-jdbc</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-jpa</artifactId>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
-        <!-- FATE -->
         <dependency>
-            <groupId>com.sixgroup.fate</groupId>
-            <artifactId>fate-starter-backend</artifactId>
+            <groupId>com.sixgroup.refit.common.base</groupId>
+            <artifactId>rft-common-base-starter</artifactId>
         </dependency>
-        <!-- validations -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
+            <groupId>com.sixgroup.refit.common.base</groupId>
+            <artifactId>rft-common-base-starter-server-backend</artifactId>
         </dependency>
-        <!-- Log & monitoring -->
+        <dependency>
+            <groupId>com.sixgroup.refit.common.base</groupId>
+            <artifactId>rft-common-base-starter-feature-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sixgroup.refit.common.base</groupId>
+            <artifactId>rft-common-base-starter-feature-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sixgroup.refit.common.base</groupId>
+            <artifactId>rft-common-base-starter-feature-sqlserver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sixgroup.refit.common.base</groupId>
+            <artifactId>rft-common-base-test-starter-feature-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.8.139</version>
+        </dependency>
+        <dependency>
+            <groupId>io.zipkin.brave</groupId>
+            <artifactId>brave-bom</artifactId>
+            <version>5.14.1</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sixgroup.fate</groupId>
-            <artifactId>fate-logging</artifactId>
-            <classifier>unified-log-config</classifier>
-            <type>zip</type>
-        </dependency>
-        <!-- Kafka dependencies -->
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>kafka-avro-serializer</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${org.mapstruct.version}</version>
-        </dependency>
-        <!-- Springboot tools -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka-test</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>kafka-streams</artifactId>
-                    <groupId>org.apache.kafka</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>kafka-streams-test-utils</artifactId>
-                    <groupId>org.apache.kafka</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- rft libs-->
-        <dependency>
-            <groupId>com.sixgroup.refit.common</groupId>
-            <artifactId>rft-commons-spring-support-lib</artifactId>
-            <version>${rft-commons-spring-support.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sixgroup.refit.observability</groupId>
-            <artifactId>rft-commons-observability</artifactId>
-            <version>${rft-commons-observability.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sixgroup.refit.observability</groupId>
             <artifactId>rft-observability-sla-validator</artifactId>
             <version>${rft-observability-sla-validator.version}</version>
         </dependency>
-
-        <!-- remove lombok warnings -->
         <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-annotations</artifactId>
-            <version>${spotbugs-annotations.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <!-- Cucumber dependencies -->
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-spring</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit-platform-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!-- XML dependencies -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-        <!-- Junit dependencies -->
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-suite</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
+            <groupId>com.sixgroup.refit.common.base</groupId>
+            <artifactId>rft-common-base-test-starter-feature-cucumber</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jeasy</groupId>
@@ -242,32 +88,6 @@
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>${org.mapstruct.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok-mapstruct-binding</artifactId>
-            <version>0.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>3.1.2</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>5.9</version>
@@ -283,200 +103,33 @@
             <version>4.2.0</version>
         </dependency>
         <dependency>
-            <groupId>Impala</groupId>
-            <artifactId>ImpalaJDBC42</artifactId>
-            <version>${imapala-jdbc.version}</version>
+            <groupId>com.sixgroup.refit.common.base</groupId>
+            <artifactId>rft-common-base-starter-feature-impala</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>mssql-jdbc</artifactId>
-            <version>${sql-server-version}</version>
-        </dependency>
-
         <dependency>
             <groupId>com.sixgroup.refit.observability</groupId>
             <artifactId>rft-observability-item-topic</artifactId>
             <version>${rft-observability-item-topic-version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>com.sixgroup.refit.observability</groupId>
             <artifactId>rft-observability-item-state-library</artifactId>
             <version>${rft-observability-item-state-library.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.15.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.12.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp-urlconnection</artifactId>
             <version>4.12.0</version>
         </dependency>
-
-
     </dependencies>
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <!-- Compilation -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                    <fork>true</fork>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${org.mapstruct.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok-mapstruct-binding</artifactId>
-                            <version>0.2.0</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-            <!-- Spring Boot  packaging -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Code coverage -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Include unified log config -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <!-- unpack unified-log-config -->
-                    <execution>
-                        <id>unpack-unified-log-config</id>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.sixgroup.fate</groupId>
-                                    <artifactId>fate-logging</artifactId>
-                                    <classifier>unified-log-config</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>
-                                        ${project.build.directory}/classes/unified-log-config
-                                    </outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Generate POJOs from IDLs -->
-            <plugin>
-                <groupId>org.apache.avro</groupId>
-                <artifactId>avro-maven-plugin</artifactId>
-                <version>${avro.version}</version>
-                <configuration>
-                    <stringType>String</stringType>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>generate.topic.pojos</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>idl-protocol</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- CICD Integration
-            https://maven.apache.org/maven-ci-friendly.html -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.3.0</version>
-                <configuration>
-                    <updatePomFile>true</updatePomFile>
-                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>flatten.clean</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>
