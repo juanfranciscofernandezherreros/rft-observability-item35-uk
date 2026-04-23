@@ -13,7 +13,7 @@
     <artifactId>rft-observability-item35-creator</artifactId>
     <version>${revision}${sha1}${changelist}</version>
     <properties>
-        <revision>1.10.2</revision>
+        <revision>1.11.0</revision>
         <sha1></sha1>
         <changelist>-SNAPSHOT</changelist>
         <mssql-jdbc.version>11.2.0.jre11</mssql-jdbc.version>
