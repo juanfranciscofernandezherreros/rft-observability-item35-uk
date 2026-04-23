@@ -34,11 +34,7 @@
         <dependency>
             <groupId>com.sixgroup.refit.common.base</groupId>
             <artifactId>rft-common-base-starter-feature-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sixgroup.refit.common.base</groupId>
-            <artifactId>rft-common-base-starter-feature-kafka</artifactId>
-        </dependency>
+        </dependency>    
         <dependency>
             <groupId>com.sixgroup.refit.common.base</groupId>
             <artifactId>rft-common-base-starter-feature-sqlserver</artifactId>
