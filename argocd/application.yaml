@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rft-observability-item35-creator
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/juanfranciscofernandezherreros/gitops-config.git
+    targetRevision: HEAD
+    path: manifests/rft-observability-item35-creator
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: rft-observability-item35
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true

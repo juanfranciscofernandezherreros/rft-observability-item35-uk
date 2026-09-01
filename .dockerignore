@@ -1,0 +1,4 @@
+.git
+.idea
+source/target/*
+!source/target/rft-observability-item35-creator-1.11.0-SNAPSHOT.jar

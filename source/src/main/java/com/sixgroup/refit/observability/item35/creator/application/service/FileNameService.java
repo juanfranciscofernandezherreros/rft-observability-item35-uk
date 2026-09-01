@@ -4,6 +4,7 @@ import com.sixgroup.refit.observability.item35.creator.configuration.Regulation;
 import com.sixgroup.refit.observability.item35.creator.configuration.ReportItemProperties;
 import com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType;
 import com.sixgroup.refit.observability.item35.creator.shared.exception.InternalErrorException;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,10 @@ public class FileNameService {
         log.info("Generating filename for itemType: {} and itemDate: {}", itemType, itemDate);
         validateRegulationSupport(itemType);
         String fileNamePattern = getPatternByItemType(itemType);
-        log.info("Replacing '{}' in pattern '{}' with date '{}'", FILE_NAME_PATTERN_YYYYMMDD, fileNamePattern, itemDate);
-        String finalFileName = fileNamePattern.replace(FILE_NAME_PATTERN_YYYYMMDD, itemDate);
+        String reportingReferenceDate = DateUtils.reportingReferenceDate(itemDate);
+        log.info("Replacing '{}' in pattern '{}' with reporting reference date '{}'", FILE_NAME_PATTERN_YYYYMMDD,
+            fileNamePattern, reportingReferenceDate);
+        String finalFileName = fileNamePattern.replace(FILE_NAME_PATTERN_YYYYMMDD, reportingReferenceDate);
         log.info("Final generated filename: {}", finalFileName);
         return finalFileName;
     }

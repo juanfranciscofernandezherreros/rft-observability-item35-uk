@@ -35,6 +35,11 @@ public final class DateUtils {
         return lastDayOfMonth.format(DATE_FORMAT_YYYY_MM_DD);
     }
 
+    public static String reportingReferenceDate(final String itemDate) {
+        final LocalDate date = LocalDate.parse(itemDate, DATE_FORMAT_YYYYMMDD);
+        return date.minusMonths(1).withDayOfMonth(15).format(DATE_FORMAT_YYYYMMDD);
+    }
+
     public static String itemDateFormatted(final String itemDate) {
         return LocalDate.parse(itemDate, DATE_FORMAT_YYYYMMDD).format(DATE_FORMAT_YYYY_MM_DD);
     }

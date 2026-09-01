@@ -1,0 +1,12 @@
+http:
+  routers:
+    kind-ingress:
+      entryPoints:
+        - web
+      rule: PathPrefix(`/`)
+      service: kind-ingress
+  services:
+    kind-ingress:
+      loadBalancer:
+        servers:
+          - url: http://hello-world-control-plane:30080

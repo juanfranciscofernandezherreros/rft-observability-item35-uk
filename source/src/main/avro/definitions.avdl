@@ -1,5 +1,18 @@
-@namespace ( "com.sixgroup.refit.observability" )
-protocol Internals {
-  import idl  "classpath:/topics/rft-observability-item-topic.avdl";
+@namespace("com.sixgroup.refit.observability.topic.item")
+protocol ItemProtocol {
+    record ItemId {
+        string itemId;
+    }
+    record FileInfo {
+        string fileName;
+        string fileUrl;
+    }
+    record ItemCommand {
+        string itemId;
+        string itemType;
+        string command;
+        string itemDate;
+        timestamp_ms creationTimestamp;
+        FileInfo fileInfo;
+    }
 }
-
