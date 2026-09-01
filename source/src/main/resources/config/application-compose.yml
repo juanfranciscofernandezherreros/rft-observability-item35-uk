@@ -1,0 +1,68 @@
+server:
+  port: 8042
+
+management:
+  server:
+    port: 9040
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+spring:
+  kafka:
+    bootstrap-servers: kafka:29092
+    producer:
+      key-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        schema.registry.url: http://schema-registry:8081
+        avro.remove.java.properties: true
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        schema.registry.url: http://schema-registry:8081
+        specific.avro.reader: true
+  datasource:
+    kududb:
+      jdbc-url: jdbc:h2:mem:kudu;INIT=RUNSCRIPT FROM '/app/db/init_kudu.sql'
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver
+      dialect: org.hibernate.dialect.HSQLDialect
+      ddl-auto: validate
+      persistence-unit: kududb
+    sqlserverdb:
+      jdbc-url: jdbc:h2:mem:DBO;MODE=MSSQLServer;INIT=RUNSCRIPT FROM '/app/db/init_mssql.sql'
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver
+      dialect: org.hibernate.dialect.SQLServer2012Dialect
+      ddl-auto: validate
+      persistence-unit: sqlserverdb
+      schema: dbo
+
+component-config:
+  csv:
+    output_path: /data/reports/
+  topics:
+    observability-item-topic: rft.dev.observability.item.private.v1
+    observability-item-consumer-group-id: rft.compose.rft-observability-item35-creator
+  cloudera:
+    cpu:
+      enabled: false
+    ram:
+      enabled: false
+    storage:
+      enabled: false
+
+logging:
+  level:
+    root: INFO
+    org.apache.kafka: WARN
