@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../k8s
+
+patches:
+  - target:
+      kind: Deployment
+      name: rft-observability-item35-creator
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: rft-observability-item35-creator:compose
+      - op: add
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            memory: 100Mi
+          limits:
+            memory: 100Mi
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SPRING_APPLICATION_JSON
+          value: '{"spring":{"kafka":{"bootstrap-servers":"host.docker.internal:29093","producer":{"properties":{"schema.registry.url":"http://host.docker.internal:8081"}},"consumer":{"properties":{"schema.registry.url":"http://host.docker.internal:8081"}}}}}'

@@ -3,8 +3,6 @@ FROM maven:3.9.11-eclipse-temurin-17 AS build
 WORKDIR /workspace
 
 COPY source/pom.xml pom.xml
-RUN mvn --batch-mode dependency:go-offline
-
 COPY source/src src
 RUN mvn --batch-mode clean package -Dmaven.test.skip=true
 
