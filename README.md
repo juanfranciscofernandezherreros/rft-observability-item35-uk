@@ -101,6 +101,53 @@ $jobs | Wait-Job | Receive-Job
 $jobs | Remove-Job
 ```
 
+### Bash: launch ITEM35A and ITEM35B
+
+The following commands publish `itemDate=20240315`, so the local H2 fixtures
+for February 2024 produce 5 ITEM35A rows and 15 ITEM35B rows.
+
+ITEM35A:
+
+```bash
+timestamp=$(date +%s%3N)
+
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data-binary @- \
+  'http://localhost:9080/api/clusters/item35-local/topics/rft.dev.observability.item.private.v1/messages' <<EOF
+{
+  "partition": 0,
+  "key": "{\"itemId\":\"item35\"}",
+  "headers": {},
+  "content": "{\"itemId\":\"item35\",\"itemType\":\"submissionVolumes\",\"command\":\"request\",\"itemDate\":\"20240315\",\"creationTimestamp\":${timestamp},\"fileInfo\":{\"fileName\":\"\",\"fileUrl\":\"\"}}",
+  "keySerde": "SchemaRegistry",
+  "valueSerde": "SchemaRegistry"
+}
+EOF
+```
+
+ITEM35B:
+
+```bash
+timestamp=$(date +%s%3N)
+
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data-binary @- \
+  'http://localhost:9080/api/clusters/item35-local/topics/rft.dev.observability.item.private.v1/messages' <<EOF
+{
+  "partition": 0,
+  "key": "{\"itemId\":\"item35\"}",
+  "headers": {},
+  "content": "{\"itemId\":\"item35\",\"itemType\":\"reportGeneration\",\"command\":\"request\",\"itemDate\":\"20240315\",\"creationTimestamp\":${timestamp},\"fileInfo\":{\"fileName\":\"\",\"fileUrl\":\"\"}}",
+  "keySerde": "SchemaRegistry",
+  "valueSerde": "SchemaRegistry"
+}
+EOF
+```
+
 The four expected HTTP responses are `200`. Kafka preserves message order in
 the topic's single partition, while Item35 delegates each consumed request to
 its asynchronous task executor. Generated files appear under
