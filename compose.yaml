@@ -142,6 +142,9 @@ services:
       - "9040:9040"
     environment:
       SPRING_PROFILES_ACTIVE: compose,uk
+      SPRING_H2_CONSOLE_ENABLED: "true"
+      SPRING_H2_CONSOLE_PATH: /h2-console
+      SPRING_H2_CONSOLE_SETTINGS_WEB_ALLOW_OTHERS: "true"
     volumes:
       - ./source/src/main/resources/reports:/data/reports
     healthcheck:
