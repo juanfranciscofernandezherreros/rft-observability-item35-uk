@@ -61,7 +61,7 @@ Este documento inventaría las tablas referenciadas por las entidades JPA, los r
 - **Columnas:** `id`, `state_name`, `state_date`, `comment`, `item_reporting_id`.
 - **Relación:** `item_reporting_id` referencia a `item_reporting`.
 - **Uso actual:** no existe una entidad ni un repositorio que acceda directamente a esta tabla en el código Java.
-- **Script:** `source/src/test/resources/db/sqlServer/init_mssql.sql`.
+- **Script local:** `source/src/main/resources/db/init_mssql.sql`.
 
 ## Origen de ITEM35C e ITEM35D
 

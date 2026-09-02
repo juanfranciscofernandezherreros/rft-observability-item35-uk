@@ -31,7 +31,7 @@ spring:
         specific.avro.reader: true
   datasource:
     kududb:
-      jdbc-url: jdbc:h2:mem:kudu;INIT=RUNSCRIPT FROM '/app/db/init_kudu.sql'
+      jdbc-url: jdbc:h2:mem:kudu;INIT=RUNSCRIPT FROM 'classpath:db/init_kudu.sql'
       username: sa
       password:
       driver-class-name: org.h2.Driver
@@ -39,7 +39,7 @@ spring:
       ddl-auto: validate
       persistence-unit: kududb
     sqlserverdb:
-      jdbc-url: jdbc:h2:mem:DBO;MODE=MSSQLServer;INIT=RUNSCRIPT FROM '/app/db/init_mssql.sql'
+      jdbc-url: jdbc:h2:mem:DBO;MODE=MSSQLServer;INIT=RUNSCRIPT FROM 'classpath:db/init_mssql.sql'
       username: sa
       password:
       driver-class-name: org.h2.Driver
