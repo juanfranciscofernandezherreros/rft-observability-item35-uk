@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prueba de reportes con tablas vacias - Item35</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17212b;
+      --muted: #5d6975;
+      --line: #cfd6dc;
+      --surface: #f5f7f8;
+      --navy: #17324d;
+      --green: #176b45;
+      --green-bg: #e9f6ef;
+      --red: #a12622;
+      --red-bg: #fbeceb;
+      --amber: #7a5200;
+      --amber-bg: #fff4cf;
+      --blue-bg: #eaf2f8;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #ffffff;
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+      letter-spacing: 0;
+    }
+
+    header {
+      border-top: 8px solid var(--navy);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .header-inner,
+    main,
+    footer {
+      width: min(1040px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .header-inner { padding: 42px 0 34px; }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 46px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 780px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main { padding: 34px 0 56px; }
+
+    nav {
+      padding: 16px 0 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    nav a {
+      display: inline-block;
+      margin: 4px 20px 4px 0;
+      color: var(--navy);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    nav a:hover { text-decoration: underline; }
+
+    section {
+      padding: 30px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      color: var(--navy);
+      font-size: 25px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 24px 0 8px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    p { margin: 10px 0; }
+
+    code,
+    pre {
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    code {
+      padding: 1px 4px;
+      border: 1px solid #d9e0e5;
+      background: var(--surface);
+      font-size: 0.92em;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 14px 0;
+      padding: 18px;
+      overflow-x: auto;
+      border-left: 4px solid var(--navy);
+      background: #18232d;
+      color: #f4f7f9;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    pre code {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 22px 0 0;
+    }
+
+    .metric {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--navy);
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .table-wrap {
+      margin: 16px 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      background: #ffffff;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface);
+      color: var(--navy);
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .status {
+      display: inline-block;
+      padding: 2px 7px;
+      border: 1px solid currentColor;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status.generated { color: var(--green); background: var(--green-bg); }
+    .status.skipped { color: var(--red); background: var(--red-bg); }
+
+    .callout {
+      margin: 18px 0;
+      padding: 16px 18px;
+      border-left: 5px solid var(--amber);
+      background: var(--amber-bg);
+    }
+
+    .callout.info {
+      border-left-color: var(--navy);
+      background: var(--blue-bg);
+    }
+
+    ul,
+    ol { padding-left: 24px; }
+
+    li { margin: 7px 0; }
+
+    a { color: #0b5a8c; }
+
+    .file-list a {
+      overflow-wrap: anywhere;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 14px;
+    }
+
+    footer {
+      padding: 22px 0 38px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 720px) {
+      .header-inner,
+      main,
+      footer { width: min(100% - 24px, 1040px); }
+      .header-inner { padding: 30px 0 26px; }
+      .summary { grid-template-columns: 1fr; }
+      h1 { font-size: 32px; }
+      .subtitle { font-size: 16px; }
+    }
+
+    @media print {
+      header { border-top-width: 4px; }
+      .header-inner,
+      main,
+      footer { width: 100%; }
+      nav { display: none; }
+      section { break-inside: avoid; }
+      a { color: var(--ink); text-decoration: none; }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <p class="eyebrow">RFT Observability / Item35</p>
+      <h1>Prueba de los cuatro reportes con tablas vacías</h1>
+      <p class="subtitle">
+        Evidencia de ejecución local mediante Docker Compose y Kafka, partiendo de los esquemas H2 sin datos funcionales.
+      </p>
+      <div class="meta">
+        <span><strong>Fecha:</strong> 2 de septiembre de 2026</span>
+        <span><strong>Topic:</strong> rft.dev.observability.item.private.v1</span>
+        <span><strong>Perfil:</strong> compose, uk</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <nav aria-label="Contenido del informe">
+      <a href="#objetivo">Objetivo</a>
+      <a href="#preparacion">Preparación</a>
+      <a href="#ejecucion">Ejecución</a>
+      <a href="#resultados">Resultados</a>
+      <a href="#cloudera">Cloudera</a>
+      <a href="#conclusion">Conclusión</a>
+    </nav>
+
+    <section id="objetivo">
+      <h2>1. Objetivo</h2>
+      <p>
+        Comprobar el comportamiento real de ITEM35A, ITEM35B, ITEM35C e ITEM35D cuando las tablas de entrada se encuentran vacías y las cuatro solicitudes se reciben prácticamente al mismo tiempo.
+      </p>
+      <div class="summary" aria-label="Resumen de la prueba">
+        <div class="metric"><strong>4</strong><span>eventos publicados</span></div>
+        <div class="metric"><strong>4 × HTTP 200</strong><span>publicaciones aceptadas</span></div>
+        <div class="metric"><strong>2 de 4</strong><span>CSV generados</span></div>
+      </div>
+    </section>
+
+    <section id="preparacion">
+      <h2>2. Preparación</h2>
+      <ol>
+        <li>Se mantuvieron los esquemas y las tablas que necesita Hibernate para validar las entidades.</li>
+        <li>Se eliminaron todos los <code>INSERT</code> de los scripts H2 cargados por el perfil Compose.</li>
+        <li>Se eliminaron los cuatro CSV de la ejecución anterior para no confundir archivos antiguos con el resultado actual.</li>
+        <li>Se reinició el stack completo con <code>docker compose up -d</code>.</li>
+        <li>Se esperó a que Kafka, Schema Registry, Kafka UI e Item35 alcanzaran el estado <code>healthy</code>.</li>
+      </ol>
+
+      <h3>Tablas creadas sin datos</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Origen</th><th>Esquema</th><th>Tabla</th><th>Estado inicial</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Kudu simulado en H2</td><td>EMIR_REFIT_DEV_CONTROL_REFIT</td><td>record_status</td><td>0 filas</td></tr>
+            <tr><td>Kudu simulado en H2</td><td>EMIR_REFIT_DEV_CONTROL_REFIT</td><td>reports_file_outgoing</td><td>0 filas</td></tr>
+            <tr><td>Kudu simulado en H2</td><td>EMIR_REFIT_DEV_ACCOUNT_MNG</td><td>regu_identity</td><td>0 filas</td></tr>
+            <tr><td>SQL Server simulado en H2</td><td>dbo</td><td>item_reporting</td><td>0 filas</td></tr>
+            <tr><td>SQL Server simulado en H2</td><td>dbo</td><td>item_reporting_state</td><td>0 filas</td></tr>
+            <tr><td>SQL Server simulado en H2</td><td>dbo</td><td>report_eod_state</td><td>0 filas</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <strong>Estado inicial frente a estado final.</strong> Las tablas estaban vacías antes del lanzamiento. Durante el procesamiento, el propio microservicio puede insertar estados técnicos en <code>item_reporting</code> e <code>item_reporting_state</code>; esas inserciones no son datos de origen de los reportes.
+      </div>
+    </section>
+
+    <section id="ejecucion">
+      <h2>3. Ejecución simultánea</h2>
+      <p>
+        Se publicaron cuatro mensajes Avro mediante Kafka UI REST. Las solicitudes HTTP se iniciaron sin esperar la respuesta de la anterior y después se esperó conjuntamente a que finalizaran las cuatro.
+      </p>
+
+      <h3>Clave Avro</h3>
+      <pre><code>{"itemId":"item35"}</code></pre>
+
+      <h3>Valor Avro</h3>
+      <pre><code>{
+  "itemId": "item35",
+  "itemType": "submissionVolumes",
+  "command": "request",
+  "itemDate": "20240315",
+  "creationTimestamp": 1788330889000,
+  "fileInfo": {
+    "fileName": "",
+    "fileUrl": ""
+  }
+}</code></pre>
+      <p>
+        El campo <code>itemType</code> tomó los valores <code>submissionVolumes</code>, <code>reportGeneration</code>, <code>storageCapacity</code> y <code>computeCapacity</code>. Los cuatro envíos devolvieron HTTP 200.
+      </p>
+    </section>
+
+    <section id="resultados">
+      <h2>4. Resultados observados</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Reporte</th><th>Resultado</th><th>Archivo</th><th>Tamaño</th><th>Filas de datos</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ITEM35A</td>
+              <td><span class="status skipped">Omitido</span></td>
+              <td>No creado</td>
+              <td>0 bytes</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>ITEM35B</td>
+              <td><span class="status skipped">Omitido</span></td>
+              <td>No creado</td>
+              <td>0 bytes</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>ITEM35C</td>
+              <td><span class="status generated">Generado</span></td>
+              <td>TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240215.csv</td>
+              <td>3.384 bytes</td>
+              <td>32</td>
+            </tr>
+            <tr>
+              <td>ITEM35D</td>
+              <td><span class="status generated">Generado</span></td>
+              <td>TRRGS_UKEMIR_PR_FU_ND_ITEM35D_20240215.csv</td>
+              <td>6.026 bytes</td>
+              <td>62</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Evidencia en logs</h3>
+      <pre><code>ITEM35A: No data found in submission volumes, skipping report generation
+ITEM35B: Total records after joining collections: 0
+ITEM35B: No data found in report generation. Skipping report generation.
+ITEM35C: Calculated storage capacity dataset size: 32
+ITEM35C: File created and written successfully
+ITEM35D: File created and written successfully</code></pre>
+
+      <div class="callout">
+        <strong>A y B no generan un CSV vacío.</strong> Cuando sus consultas devuelven cero registros, ambos casos de uso terminan antes de invocar al escritor de CSV. Por eso no existe ni siquiera un archivo que contenga solamente la cabecera.
+      </div>
+
+      <h3>Archivos disponibles</h3>
+      <ul class="file-list">
+        <li><a href="../source/src/main/resources/reports/TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240215.csv">TRRGS_UKEMIR_PR_FU_ND_ITEM35C_20240215.csv</a></li>
+        <li><a href="../source/src/main/resources/reports/TRRGS_UKEMIR_PR_FU_ND_ITEM35D_20240215.csv">TRRGS_UKEMIR_PR_FU_ND_ITEM35D_20240215.csv</a></li>
+      </ul>
+    </section>
+
+    <section id="cloudera">
+      <h2>5. Por qué C y D generan datos</h2>
+      <p>
+        ITEM35C e ITEM35D no obtienen sus medidas de las tablas H2 anteriores. Sus repositorios consultan Cloudera. En el perfil local <code>application-compose.yml</code>, las tres integraciones están desactivadas:
+      </p>
+      <pre><code>component-config:
+  cloudera:
+    cpu:
+      enabled: false
+    ram:
+      enabled: false
+    storage:
+      enabled: false</code></pre>
+      <p>
+        Las anotaciones <code>@ConditionalOnProperty(... havingValue = "false")</code> activan entonces las implementaciones mock. Estas leen los siguientes recursos incluidos en el JAR:
+      </p>
+      <ul>
+        <li>ITEM35C: <code>json/total_all_MBT.json</code> y <code>json/free_all_MBT.json</code>.</li>
+        <li>ITEM35D CPU: <code>json/capacity-cpu.json</code>.</li>
+        <li>ITEM35D RAM: <code>json/capacity-ram.json</code> y <code>json/capacity-ram-total.json</code>.</li>
+      </ul>
+      <p>
+        Por tanto, vaciar las tablas afecta a A y B, pero no deja sin datos a C y D mientras Compose continúe utilizando esos mocks. En un entorno conectado a Cloudera, C y D dependerán de las respuestas reales de sus APIs.
+      </p>
+    </section>
+
+    <section id="conclusion">
+      <h2>6. Conclusión</h2>
+      <p>
+        La prueba confirma que el comportamiento actual no es producir cuatro CSV vacíos. Con las tablas funcionales vacías, ITEM35A e ITEM35B no crean archivo. ITEM35C e ITEM35D sí crean archivos con datos porque el entorno local utiliza respuestas JSON mock independientes de las tablas.
+      </p>
+      <p>
+        Al finalizar la prueba, el stack quedó iniciado y saludable. Kafka UI permanece disponible en <a href="http://localhost:9080">http://localhost:9080</a> y el endpoint de salud de Item35 en <a href="http://localhost:9040/actuator/health">http://localhost:9040/actuator/health</a>.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Informe generado a partir de la ejecución local observada del microservicio rft-observability-item35-creator.
+  </footer>
+</body>
+</html>
