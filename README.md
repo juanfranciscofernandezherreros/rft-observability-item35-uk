@@ -27,6 +27,85 @@ key and value schemas.
 - Kafka from the host: `localhost:9092`
 - Generated CSV files: `source/src/main/resources/reports`
 
+## Launch all four reports concurrently
+
+Wait until Kafka UI and Item35 are healthy. Then run the following PowerShell
+block from the repository root. It starts all four `curl.exe` processes before
+waiting for any response, so the four report requests are published
+concurrently.
+
+```powershell
+$endpoint = "http://localhost:9080/api/clusters/item35-local/topics/rft.dev.observability.item.private.v1/messages"
+$itemDate = "20240315"
+$timestamp = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+
+$submissionVolumesPayload = @"
+{"partition":0,"key":"{\"itemId\":\"item35\"}","headers":{},"content":"{\"itemId\":\"item35\",\"itemType\":\"submissionVolumes\",\"command\":\"request\",\"itemDate\":\"$itemDate\",\"creationTimestamp\":$timestamp,\"fileInfo\":{\"fileName\":\"\",\"fileUrl\":\"\"}}","keySerde":"SchemaRegistry","valueSerde":"SchemaRegistry"}
+"@
+
+$reportGenerationPayload = @"
+{"partition":0,"key":"{\"itemId\":\"item35\"}","headers":{},"content":"{\"itemId\":\"item35\",\"itemType\":\"reportGeneration\",\"command\":\"request\",\"itemDate\":\"$itemDate\",\"creationTimestamp\":$timestamp,\"fileInfo\":{\"fileName\":\"\",\"fileUrl\":\"\"}}","keySerde":"SchemaRegistry","valueSerde":"SchemaRegistry"}
+"@
+
+$storageCapacityPayload = @"
+{"partition":0,"key":"{\"itemId\":\"item35\"}","headers":{},"content":"{\"itemId\":\"item35\",\"itemType\":\"storageCapacity\",\"command\":\"request\",\"itemDate\":\"$itemDate\",\"creationTimestamp\":$timestamp,\"fileInfo\":{\"fileName\":\"\",\"fileUrl\":\"\"}}","keySerde":"SchemaRegistry","valueSerde":"SchemaRegistry"}
+"@
+
+$computeCapacityPayload = @"
+{"partition":0,"key":"{\"itemId\":\"item35\"}","headers":{},"content":"{\"itemId\":\"item35\",\"itemType\":\"computeCapacity\",\"command\":\"request\",\"itemDate\":\"$itemDate\",\"creationTimestamp\":$timestamp,\"fileInfo\":{\"fileName\":\"\",\"fileUrl\":\"\"}}","keySerde":"SchemaRegistry","valueSerde":"SchemaRegistry"}
+"@
+
+$jobs = @(
+    Start-Job -Name "ITEM35A-submissionVolumes" -ScriptBlock {
+        param($url, $payload)
+        $payload | curl.exe --fail-with-body --silent --show-error `
+            --request POST `
+            --header "Content-Type: application/json" `
+            --data-binary "@-" `
+            --write-out "ITEM35A HTTP %{http_code}`n" `
+            $url
+    } -ArgumentList $endpoint, $submissionVolumesPayload
+
+    Start-Job -Name "ITEM35B-reportGeneration" -ScriptBlock {
+        param($url, $payload)
+        $payload | curl.exe --fail-with-body --silent --show-error `
+            --request POST `
+            --header "Content-Type: application/json" `
+            --data-binary "@-" `
+            --write-out "ITEM35B HTTP %{http_code}`n" `
+            $url
+    } -ArgumentList $endpoint, $reportGenerationPayload
+
+    Start-Job -Name "ITEM35C-storageCapacity" -ScriptBlock {
+        param($url, $payload)
+        $payload | curl.exe --fail-with-body --silent --show-error `
+            --request POST `
+            --header "Content-Type: application/json" `
+            --data-binary "@-" `
+            --write-out "ITEM35C HTTP %{http_code}`n" `
+            $url
+    } -ArgumentList $endpoint, $storageCapacityPayload
+
+    Start-Job -Name "ITEM35D-computeCapacity" -ScriptBlock {
+        param($url, $payload)
+        $payload | curl.exe --fail-with-body --silent --show-error `
+            --request POST `
+            --header "Content-Type: application/json" `
+            --data-binary "@-" `
+            --write-out "ITEM35D HTTP %{http_code}`n" `
+            $url
+    } -ArgumentList $endpoint, $computeCapacityPayload
+)
+
+$jobs | Wait-Job | Receive-Job
+$jobs | Remove-Job
+```
+
+The four expected HTTP responses are `200`. Kafka preserves message order in
+the topic's single partition, while Item35 delegates each consumed request to
+its asynchronous task executor. Generated files appear under
+`source/src/main/resources/reports`.
+
 Stop the stack while retaining Kafka data:
 
 ```powershell
