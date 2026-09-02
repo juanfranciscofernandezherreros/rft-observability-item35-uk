@@ -8,9 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/juanfranciscofernandezherreros/gitops-config.git
-    targetRevision: HEAD
-    path: manifests/rft-observability-item35-creator
+    repoURL: https://gitlab.six-group.net/six/rftemir/rft/components/backend/rft-observability/rft-observability-item35-creator.git
+    targetRevision: main
+    path: k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: rft-observability-item35
