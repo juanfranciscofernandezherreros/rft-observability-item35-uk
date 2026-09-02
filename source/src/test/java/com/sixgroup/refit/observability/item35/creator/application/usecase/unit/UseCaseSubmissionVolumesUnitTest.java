@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -53,8 +54,8 @@ class UseCaseSubmissionVolumesUnitTest {
         recordStatusList.add(new RecordStatus("2024-01-01", "test", "web", 10));
         File mockedFile = new File(fileName);
 
-        when(recordStatusService.findRecordStatus(any(), any())).thenReturn(recordStatusList);
-        when(writeFileSubmissionVolumesService.writeFile(anyList(), any(), any())).thenReturn(mockedFile);
+        when(recordStatusService.iterateRecordStatus(any(), any())).thenReturn(recordStatusList.iterator());
+        when(writeFileSubmissionVolumesService.writeFileStreaming(any(), any(), any())).thenReturn(mockedFile);
         when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         File resultFile = useCaseSubmissionVolumes.execute(ItemCommandMock.builderItemCommand(), mockHeaders);
@@ -67,7 +68,7 @@ class UseCaseSubmissionVolumesUnitTest {
     void testManageFileSubmissionVolumes_NoRecordStatusFound() {
         final String fileName = "test_file.csv";
 
-        when(recordStatusService.findRecordStatus(any(), any())).thenReturn(new ArrayList<>());
+        when(recordStatusService.iterateRecordStatus(any(), any())).thenReturn(Collections.emptyIterator());
         when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         File resultFile = useCaseSubmissionVolumes.execute(ItemCommandMock.builderItemCommand(), mockHeaders);
@@ -84,8 +85,8 @@ class UseCaseSubmissionVolumesUnitTest {
         List<RecordStatus> recordStatusList = new ArrayList<>();
         recordStatusList.add(new RecordStatus("test", "test", "test", 10));
 
-        when(recordStatusService.findRecordStatus(any(), any())).thenReturn(recordStatusList);
-        when(writeFileSubmissionVolumesService.writeFile(any(), any(), any())).thenThrow(IOException.class);
+        when(recordStatusService.iterateRecordStatus(any(), any())).thenReturn(recordStatusList.iterator());
+        when(writeFileSubmissionVolumesService.writeFileStreaming(any(), any(), any())).thenThrow(IOException.class);
         when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         File resultFile = useCaseSubmissionVolumes.execute(ItemCommandMock.builderItemCommand(), mockHeaders);

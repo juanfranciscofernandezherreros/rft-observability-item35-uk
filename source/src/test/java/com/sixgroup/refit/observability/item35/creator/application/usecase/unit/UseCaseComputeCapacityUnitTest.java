@@ -57,14 +57,14 @@ class UseCaseComputeCapacityUnitTest {
         when(capacityCpuService.findByCapacityCpu(anyString(), anyString())).thenReturn(capacitiesCpu);
         when(capacityRamService.findByCapacityRam(anyString(), anyString())).thenReturn(capacitiesRam);
         File mockFile = mock(File.class);
-        when(writeFileComputeCapacity.writeFile(anyList(), any(ItemCommandDTO.class), any())).thenReturn(mockFile);
+        when(writeFileComputeCapacity.writeFileStreaming(any(), any(ItemCommandDTO.class), any())).thenReturn(mockFile);
         when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         useCaseComputeCapacity.execute(itemCommandDTO, mockHeaders);
 
         verify(capacityCpuService, times(1)).findByCapacityCpu(anyString(), anyString());
         verify(capacityRamService, times(1)).findByCapacityRam(anyString(), anyString());
-        verify(writeFileComputeCapacity, times(1)).writeFile(anyList(), any(ItemCommandDTO.class), any());
+        verify(writeFileComputeCapacity, times(1)).writeFileStreaming(any(), any(ItemCommandDTO.class), any());
         verify(producerItemService, times(1)).send(any(ItemCommandDTO.class), any());
         verify(stateService, times(4)).nextStep(any(StateRequest.class));
     }
@@ -83,7 +83,7 @@ class UseCaseComputeCapacityUnitTest {
 
         verify(capacityCpuService, times(1)).findByCapacityCpu(anyString(), anyString());
         verify(capacityRamService, times(1)).findByCapacityRam(anyString(), anyString());
-        verify(writeFileComputeCapacity, times(0)).writeFile(anyList(), any(ItemCommandDTO.class), any());
+        verify(writeFileComputeCapacity, times(0)).writeFileStreaming(any(), any(ItemCommandDTO.class), any());
         verify(producerItemService, times(0)).send(any(ItemCommandDTO.class), any());
         verify(stateService, times(1)).setError(any(StateRequest.class));
     }

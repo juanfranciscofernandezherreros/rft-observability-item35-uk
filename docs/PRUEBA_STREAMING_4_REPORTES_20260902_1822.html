@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prueba streaming de los cuatro reportes Item35</title>
+  <style>
+    :root { --ink:#17202a; --muted:#5b6573; --line:#d8dde5; --paper:#fff; --bg:#f3f5f7; --green:#177245; --red:#a33a32; --blue:#245ea8; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 Arial, sans-serif; letter-spacing:0; }
+    main { max-width:1100px; margin:0 auto; padding:36px 24px 64px; background:var(--paper); }
+    h1 { margin:0 0 4px; font-size:30px; }
+    h2 { margin-top:32px; padding-bottom:7px; border-bottom:2px solid var(--ink); font-size:21px; }
+    h3 { margin-top:24px; font-size:17px; }
+    .muted { color:var(--muted); }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:22px 0; }
+    .metric { border:1px solid var(--line); border-top:4px solid var(--blue); padding:14px; }
+    .metric strong { display:block; font-size:23px; }
+    .metric span { color:var(--muted); }
+    table { width:100%; border-collapse:collapse; margin:14px 0; }
+    th,td { border:1px solid var(--line); padding:9px 10px; text-align:left; vertical-align:top; }
+    th { background:#eef1f4; }
+    code { background:#eef1f4; padding:2px 5px; }
+    .ok,.warn,.bad { padding:12px 14px; margin:14px 0; border-left:5px solid; }
+    .ok { background:#edf8f2; border-color:var(--green); }
+    .warn { background:#fff7e6; border-color:#b7791f; }
+    .bad { background:#fff0ef; border-color:var(--red); }
+    @media (max-width:760px) { .metrics { grid-template-columns:1fr 1fr; } main { padding:24px 14px; } table { font-size:13px; } }
+  </style>
+</head>
+<body><main>
+  <h1>Prueba streaming de Item35</h1>
+  <p class="muted">Cuatro reportes simultáneos | 2 de septiembre de 2026 | Ejecución válida: 18:22:50-18:23:22 CEST</p>
+
+  <div class="metrics">
+    <div class="metric"><strong>2,707 GiB</strong><span>pico real del cgroup</span></div>
+    <div class="metric"><strong>31,8 s</strong><span>medición hasta estabilidad</span></div>
+    <div class="metric"><strong>1.200.094</strong><span>filas CSV totales</span></div>
+    <div class="metric"><strong>0</strong><span>reinicios y OOM</span></div>
+  </div>
+
+  <h2>Objetivo y entorno</h2>
+  <p>Se comprobó el cambio que evita construir las listas finales completas y escribe los CSV registro a registro. ITEM35A e ITEM35B se alimentaron con 600.000 filas cada uno en H2; ITEM35C e ITEM35D utilizaron los JSON mock de Cloudera incluidos en el perfil local.</p>
+  <table>
+    <tr><th>Elemento</th><th>Valor</th></tr>
+    <tr><td>Topic</td><td><code>rft.dev.observability.item.private.v1</code>, recreado antes de la prueba</td></tr>
+    <tr><td>Fecha del mensaje</td><td><code>20240315</code></td></tr>
+    <tr><td>Carga H2</td><td>600.000 filas en <code>record_status</code> y 600.000 en <code>reports_file_outgoing</code></td></tr>
+    <tr><td>Tiempo de carga H2</td><td>4,360 s; conteos verificados antes del envío</td></tr>
+    <tr><td>Concurrencia</td><td>Los cuatro POST a Kafka UI se iniciaron como jobs antes de esperar respuestas</td></tr>
+    <tr><td>Muestreo</td><td><code>docker stats --no-stream</code> cada 500 ms más <code>memory.peak</code> del cgroup</td></tr>
+  </table>
+
+  <h2>Resultado final</h2>
+  <table>
+    <thead><tr><th>Item</th><th>HTTP Kafka UI</th><th>Tiempo HTTP</th><th>Tiempo aproximado de generación</th><th>Filas de datos</th><th>Bytes</th></tr></thead>
+    <tbody>
+      <tr><td>ITEM35A</td><td>200</td><td>155 ms</td><td>24,410 s</td><td>600.000</td><td>36.600.106</td></tr>
+      <tr><td>ITEM35B</td><td>200</td><td>155 ms</td><td>23,176 s</td><td>600.000</td><td>75.000.173</td></tr>
+      <tr><td>ITEM35C</td><td>200</td><td>242 ms</td><td>0,536 s hasta fichero</td><td>32</td><td>3.384</td></tr>
+      <tr><td>ITEM35D</td><td>200</td><td>203 ms</td><td>0,356 s hasta fichero</td><td>62</td><td>6.026</td></tr>
+    </tbody>
+  </table>
+  <p>El último CSV terminó aproximadamente 25,4 segundos después del inicio de la medición. Los 31,8 segundos incluyen cinco comprobaciones consecutivas de estabilidad del tamaño de los cuatro ficheros.</p>
+  <div class="ok"><strong>Prueba completada:</strong> cuatro ficheros válidos, cuatro respuestas HTTP 200, contenedor en ejecución, <code>RestartCount=0</code> y <code>OOMKilled=false</code>.</div>
+
+  <h2>Memoria y CPU</h2>
+  <table>
+    <thead><tr><th>Medida</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>Memoria justo antes del envío</td><td>1.818.828.800 bytes = 1.734,6 MiB = 1,694 GiB</td></tr>
+      <tr><td>Pico observado por muestreo</td><td>2.899.102.925 bytes = 2.764,8 MiB = 2,700 GiB</td></tr>
+      <tr><td>Pico exacto del cgroup</td><td>2.906.542.080 bytes = 2.771,9 MiB = 2,707 GiB</td></tr>
+      <tr><td>Memoria veinte segundos después</td><td>Aproximadamente 2,700 GiB</td></tr>
+      <tr><td>Heap usado después</td><td>904,8 MiB</td></tr>
+      <tr><td>Heap comprometido después</td><td>2.148 MiB</td></tr>
+      <tr><td>Non-heap usado después</td><td>142 MiB</td></tr>
+      <tr><td>Pico de CPU observado</td><td>631,60%</td></tr>
+    </tbody>
+  </table>
+  <p>La diferencia entre memoria Docker y heap usado incluye heap comprometido, memoria nativa de JVM, pilas, buffers y caché de páginas. Para limitar Kubernetes debe utilizarse el pico del contenedor, no solo el heap usado.</p>
+
+  <h2>Comparación con la prueba anterior</h2>
+  <table>
+    <thead><tr><th>Métrica</th><th>Anterior, listas completas</th><th>Actual, streaming</th><th>Diferencia</th></tr></thead>
+    <tbody>
+      <tr><td>Pico del contenedor</td><td>3,165 GiB</td><td>2,707 GiB</td><td>-0,458 GiB, aproximadamente -469 MiB o -14,5%</td></tr>
+      <tr><td>Línea base tras cargar H2</td><td>2,266 GiB</td><td>1,694 GiB</td><td>-0,572 GiB</td></tr>
+      <tr><td>Aumento desde línea base</td><td>920,6 MiB</td><td>1.037,3 MiB</td><td>+116,7 MiB</td></tr>
+      <tr><td>Fin detectado</td><td>16,8 s, A/B de carga alta</td><td>25,4 s reales; 31,8 s con estabilización, A/B/C/D</td><td>Más lento en esta ejecución</td></tr>
+      <tr><td>ITEM35A</td><td>6,65 s</td><td>24,41 s</td><td>+267%</td></tr>
+      <tr><td>ITEM35B</td><td>12,98 s</td><td>23,18 s</td><td>+78,6%</td></tr>
+    </tbody>
+  </table>
+  <div class="warn"><strong>Interpretación:</strong> el pico absoluto bajó un 14,5%, pero la JVM comenzó esta prueba con 0,572 GiB menos. El aumento durante la generación no bajó. Por tanto, esta ejecución demuestra un pico total menor y memoria acotada por lotes, pero no demuestra por sí sola que toda la reducción proceda del streaming. Se necesitan varias repeticiones con el mismo estado inicial de JVM para obtener una comparación estadística.</div>
+
+  <h2>Incidencia encontrada y corrección</h2>
+  <p>La primera repetición usó páginas de 1.000 filas. ITEM35B terminó, pero ITEM35A seguía escribiendo después del timeout: llevaba 29.089.792 bytes y el fichero permanecía abierto. El monitor terminó a los 3.012,2 segundos, con un pico de cgroup de 3.269.984.256 bytes y sin OOM.</p>
+  <p>La causa fue la paginación por offset sobre consultas agrupadas: ITEM35A recalculaba la agrupación hasta 600 veces. Se mantuvo el streaming y se aumentó el lote a 50.000, reduciendo el número máximo de consultas a 12 por conjunto de 600.000 filas. Tras recompilar, ejecutar los 106 tests, reconstruir el contenedor, limpiar los CSV y recargar H2, la repetición válida terminó en 31,8 segundos.</p>
+  <div class="bad"><strong>No usar páginas de 1.000 para esta consulta agrupada.</strong> La escritura fila a fila evita la lista final, pero el tamaño de página debe equilibrar memoria y coste de reevaluar la consulta.</div>
+
+  <h2>Conclusión para Kubernetes</h2>
+  <p>El flujo completó esta carga con un pico real de 2,707 GiB. Un límite de 3 GiB dejaría solo unos 300 MiB de margen y resulta ajustado para variaciones, GC y concurrencia externa. Para este escenario local, un límite inicial de 4 GiB ofrece margen razonable; debe validarse con varias repeticiones y con los volúmenes reales de C/D antes de convertirlo en valor de producción.</p>
+  <p>El cambio mejora la arquitectura de memoria porque elimina las colecciones finales completas y mantiene páginas acotadas. La prueba también muestra que streaming no implica automáticamente menor tiempo: las consultas paginadas agregadas añaden trabajo y deben optimizarse o migrarse a paginación por clave/cursores en la fuente real.</p>
+</main></body>
+</html>

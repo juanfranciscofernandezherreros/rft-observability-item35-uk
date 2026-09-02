@@ -16,16 +16,46 @@ Then build the runtime image and start the complete stack:
 docker compose up -d --build
 ```
 
-This starts the item35 service, Kafka, ZooKeeper, Schema Registry and Kafka UI.
-It also creates `rft.dev.observability.item.private.v1` and registers its Avro
-key and value schemas.
+This starts the item35 service, Kafka, ZooKeeper, Schema Registry, Kafka UI,
+Prometheus, Loki, Promtail and Grafana. It also creates
+`rft.dev.observability.item.private.v1` and registers its Avro key and value
+schemas.
 
 - Kafka UI: http://localhost:9080
 - Item35 API: http://localhost:8042
 - Item35 health: http://localhost:9040/actuator/health
+- Item35 Prometheus metrics: http://localhost:9040/actuator/prometheus
 - Schema Registry: http://localhost:8081
 - Kafka from the host: `localhost:9092`
+- Prometheus: http://localhost:9090
+- Loki readiness: http://localhost:3100/ready
+- Grafana: http://localhost:3000 (`admin` / `admin`)
 - Generated CSV files: `source/src/main/resources/reports`
+
+## Local observability
+
+Grafana provisions the Prometheus and Loki datasources automatically. Open the
+`Item35 / Item35 local observability` dashboard, or use its direct URL:
+
+http://localhost:3000/d/item35-local-observability/item35-local-observability
+
+The dashboard includes JVM memory, process and system CPU, HTTP request rate,
+and the Docker logs emitted by Item35. Prometheus scrapes Item35 every five
+seconds. Promtail discovers the containers in this Compose project through the
+Docker socket and sends their logs to Loki.
+
+Useful queries:
+
+```promql
+up{job="item35"}
+```
+
+```logql
+{compose_service="item35"}
+```
+
+Prometheus, Loki and Grafana data is retained in named volumes. Running
+`docker compose down --volumes` removes that local observability history.
 
 ## Launch all four reports concurrently
 

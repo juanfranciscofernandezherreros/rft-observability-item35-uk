@@ -15,6 +15,7 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.mappper.Re
 import com.sixgroup.refit.observability.item35.creator.infrastructure.repository.kudu.account.ReguIdentityAdapterRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.sla.SlaInfoRepository;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.LazyIterators;
 import com.sixgroup.refit.observability.modules.validate.domain.data.SlaInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,83 +45,48 @@ public class RegulatorService {
     @Value("${component-config.kududb-account.blockSize}")
     private int blockSize;
 
-    public List<ReportGenerationDto> findRegulator(final String initDate, final String endDate, final String itemDate) {
-        log.debug("[START] Entering findRegulator method. Parameters: initDate={}, endDate={}, itemDate={}", initDate, endDate, itemDate);
-
-        // 1. Fetching Regulation records
-        log.debug("[QUERY] Fetching regulators from Kudu via findRegulatorByDayAccountAndFileType...");
-        final List<RegulatorDTO> regulations = reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(initDate, endDate);
-        log.debug("[QUERY RESULT] {} regulation records retrieved for period {} to {}", regulations.size(), initDate, endDate);
-
-        // 2. Extracting traces for identity lookup
-        final List<String> accountTraces = regulations.stream().map(RegulatorDTO::getAccountTrace).distinct().toList();
-        log.debug("[DATA PREPARATION] Extracted {} unique account traces from regulations", accountTraces.size());
-
-        // 3. Batch fetch identities
-        final List<ReguIdentityDTO> reguIdentities = fetchAllReguIdentityEntities(accountTraces);
-        log.debug("[DATA PREPARATION] Total ReguIdentity entities resolved: {}", reguIdentities.size());
-
-        // 4. Initial validation
-        if (regulations.isEmpty() || reguIdentities.isEmpty()) {
-            log.debug("[STOP] Terminating process: Regulations List Empty: {}, ReguIdentities List Empty: {}",
-                regulations.isEmpty(), reguIdentities.isEmpty());
-            return new ArrayList<>();
-        }
-
-        // 5. Building the cross-reference map
-        log.debug("[PROCESS] Building trace-to-identity mapping including translation accounts...");
-        final Map<String, ReguIdentityDTO> traceCodeRegulatorMap = buildRegulatorMap(reguIdentities);
-        log.debug("[PROCESS] Map construction complete. Final map size: {}", traceCodeRegulatorMap.size());
-
-        printTraceCodeRegulatorId(reguIdentities);
-
-        // 6. Fetching EOD State
-        log.debug("[QUERY] Fetching Report EOD status from SQL Server for range {} to {}...", initDate, endDate);
+    public Iterator<ReportGenerationDto> iterateRegulator(final String initDate, final String endDate,
+                                                           final String itemDate) {
+        Iterator<RegulatorDTO> regulations = reportingFileAdapterRepository
+            .iterateRegulatorByDayAccountAndFileType(initDate, endDate);
+        Map<String, ReguIdentityDTO> traceCodeRegulatorMap = buildRegulatorMap(Collections.emptyList());
         final List<ReportEoDDTO> reportsEoD = reportEodProcessStateRepository.find(initDate, endDate);
-        log.debug("[QUERY RESULT] Found {} ReportEoD entries in the state repository", reportsEoD.size());
 
-        final List<ReportGenerationDto> regulatorReportGenerationData = new ArrayList<>();
-        AtomicInteger counter = new AtomicInteger(1);
-        int totalToProcess = regulations.size();
+        return LazyIterators.filterMap(regulations, regulator -> {
+            if (!traceCodeRegulatorMap.containsKey(regulator.getAccountTrace())) {
+                List<ReguIdentityDTO> identities = fetchAllReguIdentityEntities(List.of(regulator.getAccountTrace()));
+                identities.forEach(identity -> traceCodeRegulatorMap.putIfAbsent(identity.getTraceCode(), identity));
+            }
+            if (!traceCodeRegulatorMap.containsKey(regulator.getAccountTrace())) {
+                return Optional.empty();
+            }
 
-        // 7. Processing each regulation
-        regulations.forEach(regulator -> {
-            int idx = counter.getAndIncrement();
-            log.debug("[ITERATION {}/{}] Processing Regulator: FileType={}, Session={}, Trace={}",
-                idx, totalToProcess, regulator.getFileType(), regulator.getReportingSession(), regulator.getAccountTrace());
-
-            Optional<SlaInfo> slaInfo;
-            log.debug("[SLA LOOKUP] Attempting to match ReportEoD for FileType: '{}'", regulator.getFileType());
             final Optional<ReportEoDDTO> reportEoDFound = findReportEod(reportsEoD, fileTypeProperties.getReports(), regulator.getFileType(), regulator.getReportingSession());
-
+            Optional<SlaInfo> slaInfo;
             if (reportEoDFound.isPresent()) {
-                log.debug("[SLA CONTEXT] Match found in EOD Table. Using StartedDate: {} and CreationDate: {}",
-                    reportEoDFound.get().getStartedDate(), regulator.getCreationDate());
                 slaInfo = slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), reportEoDFound.get().getStartedDate(), regulator.getCreationDate());
             } else {
-                log.debug("[SLA CONTEXT] No EOD match. Falling back to default SLA lookup with CreationDate: {}", regulator.getCreationDate());
                 slaInfo = slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
             }
 
             if (slaInfo.isEmpty()) {
                 log.error("[CRITICAL ERROR] SlaInfo NOT found. Details: Entity={}, FileType={}, Session={}, Date={}",
                     REGULATOR_ENTITY, regulator.getFileType(), regulator.getReportingSession(), regulator.getCreationDate());
-            } else {
-                log.debug("[SUCCESS] SLA details found: {}. Proceeding with mapping...", slaInfo.get());
-
-                final ReportGenerationDto reportGenerationDto = regulatorMapper.toReportGenerationDto(regulator, fileTypeProperties, slaInfo.get(), traceCodeRegulatorMap);
-
-                String formattedDate = DateUtils.itemDateFormatted(itemDate);
-                reportGenerationDto.setReportingDate(formattedDate);
-                log.debug("[MAPPING] Created DTO for {}. ReportingDate set to {}", regulator.getFileType(), formattedDate);
-
-                regulatorReportGenerationData.add(reportGenerationDto);
+                return Optional.empty();
             }
-        });
 
-        log.debug("[FINISH] Regulator process ended. Successfully generated {}/{} report DTOs",
-            regulatorReportGenerationData.size(), totalToProcess);
-        return regulatorReportGenerationData;
+            ReportGenerationDto result = regulatorMapper.toReportGenerationDto(
+                regulator, fileTypeProperties, slaInfo.get(), traceCodeRegulatorMap);
+            result.setReportingDate(DateUtils.itemDateFormatted(itemDate));
+            return Optional.of(result);
+        });
+    }
+
+    public List<ReportGenerationDto> findRegulator(final String initDate, final String endDate,
+                                                    final String itemDate) {
+        List<ReportGenerationDto> results = new ArrayList<>();
+        iterateRegulator(initDate, endDate, itemDate).forEachRemaining(results::add);
+        return results;
     }
 
     protected Optional<ReportEoDDTO> findReportEod(final List<ReportEoDDTO> reportsEoD,

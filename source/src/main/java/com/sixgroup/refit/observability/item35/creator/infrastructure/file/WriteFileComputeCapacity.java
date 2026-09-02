@@ -19,7 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Iterator;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.DATABASE_SERVER_OR_PLATFORM;
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.DATA_CENTER_LOCATION;
@@ -35,7 +35,7 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
     private final ReportItemProperties reportItemProperties;
 
     @Override
-    public File writeFile(final List<Capacity> capacities,
+    public File writeFileStreaming(final Iterator<Capacity> capacities,
                           final ItemCommandDTO itemCommandDTO,
                           final String fileName) throws IOException {
 
@@ -57,7 +57,8 @@ public class WriteFileComputeCapacity implements WriteFileItem35Service<Capacity
 
             writeHeader(csvWriter);
 
-            for (Capacity capacityData : capacities) {
+            while (capacities.hasNext()) {
+                Capacity capacityData = capacities.next();
                 writeRecord(csvWriter, capacityData, itemCommandDTO.getItemDate());
             }
         }

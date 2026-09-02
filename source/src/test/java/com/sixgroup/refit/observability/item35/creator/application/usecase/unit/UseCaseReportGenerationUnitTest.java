@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,7 +49,7 @@ class UseCaseReportGenerationUnitTest {
     @InjectMocks
     private UseCaseReportGeneration useCaseReportGeneration;
     @Captor
-    ArgumentCaptor<List<ReportGenerationDto>> reportGenerationDtoListCaptor;
+    ArgumentCaptor<Iterator<ReportGenerationDto>> reportGenerationDtoListCaptor;
     @Mock
     private WriteFileItem35Service<ReportGenerationDto> writeFileReportGenerationService;
     @Mock
@@ -136,9 +138,9 @@ class UseCaseReportGenerationUnitTest {
     void execute_resource_not_found() {
         final String fileName = "test_file.csv";
 
-        when(participantService.findParticipants(any(), any(), any())).thenReturn(Collections.emptyList());
-        when(regulatorService.findRegulator(any(), any(), any())).thenReturn(Collections.emptyList());
-        when(trService.findTr(any(), any(), any())).thenReturn(Collections.emptyList());
+        when(participantService.iterateParticipants(any(), any(), any())).thenReturn(Collections.emptyIterator());
+        when(regulatorService.iterateRegulator(any(), any(), any())).thenReturn(Collections.emptyIterator());
+        when(trService.iterateTr(any(), any(), any())).thenReturn(Collections.emptyIterator());
         when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         final File response = useCaseReportGeneration.execute(getItemCommandDTO(), mockHeaders);
@@ -146,8 +148,8 @@ class UseCaseReportGenerationUnitTest {
         assertNull(response);
         verify(stateService, times(1)).setError(any());
         verify(producerItemService, times(0)).send(any(), any());
-        verify(regulatorService, times(1)).findRegulator(any(), any(), any());
-        verify(trService, times(1)).findTr(any(), any(), any());
+        verify(regulatorService, times(1)).iterateRegulator(any(), any(), any());
+        verify(trService, times(1)).iterateTr(any(), any(), any());
     }
 
     @Test
@@ -158,39 +160,40 @@ class UseCaseReportGenerationUnitTest {
             "TAR108", "participant", "1900-01-01T00:00:06Z",
             "2024-02-20T18:55:29Z", "2024-02-20T18:55:29Z", "2024-02-20",
             "2024-02-21T06:00:00Z", "11.0");
-        when(participantService.findParticipants(any(), any(), any())).thenReturn(List.of(reportGenerationParticipant));
+        when(participantService.iterateParticipants(any(), any(), any())).thenReturn(List.of(reportGenerationParticipant).iterator());
 
         final ReportGenerationDto reportGenerationRegulator = new ReportGenerationDto("2024-02-29",
             "TSR107", "ESMA", "1900-01-01T18:55:29Z",
             "2024-02-20T18:55:29Z", "2024-02-20T18:55:29Z", "2024-02-20",
             "2024-02-21T12:00:00Z", "17.0");
 
-        when(regulatorService.findRegulator(any(), any(), any())).thenReturn(List.of(reportGenerationRegulator));
+        when(regulatorService.iterateRegulator(any(), any(), any())).thenReturn(List.of(reportGenerationRegulator).iterator());
 
         ReportGenerationDto reportGenerationTr = new ReportGenerationDto("2024-02-29",
             "RL078", "TR", "1900-01-01T14:08:12Z",
             "2024-02-22T14:08:12Z", "2024-02-22T14:08:12Z", "2024-02-22",
             "2024-02-23T12:00:00Z", "21.8");
 
-        when(trService.findTr(any(), any(), any())).thenReturn(List.of(reportGenerationTr));
+        when(trService.iterateTr(any(), any(), any())).thenReturn(List.of(reportGenerationTr).iterator());
 
         final File mockedFile = new File(fileName);
-        when(writeFileReportGenerationService.writeFile(anyList(), any(), any())).thenReturn(mockedFile);
+        when(writeFileReportGenerationService.writeFileStreaming(any(), any(), any())).thenReturn(mockedFile);
         when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         final ItemCommandDTO itemCommandDTO = getItemCommandDTO();
 
         final File resultFile = useCaseReportGeneration.execute(itemCommandDTO, mockHeaders);
         assertNotNull(resultFile);
-        verify(participantService, times(1)).findParticipants(any(), any(), any());
-        verify(regulatorService, times(1)).findRegulator(any(), any(), any());
-        verify(trService, times(1)).findTr(any(), any(), any());
+        verify(participantService, times(1)).iterateParticipants(any(), any(), any());
+        verify(regulatorService, times(1)).iterateRegulator(any(), any(), any());
+        verify(trService, times(1)).iterateTr(any(), any(), any());
         verify(stateService, times(4)).nextStep(any(StateRequest.class));
         verify(producerItemService, times(1)).send(any(), any());
 
-        verify(writeFileReportGenerationService).writeFile(reportGenerationDtoListCaptor.capture(),
+        verify(writeFileReportGenerationService).writeFileStreaming(reportGenerationDtoListCaptor.capture(),
             any(), any());
-        List<ReportGenerationDto> value = reportGenerationDtoListCaptor.getValue();
+        List<ReportGenerationDto> value = new ArrayList<>();
+        reportGenerationDtoListCaptor.getValue().forEachRemaining(value::add);
 
         assertEquals(value, List.of(reportGenerationParticipant, reportGenerationRegulator, reportGenerationTr));
     }
@@ -202,40 +205,41 @@ class UseCaseReportGenerationUnitTest {
             "TAR108", "participant", "1900-01-01T00:00:06Z",
             "2024-02-20T18:55:29Z", "2024-02-20T18:55:29Z", "20-02-2024",
             "2024-02-21T06:00:00Z", "11.0");
-        when(participantService.findParticipants(any(), any(), any())).thenReturn(List.of(reportGeneration_participant));
+        when(participantService.iterateParticipants(any(), any(), any())).thenReturn(List.of(reportGeneration_participant).iterator());
 
         ReportGenerationDto reportGeneration_regulator = new ReportGenerationDto("2024-02-29",
             "TSR107", "ESMA", "1900-01-01T18:55:29Z",
             "2024-02-20T18:55:29Z", "2024-02-20T18:55:29Z", "20-02-2024",
             "2024-02-21T12:00:00Z", "17.0");
 
-        when(regulatorService.findRegulator(any(), any(), any())).thenReturn(List.of(reportGeneration_regulator));
+        when(regulatorService.iterateRegulator(any(), any(), any())).thenReturn(List.of(reportGeneration_regulator).iterator());
 
         ReportGenerationDto reportGeneration_tr = new ReportGenerationDto("2024-02-29",
             "RL078", "TR", "1900-01-01T14:08:12Z",
             "2024-02-22T14:08:12Z", "2024-02-22T14:08:12Z", "22-02-2024",
             "2024-02-23T12:00:00Z", "21.8");
 
-        when(trService.findTr(any(), any(), any())).thenReturn(List.of(reportGeneration_tr));
+        when(trService.iterateTr(any(), any(), any())).thenReturn(List.of(reportGeneration_tr).iterator());
 
         File mockedFile = new File(fileName);
-        when(writeFileReportGenerationService.writeFile(anyList(), any(), any())).thenReturn(mockedFile);
+        when(writeFileReportGenerationService.writeFileStreaming(any(), any(), any())).thenReturn(mockedFile);
 
-        when(writeFileReportGenerationService.writeFile(anyList(), any(), any())).thenThrow(new IOException("Error"));
+        when(writeFileReportGenerationService.writeFileStreaming(any(), any(), any())).thenThrow(new IOException("Error"));
         when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
 
         final File response = useCaseReportGeneration.execute(getItemCommandDTO(), mockHeaders);
 
         assertNull(response);
 
-        verify(participantService, times(1)).findParticipants(any(), any(), any());
-        verify(regulatorService, times(1)).findRegulator(any(), any(), any());
-        verify(trService, times(1)).findTr(any(), any(), any());
+        verify(participantService, times(1)).iterateParticipants(any(), any(), any());
+        verify(regulatorService, times(1)).iterateRegulator(any(), any(), any());
+        verify(trService, times(1)).iterateTr(any(), any(), any());
         verify(stateService, times(2)).nextStep(any(StateRequest.class));
 
-        verify(writeFileReportGenerationService).writeFile(reportGenerationDtoListCaptor.capture(),
+        verify(writeFileReportGenerationService).writeFileStreaming(reportGenerationDtoListCaptor.capture(),
             any(), any());
-        List<ReportGenerationDto> value = reportGenerationDtoListCaptor.getValue();
+        List<ReportGenerationDto> value = new ArrayList<>();
+        reportGenerationDtoListCaptor.getValue().forEachRemaining(value::add);
 
         assertEquals(value, List.of(reportGeneration_participant, reportGeneration_regulator, reportGeneration_tr));
     }

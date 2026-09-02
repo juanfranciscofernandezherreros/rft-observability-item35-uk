@@ -20,7 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Iterator;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
     private final ReportItemProperties reportProperties;
 
     @Override
-    public File writeFile(final List<RecordStatus> recordStatus,
+    public File writeFileStreaming(final Iterator<RecordStatus> recordStatus,
                           final ItemCommandDTO itemCommandDTO,
                           final String fileName) throws IOException {
 
@@ -50,7 +50,8 @@ public class WriteFileSubmissionVolumes implements WriteFileItem35Service<Record
 
             writeHeader(csvWriter);
 
-            for (RecordStatus recordStatusData : recordStatus) {
+            while (recordStatus.hasNext()) {
+                RecordStatus recordStatusData = recordStatus.next();
                 writeRecord(csvWriter, recordStatusData, itemCommandDTO.getItemDate());
             }
         }

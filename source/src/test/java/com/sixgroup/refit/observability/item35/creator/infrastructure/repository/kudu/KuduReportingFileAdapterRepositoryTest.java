@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.SliceImpl;
 
 import java.util.List;
 
@@ -44,13 +45,14 @@ class KuduReportingFileAdapterRepositoryTest {
         reportConfig2.setName("TAR108");
         reportConfig2.setReportName("TAR108");
 
-        doReturn(List.of(new ParticipantDTO())).when(reportingFileKudu).findParticipantsByDayAccountAndFileType(any(), any(), anyList(), any());
+        doReturn(new SliceImpl<>(List.of(new ParticipantDTO()))).when(reportingFileKudu)
+            .findParticipantsByDayAccountAndFileType(any(), any(), anyList(), any(), any());
 
         when(participantProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
 
         kuduReportingFileAdapterRepository.findParticipantsByDayAccountAndFileType("2024-02-01", "2024-03-01");
 
-        verify(reportingFileKudu, times(1)).findParticipantsByDayAccountAndFileType(any(), any(), anyList(), any());
+        verify(reportingFileKudu, times(1)).findParticipantsByDayAccountAndFileType(any(), any(), anyList(), any(), any());
 
     }
 
@@ -63,14 +65,14 @@ class KuduReportingFileAdapterRepositoryTest {
         reportConfig2.setName("TAR108");
         reportConfig2.setReportName("TAR108");
 
-        doReturn(List.of(new RegulatorDTO())).when(reportingFileKudu)
-            .findRegulatorByDayAccountAndFileType(any(), any(), anyList(), any());
+        doReturn(new SliceImpl<>(List.of(new RegulatorDTO()))).when(reportingFileKudu)
+            .findRegulatorByDayAccountAndFileType(any(), any(), anyList(), any(), any());
 
         when(regulatorProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
 
         kuduReportingFileAdapterRepository.findRegulatorByDayAccountAndFileType("2024-02-01", "2024-03-01");
 
-        verify(reportingFileKudu, times(1)).findRegulatorByDayAccountAndFileType(any(), any(), anyList(), any());
+        verify(reportingFileKudu, times(1)).findRegulatorByDayAccountAndFileType(any(), any(), anyList(), any(), any());
     }
 
     @Test
@@ -82,14 +84,14 @@ class KuduReportingFileAdapterRepositoryTest {
         reportConfig2.setName("RL078");
         reportConfig2.setReportName("RL078");
 
-        doReturn(List.of(new TrDTO())).when(reportingFileKudu)
-            .findTrByDayAccountAndFileType(any(), any(), any(), any());
+        doReturn(new SliceImpl<>(List.of(new TrDTO()))).when(reportingFileKudu)
+            .findTrByDayAccountAndFileType(any(), any(), any(), any(), any());
 
         when(trProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
 
         kuduReportingFileAdapterRepository.findTrByDayAccountAndFileType("2024-02-01", "2024-03-01");
 
-        verify(reportingFileKudu, times(1)).findTrByDayAccountAndFileType(any(), any(), any(), any());
+        verify(reportingFileKudu, times(1)).findTrByDayAccountAndFileType(any(), any(), any(), any(), any());
     }
 
 }

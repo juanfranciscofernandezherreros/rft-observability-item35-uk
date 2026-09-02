@@ -5,6 +5,8 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kud
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RecordStatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
@@ -20,5 +22,5 @@ public interface RecordStatusKudu extends JpaRepository<RecordStatusEntity, Long
         "AND rs.reportingDate >= ?1 AND rs.reportingDate < ?2 " +
         "GROUP BY rs.reportingDate, rs.messageType, rs.submissionChannel " +
         "ORDER BY rs.reportingDate")
-    List<RecordStatusDTO> findByRecordStatus(String fromDate, String toDate);
+    Slice<RecordStatusDTO> findByRecordStatus(String fromDate, String toDate, Pageable pageable);
 }

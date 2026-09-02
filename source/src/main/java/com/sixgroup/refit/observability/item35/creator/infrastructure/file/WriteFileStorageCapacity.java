@@ -19,7 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Iterator;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.*;
 
@@ -32,7 +32,7 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
     private final ReportItemProperties reportItemProperties;
 
     @Override
-    public File writeFile(final List<StorageCapacityDto> storageCapacityDtoList,
+    public File writeFileStreaming(final Iterator<StorageCapacityDto> storageCapacityDtoList,
                           final ItemCommandDTO itemCommandDTO,
                           final String fileName) throws IOException {
 
@@ -49,7 +49,8 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
              CSVWriter csvWriter = CSVCreator.create(writer)) {
             writeHeader(csvWriter);
 
-            for (StorageCapacityDto storageCapacityData : storageCapacityDtoList) {
+            while (storageCapacityDtoList.hasNext()) {
+                StorageCapacityDto storageCapacityData = storageCapacityDtoList.next();
                 writeRecord(csvWriter, storageCapacityData);
             }
         }
@@ -67,6 +68,7 @@ public class WriteFileStorageCapacity implements WriteFileItem35Service<StorageC
         String[] data = {
             reportItemProperties.getTrCode(),
             storageCapacityData.getReportingDate(),
+            //REFIT-7169: UK ITEM35C must write EMIR in the Regulation field instead of FCA.
             reportItemProperties.getRegulationReference(),
             DATA_CENTER_LOCATION,
             DATABASE_SERVER_OR_PLATFORM,

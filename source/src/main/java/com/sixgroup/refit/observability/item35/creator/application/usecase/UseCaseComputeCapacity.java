@@ -14,6 +14,7 @@ import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerIt
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.LazyIterators;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,8 +22,8 @@ import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
@@ -71,12 +72,10 @@ public class UseCaseComputeCapacity implements ItemTypeStrategy {
             iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SAVING_INFORMATION);
 
             //Saved information
-            final List<Capacity> recordsCapacity = new ArrayList<>();
-            recordsCapacity.addAll(capacityCpu);
-            recordsCapacity.addAll(capacityRam);
-            recordsCapacity.sort(Comparator.comparing(Capacity::getDate));
+            final Iterator<Capacity> recordsCapacity = LazyIterators.mergeSorted(
+                Comparator.comparing(Capacity::getDate), capacityCpu.iterator(), capacityRam.iterator());
 
-            file = writeFileComputeCapacity.writeFile(recordsCapacity, itemCommand, fileName);
+            file = writeFileComputeCapacity.writeFileStreaming(recordsCapacity, itemCommand, fileName);
             stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).fileUrl(file.getPath()).build());
             iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SAVED_INFORMATION);
 

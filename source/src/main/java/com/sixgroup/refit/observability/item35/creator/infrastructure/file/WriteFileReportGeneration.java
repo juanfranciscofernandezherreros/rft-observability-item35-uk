@@ -17,7 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Iterator;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.TR_INCIDENT_ID;
 
@@ -30,7 +30,7 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
     private final ReportItemProperties reportProperties;
 
     @Override
-    public File writeFile(final List<ReportGenerationDto> reportGenerationList,
+    public File writeFileStreaming(final Iterator<ReportGenerationDto> reportGenerationList,
                           final ItemCommandDTO itemCommandDTO,
                           final String fileName) throws IOException {
 
@@ -49,7 +49,8 @@ public class WriteFileReportGeneration implements WriteFileItem35Service<ReportG
 
             writeHeader(csvWriter);
 
-            for (ReportGenerationDto reportGenerationData : reportGenerationList) {
+            while (reportGenerationList.hasNext()) {
+                ReportGenerationDto reportGenerationData = reportGenerationList.next();
                 writeRecord(csvWriter, reportGenerationData);
             }
         }

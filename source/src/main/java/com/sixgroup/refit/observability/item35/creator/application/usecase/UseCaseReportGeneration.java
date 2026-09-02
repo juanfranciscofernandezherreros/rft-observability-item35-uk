@@ -17,8 +17,8 @@ import com.sixgroup.refit.observability.item35.creator.domain.model.ReportGenera
 import com.sixgroup.refit.observability.item35.creator.domain.service.ProducerItemService;
 import com.sixgroup.refit.observability.item35.creator.domain.service.WriteFileItem35Service;
 import com.sixgroup.refit.observability.item35.creator.domain.strategy.ItemTypeStrategy;
-import com.sixgroup.refit.observability.item35.creator.shared.utils.CollectionsUtils;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.DateUtils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.LazyIterators;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -26,8 +26,8 @@ import org.apache.kafka.common.header.Headers;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
 import static com.sixgroup.refit.observability.item35.creator.domain.enums.ItemType.REPORT_GENERATION;
@@ -77,19 +77,13 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
             log.debug("dateTo: {}", dateTo);
 
             log.info("Calculating records for date range: [{} to {} and {} ]", dateFrom, dateTo , itemCommand.getItemDate());
-            final List<ReportGenerationDto> participants = participantService.findParticipants(dateFrom, dateTo, itemCommand.getItemDate());
-            log.debug("Participants found: {}", participants.size());
+            final Iterator<ReportGenerationDto> records = LazyIterators.mergeSorted(
+                Comparator.comparing(ReportGenerationDto::getDate),
+                participantService.iterateParticipants(dateFrom, dateTo, itemCommand.getItemDate()),
+                regulatorService.iterateRegulator(dateFrom, dateTo, itemCommand.getItemDate()),
+                trService.iterateTr(dateFrom, dateTo, itemCommand.getItemDate()));
 
-            final List<ReportGenerationDto> regulators = regulatorService.findRegulator(dateFrom, dateTo, itemCommand.getItemDate());
-            log.debug("Regulators found: {}", regulators.size());
-
-            final List<ReportGenerationDto> trs = trService.findTr(dateFrom, dateTo, itemCommand.getItemDate());
-            log.debug("TRs found: {}", trs.size());
-
-            final List<ReportGenerationDto> joinedCollection = Stream.concat(Stream.concat(participants.stream(), regulators.stream()), trs.stream()).toList();
-            log.info("Total records after joining collections: {}", joinedCollection.size());
-
-            if (CollectionUtils.isEmpty(joinedCollection)) {
+            if (!records.hasNext()) {
                 log.error("No data found in report generation. Skipping report generation.");
                 iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
                 stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("No record status found, skipping file generation").build());
@@ -101,13 +95,8 @@ public class UseCaseReportGeneration implements ItemTypeStrategy {
             stateService.nextStep(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).build());
             iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SAVING_INFORMATION);
 
-            log.debug("Ordering records by date...");
-            final List<ReportGenerationDto> orderedCollection = CollectionsUtils.getOrderCollectionsByDate(joinedCollection);
-            log.debug("Ordered collection size: {}", orderedCollection.size());
-
-            // Write file
             log.debug("Writing report file...");
-            file = writeFileReportGenerationService.writeFile(orderedCollection, itemCommand, fileName);
+            file = writeFileReportGenerationService.writeFileStreaming(records, itemCommand, fileName);
 
             log.debug("File successfully written.");
             log.debug("File path: {}", file.getPath());

@@ -8,6 +8,8 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kud
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO;
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.TrDTO;
 import com.sixgroup.refit.observability.item35.creator.shared.utils.ReportUtils;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.LazyIterators;
+import com.sixgroup.refit.observability.item35.creator.shared.utils.PagedIterator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,13 +27,15 @@ import java.util.Optional;
 @Slf4j
 public class KuduReportingFileAdapterRepository implements ReportingFileAdapterRepository {
 
+    private static final int STREAM_PAGE_SIZE = 50_000;
+
     private final ReportingFileKudu reportingFileKudu;
     private final ParticipantProperties participantProperties;
     private final RegulatorProperties regulatorProperties;
     private final TrProperties trProperties;
     private final ReportItemProperties reportProperties;
 
-    public List<ParticipantDTO> findParticipantsByDayAccountAndFileType(final String initDate, final String endDate) {
+    public Iterator<ParticipantDTO> iterateParticipantsByDayAccountAndFileType(final String initDate, final String endDate) {
         log.debug("[START] findParticipantsByDayAccountAndFileType | Range: [{} - {}]", initDate, endDate);
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
@@ -51,21 +57,18 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
         log.debug("[REPORTSQUERY] | reportsQuery: [{}]", reportsQuery);
         if (reportsQuery.isEmpty()) {
             log.error("[SKIP] No standard reports found after filtering. Returning empty list.");
-            return new ArrayList<>();
+            return Collections.emptyIterator();
         }
         List<String> reportTypes = ReportUtils.getReportsTypeQuery(reportsQuery);
         log.debug("[REPORT_TYPES] | reportTypes: [{}]", reportTypes);
         long startTime = System.currentTimeMillis();
         log.debug("[START_TIME] | start_time: [{}]", startTime);
         log.debug("[ACCOUNT_ID] | participantProperties.getAccountId(): [{}]", participantProperties.getAccountId());
-        List<ParticipantDTO> result = reportingFileKudu.findParticipantsByDayAccountAndFileType(startDate, finalDate, reportTypes, participantProperties.getAccountId());
-        log.debug("[RESULT] | result: [{}]", result);
-        long duration = System.currentTimeMillis() - startTime;
-        log.debug("[DURATION] | duration: [{}]", duration);
-        return result;
+        return new PagedIterator<>(pageable -> reportingFileKudu.findParticipantsByDayAccountAndFileType(
+            startDate, finalDate, reportTypes, participantProperties.getAccountId(), pageable), STREAM_PAGE_SIZE);
     }
 
-    public List<ParticipantDTO> findParticipantsRecoFileType(final String initDate, final String endDate) {
+    public Iterator<ParticipantDTO> iterateParticipantsRecoFileType(final String initDate, final String endDate) {
         log.debug("[START] findParticipantsRecoFileType | Range: [{} - {}]", initDate, endDate);
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
         final LocalDateTime finalDate = LocalDate.parse(endDate).atStartOfDay();
@@ -78,22 +81,15 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
         log.debug("[REPORTSQUERY] | reportsQuery: [{}]", reportsQuery);
         if (reportsQuery.isEmpty()) {
             log.error("[SKIP] No custom/RECO reports found for query. Check configuration.");
-            return new ArrayList<>();
+            return Collections.emptyIterator();
         }
         List<String> reportTypes = ReportUtils.getReportsTypeQuery(reportsQuery);
         log.debug("[QUERY] Kudu RECO Participants | Account: {} | Types: {}", participantProperties.getAccountId(), reportTypes);
         long startTime = System.currentTimeMillis();
-        final List<ParticipantDTO> participantsFound = reportingFileKudu.findParticipantsRecoFileType(startDate, finalDate, reportTypes, participantProperties.getAccountId());
-        log.debug("[PARTICIPANTSFOUND] | participantsFound: [{}]", reportsQuery);
-        long duration = System.currentTimeMillis() - startTime;
-        log.debug("[DURATION] | duration: [{}]", duration);
-        if (participantsFound.isEmpty()) {
-            log.error("[END] No RECO participants found in Kudu | Time: {}ms", duration);
-            return new ArrayList<>();
-        }
-        log.debug("[PROCESS] Translating {} participants...", participantsFound.size());
-        int translatedCount = 0;
-        for (ParticipantDTO participant : participantsFound) {
+        Iterator<ParticipantDTO> participantsFound = new PagedIterator<>(pageable ->
+            reportingFileKudu.findParticipantsRecoFileType(startDate, finalDate, reportTypes,
+                participantProperties.getAccountId(), pageable), STREAM_PAGE_SIZE);
+        return LazyIterators.filterMap(participantsFound, participant -> {
             final String originalType = participant.getFileType();
             Optional<TranslationData> translation = reportProperties.getTranslation().getReports().stream()
                 .filter(t -> t.getName().equals(originalType))
@@ -103,16 +99,12 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
                 String newValue = translation.get().getValue();
                 participant.setFileType(newValue);
                 log.trace("[TRANSLATE] {} -> {}", originalType, newValue);
-                translatedCount++;
             }
-        }
-
-        log.debug("[END] RECO finished | Total: {} | Translated: {} | Kudu Time: {}ms",
-            participantsFound.size(), translatedCount, duration);
-        return participantsFound;
+            return Optional.of(participant);
+        });
     }
 
-    public List<RegulatorDTO> findRegulatorByDayAccountAndFileType(final String initDate, final String endDate) {
+    public Iterator<RegulatorDTO> iterateRegulatorByDayAccountAndFileType(final String initDate, final String endDate) {
         log.debug("[START] findRegulatorByDayAccountAndFileType | Range: [{} - {}]", initDate, endDate);
 
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
@@ -120,15 +112,11 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
         log.debug("[PROCESS] | Range: [{} - {}]", startDate, finalDate);
         List<String> reportTypes = ReportUtils.getReportsTypeQuery(regulatorProperties.getReports());
         log.debug("[QUERY] Kudu Regulator | Account: {} | Types: {}", regulatorProperties.getAccountId(), reportTypes);
-        long startTime = System.currentTimeMillis();
-        List<RegulatorDTO> result = reportingFileKudu.findRegulatorByDayAccountAndFileType(startDate, finalDate, reportTypes, regulatorProperties.getAccountId());
-        long duration = System.currentTimeMillis() - startTime;
-
-        log.debug("[END] Regulator records found: {} | Time: {}ms", result.size(), duration);
-        return result;
+        return new PagedIterator<>(pageable -> reportingFileKudu.findRegulatorByDayAccountAndFileType(
+            startDate, finalDate, reportTypes, regulatorProperties.getAccountId(), pageable), STREAM_PAGE_SIZE);
     }
 
-    public List<TrDTO> findTrByDayAccountAndFileType(final String initDate, final String endDate) {
+    public Iterator<TrDTO> iterateTrByDayAccountAndFileType(final String initDate, final String endDate) {
         log.debug("[START] findTrByDayAccountAndFileType | Range: [{} - {}]", initDate, endDate);
 
         final LocalDateTime startDate = LocalDate.parse(initDate).atStartOfDay();
@@ -136,12 +124,33 @@ public class KuduReportingFileAdapterRepository implements ReportingFileAdapterR
 
         List<String> reportTypes = ReportUtils.getReportsTypeQuery(trProperties.getReports());
         log.debug("[QUERY] Kudu TR | Account: {} | Types: {}", trProperties.getAccountId(), reportTypes);
-        long startTime = System.currentTimeMillis();
-        List<TrDTO> result = reportingFileKudu.findTrByDayAccountAndFileType(startDate, finalDate,
-            reportTypes, trProperties.getAccountId());
-        long duration = System.currentTimeMillis() - startTime;
+        return new PagedIterator<>(pageable -> reportingFileKudu.findTrByDayAccountAndFileType(
+            startDate, finalDate, reportTypes, trProperties.getAccountId(), pageable), STREAM_PAGE_SIZE);
+    }
 
-        log.debug("[END] TR records found: {} | Time: {}ms", result.size(), duration);
-        return result;
+    @Override
+    public List<ParticipantDTO> findParticipantsByDayAccountAndFileType(String initDate, String endDate) {
+        return collect(iterateParticipantsByDayAccountAndFileType(initDate, endDate));
+    }
+
+    @Override
+    public List<ParticipantDTO> findParticipantsRecoFileType(String initDate, String endDate) {
+        return collect(iterateParticipantsRecoFileType(initDate, endDate));
+    }
+
+    @Override
+    public List<RegulatorDTO> findRegulatorByDayAccountAndFileType(String initDate, String endDate) {
+        return collect(iterateRegulatorByDayAccountAndFileType(initDate, endDate));
+    }
+
+    @Override
+    public List<TrDTO> findTrByDayAccountAndFileType(String initDate, String endDate) {
+        return collect(iterateTrByDayAccountAndFileType(initDate, endDate));
+    }
+
+    private <T> List<T> collect(Iterator<T> records) {
+        List<T> results = new ArrayList<>();
+        records.forEachRemaining(results::add);
+        return results;
     }
 }

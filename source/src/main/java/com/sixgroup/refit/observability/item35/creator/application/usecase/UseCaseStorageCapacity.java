@@ -24,8 +24,9 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.sixgroup.refit.observability.item.state.domain.enums.State.*;
@@ -64,6 +65,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
 
             log.info("Fetching storage capacity data for period calculation...");
 
+            //REFIT-7169: ITEM35C must include only sessions within the reference month and exclude the next month's first day.
             final String dateFrom = DateUtils.firstDayOfPreviousMonth(itemDate);
             final String dateTo = DateUtils.firstDayOfCurrentMonth(itemDate);
 
@@ -82,10 +84,11 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             }
 
             log.info("Calculating final storage capacity dataset...");
-            final List<StorageCapacityDto> storageCapacityFinalList = calculateFinalList(itemDate, totalCapacityList, totalFreeCapacityList);
-            log.info("Calculated storage capacity dataset size: {}", storageCapacityFinalList.size());
+            //REFIT-7169: Process and write records lazily instead of retaining the complete result list in memory, preventing OOM errors with production volumes.
+            final Iterator<StorageCapacityDto> storageCapacityRecords = calculateFinalRecords(
+                itemDate, totalCapacityList, totalFreeCapacityList);
 
-            if (CollectionUtils.isEmpty(storageCapacityFinalList)) {
+            if (!storageCapacityRecords.hasNext()) {
                 log.error("No matching timestamps between total capacity and free capacity datasets");
                 iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), ERROR);
                 stateService.setError(StateRequest.builder().fileName(fileName).itemType(ITEM35_ID).errorDescription("No match between 'total free capacity data' and 'total capacity data'").build());
@@ -98,7 +101,7 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
             iLog.info(ItemReportingDto.builder().itemType(ITEM35_ID).build(), SAVING_INFORMATION);
 
             try {
-                file = writeFileStorageCapacityService.writeFile(storageCapacityFinalList, itemCommand, fileName);
+                file = writeFileStorageCapacityService.writeFileStreaming(storageCapacityRecords, itemCommand, fileName);
             } catch (Exception ex) {
                 log.error("Error writing file for item type {}", getItemType(), ex);
             }
@@ -127,16 +130,56 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
         return file;
     }
 
-    private List<StorageCapacityDto> calculateFinalList(String itemDate, List<Storage> totalCapacityList, List<Storage> totalFreeCapacityList) {
+    private Iterator<StorageCapacityDto> calculateFinalRecords(String itemDate, List<Storage> totalCapacityList,
+                                                               List<Storage> totalFreeCapacityList) {
         log.debug("Starting capacity calculations...");
 
         final AtomicReference<BigDecimal> referenceCapacity = new AtomicReference<>(totalCapacityList.get(0).getCapacity());
         final AtomicReference<BigDecimal> referenceAvailableCapacity = new AtomicReference<>(totalFreeCapacityList.get(0).getCapacity());
-        final List<StorageCapacityDto> storageCapacityFinalList = new ArrayList<>();
 
-        totalCapacityList.forEach(totalStorage -> totalFreeCapacityList.forEach(totalFreeStorage -> {
+        Iterator<Storage> totalCapacity = totalCapacityList.iterator();
+        Iterator<Storage> totalFreeCapacity = totalFreeCapacityList.iterator();
 
-            if (totalStorage.getTimeStamp().equals(totalFreeStorage.getTimeStamp())) {
+        return new Iterator<>() {
+            private Storage nextTotal = totalCapacity.hasNext() ? totalCapacity.next() : null;
+            private Storage nextFree = totalFreeCapacity.hasNext() ? totalFreeCapacity.next() : null;
+            private StorageCapacityDto next;
+            private boolean prepared;
+
+            @Override
+            public boolean hasNext() {
+                while (!prepared && nextTotal != null && nextFree != null) {
+                    int comparison = nextTotal.getTimeStamp().compareTo(nextFree.getTimeStamp());
+                    if (comparison < 0) {
+                        nextTotal = totalCapacity.hasNext() ? totalCapacity.next() : null;
+                    } else if (comparison > 0) {
+                        nextFree = totalFreeCapacity.hasNext() ? totalFreeCapacity.next() : null;
+                    } else {
+                        next = createStorageCapacityRecord(itemDate, nextTotal, nextFree,
+                            referenceCapacity, referenceAvailableCapacity);
+                        nextTotal = totalCapacity.hasNext() ? totalCapacity.next() : null;
+                        nextFree = totalFreeCapacity.hasNext() ? totalFreeCapacity.next() : null;
+                        prepared = true;
+                    }
+                }
+                return prepared;
+            }
+
+            @Override
+            public StorageCapacityDto next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                prepared = false;
+                return next;
+            }
+        };
+    }
+
+    private StorageCapacityDto createStorageCapacityRecord(String itemDate, Storage totalStorage,
+                                                             Storage totalFreeStorage,
+                                                             AtomicReference<BigDecimal> referenceCapacity,
+                                                             AtomicReference<BigDecimal> referenceAvailableCapacity) {
                 final StorageCapacityDto storageCapacityDto = new StorageCapacityDto();
                 storageCapacityDto.setTimeStamp(totalStorage.getTimeStamp());
                 referenceAvailableCapacity.set(totalFreeStorage.getCapacity());
@@ -163,15 +206,10 @@ public class UseCaseStorageCapacity implements ItemTypeStrategy {
                 storageCapacityDto.setDate(date);
 
                 String itemDateFormatted = DateUtils.itemDateFormatted(itemDate);
+                //REFIT-7169: UK ITEM35C REPORTING_DATE must contain the file generation date, including non-first-day runs.
                 storageCapacityDto.setReportingDate(itemDateFormatted);
 
-                storageCapacityFinalList.add(storageCapacityDto);
-            }
-        }));
-
-        log.debug("Capacity calculation finished. Records generated: {}", storageCapacityFinalList.size());
-
-        return storageCapacityFinalList;
+                return storageCapacityDto;
     }
 
     @Override

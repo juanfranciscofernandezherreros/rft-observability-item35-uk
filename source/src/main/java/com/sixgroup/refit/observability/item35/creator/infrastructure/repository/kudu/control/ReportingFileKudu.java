@@ -7,6 +7,8 @@ import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kud
 import com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.TrDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
@@ -22,10 +24,11 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
         "GROUP BY YEAR(rfo.reportingSessionTimeStamp), MONTH(rfo.reportingSessionTimeStamp), DAY(rfo.reportingSessionTimeStamp), rfo.fileType " +
         "ORDER BY MIN(rfo.reportingSessionTimeStamp)"
     )
-    List<ParticipantDTO> findParticipantsByDayAccountAndFileType(@Param("startTime") LocalDateTime startTime,
+    Slice<ParticipantDTO> findParticipantsByDayAccountAndFileType(@Param("startTime") LocalDateTime startTime,
                                                                  @Param("endTime") LocalDateTime endTime,
                                                                  @Param("fileTypes") List<String> fileTypes,
-                                                                 @Param("accountId") String accountId);
+                                                                 @Param("accountId") String accountId,
+                                                                 Pageable pageable);
 
     @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control" +
         ".ParticipantDTO(" +
@@ -45,10 +48,11 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
         "   - LOCATE('_', rfo.outgoingFileName) - 1) " +
         "ORDER BY MIN(rfo.reportingSessionTimeStamp)"
     )
-    List<ParticipantDTO> findParticipantsRecoFileType(@Param("startTime") LocalDateTime startTime,
+    Slice<ParticipantDTO> findParticipantsRecoFileType(@Param("startTime") LocalDateTime startTime,
                                                       @Param("endTime") LocalDateTime endTime,
                                                       @Param("fileTypes") List<String> fileTypes,
-                                                      @Param("accountId") String accountId);
+                                                      @Param("accountId") String accountId,
+                                                      Pageable pageable);
 
     @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control.RegulatorDTO(" +
         "rfo.outgoingFileName, " +
@@ -67,10 +71,11 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
         "AND UPPER(rfo.accountId) LIKE UPPER(CONCAT(:accountId, '%')) " +
         "AND rfo.fileType IN :fileTypes " +
         "ORDER BY rfo.reportingSessionTimeStamp, rfo.accountId")
-    List<RegulatorDTO> findRegulatorByDayAccountAndFileType(@Param("startDate") LocalDateTime startDate,
+    Slice<RegulatorDTO> findRegulatorByDayAccountAndFileType(@Param("startDate") LocalDateTime startDate,
                                                             @Param("endDate") LocalDateTime endDate,
                                                             @Param("fileTypes") List<String> fileTypes,
-                                                            @Param("accountId") String accountId);
+                                                            @Param("accountId") String accountId,
+                                                            Pageable pageable);
 
     @Query("SELECT new com.sixgroup.refit.observability.item35.creator.infrastructure.entity.kudu.control" +
         ".TrDTO(rfo.fileType, rfo.reportingSessionTimeStamp, rfo.accountId, MAX(rfo.creationTimestamp)) " +
@@ -81,9 +86,10 @@ public interface ReportingFileKudu extends JpaRepository<ReportingFileEntity, Lo
         "GROUP BY rfo.fileType, rfo.reportingSessionTimeStamp, rfo.accountId " +
         "ORDER BY rfo.reportingSessionTimeStamp, rfo.accountId, rfo.fileType"
     )
-    List<TrDTO> findTrByDayAccountAndFileType(
+    Slice<TrDTO> findTrByDayAccountAndFileType(
         @Param("initDate") LocalDateTime initDate,
         @Param("endDate") LocalDateTime endDate,
         @Param("fileTypes") List<String> fileTypes,
-        @Param("accountId") String accountId);
+        @Param("accountId") String accountId,
+        Pageable pageable);
 }

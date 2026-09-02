@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Iterator;
 import java.util.List;
 
 import static com.sixgroup.refit.observability.item35.creator.shared.constants.AppConstants.NUM_DECIMALS;
@@ -57,7 +58,7 @@ class UseCaseStorageCapacityTest {
     private ReportItemProperties reportItemProperties;
 
     @Captor
-    ArgumentCaptor<List<StorageCapacityDto>> storageCapacityDtoListCaptor;
+    ArgumentCaptor<Iterator<StorageCapacityDto>> storageCapacityDtoIteratorCaptor;
 
     private static ItemCommandDTO getItemCommandDTO() {
         return ItemCommandDTO.builder()
@@ -89,7 +90,7 @@ class UseCaseStorageCapacityTest {
         when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
         when(fileNameService.getFileName(any(), any())).thenReturn(fileName);
-        when(writeFileStorageCapacityService.writeFile(anyList(), any(), any())).thenReturn(new File(fileName));
+        when(writeFileStorageCapacityService.writeFileStreaming(any(), any(), any())).thenReturn(new File(fileName));
 
         File result = useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders);
 
@@ -142,7 +143,7 @@ class UseCaseStorageCapacityTest {
         when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
 
-        when(writeFileStorageCapacityService.writeFile(anyList(), any(), any()))
+        when(writeFileStorageCapacityService.writeFileStreaming(any(), any(), any()))
             .thenThrow(new IOException("disk error"));
 
         File result = useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders);
@@ -165,7 +166,7 @@ class UseCaseStorageCapacityTest {
 
         when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
-        when(writeFileStorageCapacityService.writeFile(anyList(), any(), any())).thenReturn(null);
+        when(writeFileStorageCapacityService.writeFileStreaming(any(), any(), any())).thenReturn(null);
 
         File result = useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders);
 
@@ -188,21 +189,23 @@ class UseCaseStorageCapacityTest {
 
         when(storageService.getTotalCapacity(any(), any())).thenReturn(totalCapacityList);
         when(storageService.getTotalFreeCapacity(any(), any())).thenReturn(totalFreeCapacityList);
-        when(writeFileStorageCapacityService.writeFile(anyList(), any(), any()))
+        when(writeFileStorageCapacityService.writeFileStreaming(any(), any(), any()))
             .thenReturn(new File("test_file.csv"));
 
         File result = useCaseStorageCapacity.execute(getItemCommandDTO(), mockHeaders);
 
         assertNotNull(result);
-        verify(writeFileStorageCapacityService).writeFile(storageCapacityDtoListCaptor.capture(), any(), any());
+        verify(writeFileStorageCapacityService).writeFileStreaming(
+            storageCapacityDtoIteratorCaptor.capture(), any(), any());
 
-        List<StorageCapacityDto> generated = storageCapacityDtoListCaptor.getValue();
-        assertEquals(1, generated.size());
+        Iterator<StorageCapacityDto> generated = storageCapacityDtoIteratorCaptor.getValue();
+        assertTrue(generated.hasNext());
 
         assertEquals(
             BigDecimal.ONE.setScale(NUM_DECIMALS, RoundingMode.HALF_UP),
-            generated.get(0).getUtilization()
+            generated.next().getUtilization()
         );
+        assertFalse(generated.hasNext());
 
         verify(producerItemService, times(1)).send(any(), any());
         verify(stateService, never()).setError(any());

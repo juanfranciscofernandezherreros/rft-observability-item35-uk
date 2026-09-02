@@ -22,6 +22,7 @@ public class FileNameService {
         log.info("Generating filename for itemType: {} and itemDate: {}", itemType, itemDate);
         validateRegulationSupport(itemType);
         String fileNamePattern = getPatternByItemType(itemType);
+        //REFIT-7169: For UK ITEM35C, the filename date must be the file generation date instead of the reference date.
         String reportingReferenceDate = DateUtils.reportingReferenceDate(itemDate);
         log.info("Replacing '{}' in pattern '{}' with reporting reference date '{}'", FILE_NAME_PATTERN_YYYYMMDD,
             fileNamePattern, reportingReferenceDate);

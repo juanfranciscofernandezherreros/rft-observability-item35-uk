@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prueba local de 600.000 registros - ITEM35A e ITEM35B</title>
+  <style>
+    :root { --ink:#18212a; --muted:#596672; --line:#d4dce3; --paper:#fff; --wash:#f3f6f8; --blue:#1266a3; --green:#167249; --amber:#946000; --red:#a22b2b; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--wash); color:var(--ink); font:15px/1.55 Arial,sans-serif; }
+    main { width:min(1080px,calc(100% - 32px)); margin:32px auto; background:var(--paper); border:1px solid var(--line); }
+    header { padding:32px 36px 26px; border-bottom:4px solid var(--blue); }
+    section { padding:24px 36px; border-bottom:1px solid var(--line); }
+    h1 { margin:0 0 8px; font-size:29px; letter-spacing:0; }
+    h2 { margin:0 0 14px; font-size:20px; letter-spacing:0; }
+    h3 { margin:18px 0 8px; font-size:16px; letter-spacing:0; }
+    p { margin:8px 0; }
+    .muted { color:var(--muted); }
+    .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .metric { border:1px solid var(--line); padding:14px; min-height:98px; }
+    .metric strong { display:block; color:var(--blue); font-size:24px; }
+    .metric span { color:var(--muted); }
+    table { width:100%; border-collapse:collapse; margin:12px 0; }
+    th,td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { background:#edf3f6; }
+    .ok,.warning,.danger { padding:13px 16px; margin:12px 0; }
+    .ok { background:#edf8f2; border-left:4px solid var(--green); }
+    .warning { background:#fff8e8; border-left:4px solid var(--amber); }
+    .danger { background:#fff0f0; border-left:4px solid var(--red); }
+    pre { overflow:auto; margin:12px 0; padding:16px; background:#18212a; color:#f7f9fa; font:14px/1.5 Consolas,monospace; }
+    code { font-family:Consolas,monospace; }
+    .bar { height:20px; background:#e4e9ed; margin-top:10px; }
+    .bar span { display:block; width:63.3%; height:100%; background:var(--blue); }
+    footer { padding:18px 36px; color:var(--muted); }
+    @media(max-width:760px) { .grid { grid-template-columns:1fr 1fr; } header,section { padding-left:20px; padding-right:20px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Prueba local de 600.000 registros</h1>
+    <p class="muted">ITEM35A e ITEM35B ejecutados simultaneamente | 2 de septiembre de 2026, 16:17 CEST</p>
+  </header>
+
+  <section>
+    <h2>Resultado ejecutivo</h2>
+    <div class="grid">
+      <div class="metric"><strong>600.000</strong><span>filas de datos ITEM35A</span></div>
+      <div class="metric"><strong>600.000</strong><span>filas de datos ITEM35B</span></div>
+      <div class="metric"><strong>3.165 GiB</strong><span>pico del contenedor</span></div>
+      <div class="metric"><strong>294.03%</strong><span>pico de CPU observado</span></div>
+    </div>
+    <div class="ok"><strong>Prueba completada.</strong> Ambos mensajes fueron aceptados con HTTP 200, ambos CSV terminaron correctamente y el contenedor continuo ejecutandose sin OOM ni reinicios.</div>
+  </section>
+
+  <section>
+    <h2>Preparacion de datos</h2>
+    <p>Se ejecuto <code>datos_h2_item35a_item35b_600000.sql</code> contra <code>jdbc:h2:mem:kudu</code>, la misma base H2 en memoria utilizada por Item35.</p>
+    <table>
+      <thead><tr><th>Operacion</th><th>Resultado</th><th>Tiempo H2</th></tr></thead>
+      <tbody>
+        <tr><td>Eliminar datos anteriores de record_status</td><td>5 filas eliminadas</td><td>&lt; 1 ms</td></tr>
+        <tr><td>Eliminar datos anteriores de reports_file_outgoing</td><td>15 filas eliminadas</td><td>1 ms</td></tr>
+        <tr><td>Eliminar identidad anterior</td><td>1 fila eliminada</td><td>&lt; 1 ms</td></tr>
+        <tr><td>Insertar datos ITEM35A</td><td>600.000 filas</td><td>1.336 ms</td></tr>
+        <tr><td>Insertar identidad ESMAS</td><td>1 fila</td><td>1 ms</td></tr>
+        <tr><td>Insertar datos ITEM35B</td><td>600.000 filas</td><td>290 ms</td></tr>
+        <tr><td>COMMIT</td><td>Correcto</td><td>869 ms</td></tr>
+        <tr><td>Control SQL ITEM35A</td><td>600.000 grupos</td><td>707 ms</td></tr>
+        <tr><td>Control SQL ITEM35B</td><td>600.000 filas</td><td>84 ms</td></tr>
+      </tbody>
+    </table>
+    <p>La peticion HTTP completa a H2 tardo <strong>3.366 segundos</strong>. Durante la carga, la memoria del contenedor aumento desde 742.2 MiB hasta 2.267 GiB y la CPU alcanzo 313.78%.</p>
+    <h3>Por que ITEM35A produce 600.000 filas</h3>
+    <p>ITEM35A agrupa por <code>receiveddt</code>, <code>status</code> y <code>channel</code>. El script genera una marca temporal textual diferente por milisegundo, siempre dentro de febrero de 2024. De esta forma cada registro forma un grupo distinto. Repetir una misma fecha 600.000 veces solo produciria una fila agregada.</p>
+    <h3>Por que ITEM35B produce 600.000 filas</h3>
+    <p>Se generan registros de regulador con cuenta <code>eudr%</code>, tipo <code>TAR030</code>, nombre con traza <code>ESMAS</code> e identidad asociada. Esta rama de la consulta no agrupa los resultados, por lo que cada registro valido genera una fila.</p>
+  </section>
+
+  <section>
+    <h2>Ejecucion simultanea</h2>
+    <p>Los mensajes <code>submissionVolumes</code> y <code>reportGeneration</code> se publicaron en el topic <code>rft.dev.observability.item.private.v1</code> con <code>itemDate=20240315</code>. Kafka los recibio de forma consecutiva y el microservicio los proceso en paralelo mediante <code>task-9</code> y <code>task-10</code>.</p>
+    <table>
+      <thead><tr><th>Medida</th><th>ITEM35A</th><th>ITEM35B</th></tr></thead>
+      <tbody>
+        <tr><td>Respuesta de publicacion</td><td>HTTP 200 en 213 ms</td><td>HTTP 200 en 205 ms</td></tr>
+        <tr><td>Inicio observado</td><td>16:17:30.277</td><td>16:17:30.398</td></tr>
+        <tr><td>CSV terminado</td><td>16:17:36.924</td><td>16:17:43.377</td></tr>
+        <tr><td>Duracion aproximada del proceso</td><td>6.65 s</td><td>12.98 s</td></tr>
+        <tr><td>Resultado</td><td>Correcto</td><td>Correcto</td></tr>
+      </tbody>
+    </table>
+    <p>La supervision detecto la finalizacion de ambos a los <strong>16.8 segundos</strong>, debido al intervalo de sondeo de tres segundos. El HTTP 200 solo confirma la publicacion en Kafka UI; la finalizacion real se comprobo en los logs de escritura.</p>
+  </section>
+
+  <section>
+    <h2>CSV generados</h2>
+    <table>
+      <thead><tr><th>Fichero</th><th>Lineas totales</th><th>Datos</th><th>Tamano</th></tr></thead>
+      <tbody>
+        <tr><td>TRRGS_UKEMIR_PR_FU_ND_ITEM35A_20240215.csv</td><td>600.001</td><td>600.000</td><td>36.600.106 bytes (34.90 MiB)</td></tr>
+        <tr><td>TRRGS_UKEMIR_PR_FU_ND_ITEM35B_20240215.csv</td><td>600.001</td><td>600.000</td><td>75.000.173 bytes (71.53 MiB)</td></tr>
+      </tbody>
+    </table>
+    <p>La linea adicional de cada fichero es la cabecera. ITEM35A cubre desde <code>2024-02-01 00:00:00.000</code> hasta <code>2024-02-01 00:09:59.999</code>. ITEM35B cubre marcas de creacion desde aproximadamente las 05:13:55 hasta las 05:23:54 del mismo dia.</p>
+  </section>
+
+  <section>
+    <h2>Memoria y CPU</h2>
+    <table>
+      <thead><tr><th>Momento</th><th>Memoria del contenedor</th><th>Interpretacion</th></tr></thead>
+      <tbody>
+        <tr><td>Antes de cargar 1,2 millones de filas</td><td>742.2 MiB</td><td>Aplicacion y fixture pequeno</td></tr>
+        <tr><td>Despues de cargar H2</td><td>2.266 GiB</td><td>H2 mantiene los datos dentro de la JVM</td></tr>
+        <tr><td>Pico al generar A y B</td><td>3.165 GiB</td><td>Datos H2 mas listas Java y escritura</td></tr>
+        <tr><td>Veinte segundos despues</td><td>3.155 GiB</td><td>La memoria seguia retenida o comprometida</td></tr>
+      </tbody>
+    </table>
+    <p>El incremento desde la carga terminada hasta el pico de generacion fue de aproximadamente <strong>920.6 MiB</strong>. El heap usado despues de la prueba era <strong>1.670 GiB</strong>, el heap comprometido <strong>2.542 GiB</strong> y el non-heap usado <strong>150.38 MiB</strong>.</p>
+    <p>El pico de CPU durante los reportes fue 294.03%, equivalente a casi tres nucleos ocupados en el instante medido. Durante la carga SQL se observo 313.78%.</p>
+    <div class="bar" title="3.165 GiB sobre un limite recomendado de 5 GiB"><span></span></div>
+    <p class="muted">El pico equivale al 63.3% de un limite de 5 GiB.</p>
+  </section>
+
+  <section>
+    <h2>Dimensionamiento resultante</h2>
+    <div class="danger"><strong>El limite de 1Gi ya no es valido.</strong> El proceso local alcanzo 3.165 GiB y con 1Gi habria sido terminado por OOM antes de completar.</div>
+    <div class="ok"><strong>Propuesta para repetir este escenario local:</strong> request de 3.5Gi y limit de 5Gi, junto con un heap configurado expresamente.</div>
+    <pre><code>resources:
+  requests:
+    memory: "3584Mi"
+    cpu: "1"
+  limits:
+    memory: "5Gi"
+    cpu: "4"
+
+env:
+  - name: JAVA_TOOL_OPTIONS
+    value: "-XX:MaxRAMPercentage=70 -XX:InitialRAMPercentage=25"</code></pre>
+    <p>El limite de 5 GiB deja aproximadamente 1.835 GiB sobre el pico medido. Es importante configurar el heap: con la ergonomia habitual del 25%, una JVM dentro de un limite de 5 GiB podria reservar solo alrededor de 1.25 GiB de heap, menos que los 1.670 GiB usados en esta prueba.</p>
+    <div class="warning"><strong>No aplicar directamente a produccion sin separar efectos.</strong> En local, H2 vive dentro del mismo proceso y aporta gran parte del consumo. En produccion, Kudu u otra base externa no ocuparia el heap del pod, pero el codigo sigue materializando hasta 600.000 DTO en listas antes de escribir. Se debe repetir contra la fuente productiva equivalente y observar varios ciclos antes de fijar el limite definitivo.</div>
+  </section>
+
+  <section>
+    <h2>Mensajes de nivel ERROR observados</h2>
+    <p>ITEM35B registro <code>No RECO participants found in Kudu</code> y <code>No participants found to process</code>. No fueron fallos de la prueba: el conjunto SQL contiene exclusivamente 600.000 filas de regulador para que el total final sea exactamente 600.000. El log posterior confirmo <code>Total records after joining collections: 600000</code> y la escritura correcta del fichero.</p>
+    <p>No aparecieron <code>OutOfMemoryError</code>, errores de escritura ni fallos de generacion. Docker informo <code>OOMKilled=false</code>, <code>RestartCount=0</code> y estado <code>running</code>. El contenedor no tiene actualmente ningun limite de memoria configurado.</p>
+  </section>
+
+  <section>
+    <h2>Trazabilidad</h2>
+    <p>Las metricas y logs pueden revisarse en <a href="http://localhost:3000/d/item35-local-observability/item35-local-observability">Grafana - Item35 local observability</a>, con usuario <code>admin</code> y contrasena <code>admin</code>. Los CSV permanecen montados en <code>source/src/main/resources/reports</code>.</p>
+  </section>
+
+  <footer>Informe basado en mediciones reales de Docker, Actuator, H2 y logs de Item35.</footer>
+</main>
+</body>
+</html>

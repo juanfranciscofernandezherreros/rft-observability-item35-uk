@@ -63,9 +63,9 @@ class LocalReportGenerationSmokeTest {
             "2026-08-15T02:00:00Z", "2026-08-15T02:00:00Z", "2026-08-15",
             "2026-08-15T06:00:00Z", "0.0");
 
-        when(participantService.findParticipants(anyString(), anyString(), anyString())).thenReturn(List.of(row));
-        when(regulatorService.findRegulator(anyString(), anyString(), anyString())).thenReturn(Collections.emptyList());
-        when(trService.findTr(anyString(), anyString(), anyString())).thenReturn(Collections.emptyList());
+        when(participantService.iterateParticipants(anyString(), anyString(), anyString())).thenReturn(List.of(row).iterator());
+        when(regulatorService.iterateRegulator(anyString(), anyString(), anyString())).thenReturn(Collections.emptyIterator());
+        when(trService.iterateTr(anyString(), anyString(), anyString())).thenReturn(Collections.emptyIterator());
 
         ItemCommandDTO command = ItemCommandDTO.builder()
             .itemDate(EXECUTION_DATE)

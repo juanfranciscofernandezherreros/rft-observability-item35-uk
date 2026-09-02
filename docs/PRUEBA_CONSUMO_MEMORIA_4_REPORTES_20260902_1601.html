@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prueba de memoria Item35 - cuatro reportes simultaneos</title>
+  <style>
+    :root { color-scheme: light; --ink:#17202a; --muted:#5d6875; --line:#d8dee6; --green:#197348; --amber:#9a5d00; --blue:#1769aa; --paper:#fff; --wash:#f4f7f9; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--wash); color:var(--ink); font:15px/1.55 Arial, sans-serif; }
+    main { width:min(1040px, calc(100% - 32px)); margin:32px auto; background:var(--paper); border:1px solid var(--line); }
+    header { padding:32px 36px 26px; border-bottom:4px solid var(--blue); }
+    section { padding:24px 36px; border-bottom:1px solid var(--line); }
+    h1 { margin:0 0 8px; font-size:30px; letter-spacing:0; }
+    h2 { margin:0 0 14px; font-size:20px; letter-spacing:0; }
+    p { margin:8px 0; }
+    .muted { color:var(--muted); }
+    .grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; }
+    .metric { border:1px solid var(--line); padding:14px; min-height:98px; }
+    .metric strong { display:block; font-size:25px; color:var(--blue); }
+    .metric span { color:var(--muted); }
+    table { width:100%; border-collapse:collapse; margin-top:12px; }
+    th, td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); }
+    th { background:#eef3f6; }
+    .ok { color:var(--green); font-weight:bold; }
+    .warning { border-left:4px solid var(--amber); background:#fff8e9; padding:12px 16px; }
+    .recommendation { border-left:4px solid var(--green); background:#eef8f2; padding:14px 16px; }
+    pre { overflow:auto; padding:16px; background:#17202a; color:#f7f9fb; font-size:14px; }
+    code { font-family:Consolas, monospace; }
+    .bar { height:18px; background:#e6ebef; margin:8px 0 4px; }
+    .bar span { display:block; height:100%; background:var(--blue); width:72.03%; }
+    footer { padding:18px 36px; color:var(--muted); }
+    @media (max-width:720px) { .grid { grid-template-columns:1fr 1fr; } header, section { padding-left:20px; padding-right:20px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Prueba de memoria: cuatro reportes simultaneos</h1>
+    <p class="muted">Item35 local | 2 de septiembre de 2026 | Inicio 16:01:21 CEST</p>
+  </header>
+
+  <section>
+    <h2>Resultado ejecutivo</h2>
+    <div class="grid">
+      <div class="metric"><strong>733.8 MiB</strong><span>memoria antes del envio</span></div>
+      <div class="metric"><strong>737.6 MiB</strong><span>pico observado</span></div>
+      <div class="metric"><strong>+3.8 MiB</strong><span>incremento durante la prueba</span></div>
+      <div class="metric"><strong>72.59%</strong><span>pico de CPU del contenedor</span></div>
+    </div>
+    <p class="ok">Los cuatro mensajes devolvieron HTTP 200, los cuatro CSV se generaron y el contenedor no sufrio OOM ni reinicios.</p>
+  </section>
+
+  <section>
+    <h2>Como se realizo</h2>
+    <p>Se publicaron al mismo tiempo cuatro mensajes Avro mediante Kafka UI en el topic <code>rft.dev.observability.item.private.v1</code>, todos con <code>itemDate=20240315</code>. Los tipos fueron <code>submissionVolumes</code>, <code>reportGeneration</code>, <code>storageCapacity</code> y <code>computeCapacity</code>.</p>
+    <p>Mientras el microservicio procesaba los mensajes se tomaron 12 muestras con <code>docker stats --no-stream</code>, desde antes del envio hasta aproximadamente 21 segundos despues. Tambien se consultaron Actuator/Prometheus y el estado Docker del contenedor.</p>
+    <table>
+      <thead><tr><th>Item</th><th>Respuesta</th><th>Duracion HTTP</th><th>CSV</th><th>Filas de datos</th></tr></thead>
+      <tbody>
+        <tr><td>ITEM35A</td><td>200</td><td>173 ms</td><td>ITEM35A_20240215.csv</td><td>5</td></tr>
+        <tr><td>ITEM35B</td><td>200</td><td>178 ms</td><td>ITEM35B_20240215.csv</td><td>15</td></tr>
+        <tr><td>ITEM35C</td><td>200</td><td>206 ms</td><td>ITEM35C_20240215.csv</td><td>32</td></tr>
+        <tr><td>ITEM35D</td><td>200</td><td>188 ms</td><td>ITEM35D_20240215.csv</td><td>62</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Lectura de memoria</h2>
+    <p>La primera muestra fue de <strong>733.8 MiB</strong>. La muestra tomada inmediatamente despues del procesamiento alcanzo <strong>737.6 MiB</strong> y las restantes oscilaron entre 736.9 y 737.6 MiB.</p>
+    <div class="bar" title="737.6 MiB de un limite propuesto de 1024 MiB"><span></span></div>
+    <p class="muted">El pico observado representa el 72.03% de un limite propuesto de 1 GiB.</p>
+    <p>Actuator mostro aproximadamente <strong>130 MiB de heap usado</strong> y <strong>144 MiB de memoria no-heap usada</strong> despues de la prueba. La cifra de Docker es mayor porque incluye memoria nativa de la JVM, pilas de hilos, buffers, librerias y cache contabilizada por el contenedor. Para limitar un pod debe utilizarse la cifra del contenedor, no solamente el heap.</p>
+    <table>
+      <thead><tr><th>Control</th><th>Resultado</th></tr></thead>
+      <tbody>
+        <tr><td>Limite Docker actual</td><td>Sin limite (0 bytes)</td></tr>
+        <tr><td>OOMKilled</td><td>No</td></tr>
+        <tr><td>RestartCount</td><td>0</td></tr>
+        <tr><td>Procesamiento concurrente</td><td>Hilos task-1, task-2, task-3 y task-4</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Limite recomendado para los datos actuales</h2>
+    <div class="recommendation">
+      <strong>Propuesta inicial: request 768Mi y limit 1Gi.</strong>
+      <p>El limite de 1 GiB deja 286.4 MiB sobre el pico medido, aproximadamente un 38.8% de margen. Un limite de 768 MiB dejaria solo 30.4 MiB y seria demasiado ajustado ante GC, carga de clases, buffers o variaciones del arranque.</p>
+    </div>
+    <pre><code>resources:
+  requests:
+    memory: "768Mi"
+  limits:
+    memory: "1Gi"</code></pre>
+    <p>Este valor debe tratarse como punto de partida para el escenario local actual. Se debe observar en Grafana el maximo durante varias ejecuciones y revisar reinicios, <code>OOMKilled</code>, pausas de GC y latencia antes de reducirlo.</p>
+  </section>
+
+  <section>
+    <h2>Alcance y limitacion importante</h2>
+    <div class="warning">
+      Esta prueba no representa 800.000 registros por reporte. Los CSV contienen 5, 15, 32 y 62 filas de datos. Por tanto, el resultado valida el funcionamiento y el consumo del escenario local actual, pero no permite dimensionar con rigor el pod de produccion para cuatro reportes de 800.000 filas simultaneos.
+    </div>
+    <p>Para dimensionar produccion hay que cargar en las fuentes reales o equivalentes 800.000 filas que cumplan los filtros de cada consulta, ejecutar de nuevo los cuatro items y mantener el muestreo hasta que terminen. El limite final debe superar el percentil alto o pico repetible de esas pruebas con margen operativo.</p>
+  </section>
+
+  <section>
+    <h2>Observacion</h2>
+    <p>Grafana conserva las metricas de Prometheus y los logs enviados a Loki. Dashboard: <a href="http://localhost:3000/d/item35-local-observability/item35-local-observability">Item35 local observability</a>. Credenciales locales: <code>admin</code> / <code>admin</code>.</p>
+  </section>
+
+  <footer>Informe generado a partir de una ejecucion real del stack Docker Compose local.</footer>
+</main>
+</body>
+</html>

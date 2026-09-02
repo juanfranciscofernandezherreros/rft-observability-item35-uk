@@ -73,8 +73,8 @@ class RegulatorServiceTest {
     @Test
     void findRegulators_repository_return_empty_list() {
 
-        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString()))
-            .thenReturn(new ArrayList<>());
+        when(reportingFileAdapterRepository.iterateRegulatorByDayAccountAndFileType(anyString(), anyString()))
+            .thenReturn(Collections.emptyIterator());
 
         List<ReportGenerationDto> response =
             regulatorService.findRegulator("2024-02-01", "2024-03-01", "20240215");
@@ -82,7 +82,7 @@ class RegulatorServiceTest {
         assertTrue(response.isEmpty());
 
         verify(reportingFileAdapterRepository, times(1))
-            .findRegulatorByDayAccountAndFileType(anyString(), anyString());
+            .iterateRegulatorByDayAccountAndFileType(anyString(), anyString());
     }
 
     @Test
@@ -128,8 +128,8 @@ class RegulatorServiceTest {
 
         when(fileTypeProperties.getReports()).thenReturn(List.of(reportConfig1, reportConfig2));
 
-        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString()))
-            .thenReturn(List.of(regulator1, regulator2));
+        when(reportingFileAdapterRepository.iterateRegulatorByDayAccountAndFileType(anyString(), anyString()))
+            .thenReturn(List.of(regulator1, regulator2).iterator());
 
         when(slaInfoRepository.getSlaInfo(REGULATOR_ENTITY, reportType1, reportSessionDate1, creationDate1))
             .thenReturn(Optional.of(slaInfo1));
@@ -178,8 +178,8 @@ class RegulatorServiceTest {
 
         when(fileTypeProperties.getReports()).thenReturn(List.of(reportConfig1));
 
-        when(reportingFileAdapterRepository.findRegulatorByDayAccountAndFileType(anyString(), anyString()))
-            .thenReturn(List.of(regulator1));
+        when(reportingFileAdapterRepository.iterateRegulatorByDayAccountAndFileType(anyString(), anyString()))
+            .thenReturn(List.of(regulator1).iterator());
 
         when(reportEodProcessStateRepository.find(anyString(), anyString()))
             .thenReturn(List.of(reportEo1));
