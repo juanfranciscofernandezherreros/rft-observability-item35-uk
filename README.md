@@ -7,7 +7,7 @@ the Docker build independent from Java trust-store and corporate proxy
 configuration:
 
 ```powershell
-mvn.cmd -f source/pom.xml --batch-mode clean package -Dmaven.test.skip=true
+mvn.cmd -f source/pom.xml --batch-mode clean package "-Dmaven.test.skip=true"
 ```
 
 Then build the runtime image and start the complete stack:
